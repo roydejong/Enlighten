@@ -8,6 +8,8 @@ namespace Enlighten\Http;
  */
 class Response
 {
+    const PROTOCOL_VERSION = 'HTTP/1.1';
+
     /**
      * The HTTP status code
      *
@@ -52,6 +54,16 @@ class Response
     }
 
     /**
+     * Returns the HTTP response status code.
+     *
+     * @return int
+     */
+    public function getResponseCode()
+    {
+        return $this->statusCode;
+    }
+
+    /**
      * Sets a HTTP header to a certain value.
      *
      * @param string $key
@@ -59,7 +71,22 @@ class Response
      */
     public function setHeader($key, $value)
     {
-        $this->headers[$key] = $value;
+        $this->headers[strval($key)] = strval($value);
+    }
+
+    /**
+     * Returns the current value of a given header.
+     *
+     * @param string $key
+     * @return string|null The string value of the header, or null if the header was not set.
+     */
+    public function getHeader($key)
+    {
+        if (!isset($this->headers[$key])) {
+            return null;
+        }
+
+        return $this->headers[$key];
     }
 
     /**
@@ -83,12 +110,22 @@ class Response
     }
 
     /**
+     * Returns the current value of the response body.
+     *
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
+
+    /**
      * Sends the HTTP headers to the client.
      * Causes output!
      */
     protected function sendHeaders()
     {
-        header(ResponseCode::getMessageForCode($this->statusCode));
+        header(sprintf('%s %s', self::PROTOCOL_VERSION, ResponseCode::getMessageForCode($this->statusCode)));
 
         foreach ($this->headers as $name => $value) {
             header(sprintf("%s: %s", $name, $value));
