@@ -23,12 +23,30 @@ abstract class RequestMethod
     const GET = 'GET';
 
     /**
-     * A request to retrieve information, but without a message body.
+     * A request to retrieve information (like a GET request), but without a message body.
+     *
+     * HTTP/1.1
      */
     const HEAD = 'HEAD';
 
     /**
-     * A request
+     * A request is an operation to annotate, submit or extend a certain resource.
+     *
+     * HTTP/1.1
      */
     const POST = 'POST';
+
+    /**
+     * A request to store a new resource.
+     *
+     * HTTP/1.1
+     */
+    const PUT = 'PUT';
+
+    /**
+     * A request to delete an existing resource.
+     *
+     * HTTP/1.1
+     */
+    const DELETE = 'DELETE';
 }
