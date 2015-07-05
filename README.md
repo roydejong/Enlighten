@@ -1,24 +1,18 @@
 Enlighten Framework
 ===
 
-**Note: Pre-release information, this does not reflect the current or final state of the project**.
+**Enlighten is a simple, lean, high-performance PHP micro framework that acts as the foundation for your web application.**
 
-Why?
----
-Enlighten is a simple, lean, high-performance framework for building web applications using PHP.
+This is a modern framework that doesn't get in your way: a low learning curve + zero configuration. Just the building blocks you need to accelerate your application development and simply *get shit done*. 
 
-The goal: a framework with a low learning curve that helps you **get shit done** without getting in your way.
+- Easy HTTP request and response management
+- Razor fast routing with dynamic variables (DI)
+- Form validation and on-the-fly generation
+- MVC building blocks for a well-organized application
+- Built for ease of use and performance
+- Low on fat: small code base with no external dependencies
 
-Do not expect 
-
-What?
----
-Enlighten offers the following features:
-
-- Model / View / Controller (MVC) architecture
-- Modular project organisation
-- Lightweight, dynamic routing with Dependency Injection (DI)
-- HTTP utilities for reading Responses and writing Requests
+**Note: This is pre-release information, this does not reflect the current or even a planned final state of the project. This is, right now, just an experiment.**
 
 Getting started
 ---
