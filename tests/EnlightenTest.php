@@ -15,6 +15,6 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
     public function testStart()
     {
         $enlighten = new Enlighten();
-        $this->assertTrue($enlighten->start());
+        $this->assertInstanceOf('Enlighten\Http\Response', $enlighten->start());
     }
 }

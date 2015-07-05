@@ -86,6 +86,8 @@ class Enlighten
     /**
      * Based on the current configuration, begins handling the incoming request.
      * This function should result in data being output.
+     *
+     * @return Response The response that was sent.
      */
     public function start()
     {
@@ -110,6 +112,6 @@ class Enlighten
         $this->response->send();
 
         // That's all folks! Execution has completed successfully.
-        return true;
+        return $this->response;
     }
 }
