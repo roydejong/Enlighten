@@ -74,7 +74,7 @@ class Enlighten
     {
         // If no explicit request was given (via Enlighten::setRequest), create one based on the current PHP globals
         if (empty($this->request)) {
-            $this->setRequest(Request::createFromEnvironment());
+            $this->setRequest(Request::extractFromEnvironment());
         }
 
         // If no user-defined router was supplied (via Enlighten::setRouter()), initialize the default implementation
