@@ -1,0 +1,2 @@
+# Ignore composer dependencies (use `composer install` to install dependencies)
+vendor

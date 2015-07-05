@@ -1,0 +1,12 @@
+{
+    "name": "roydejong/enlighten",
+    "description": "A lightweight PHP framework that helps you get shit done.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Roy de Jong",
+            "email": "roy@softwarepunt.nl"
+        }
+    ],
+    "require": {}
+}
