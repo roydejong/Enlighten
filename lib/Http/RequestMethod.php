@@ -37,7 +37,7 @@ abstract class RequestMethod
     const POST = 'POST';
 
     /**
-     * A request to store a new resource.
+     * A request to store or overwrite a new resource.
      *
      * HTTP/1.1
      */
@@ -49,4 +49,11 @@ abstract class RequestMethod
      * HTTP/1.1
      */
     const DELETE = 'DELETE';
+
+    /**
+     * A request to update or set certain values within an existing resources.
+     *
+     * IETF RFC 5789
+     */
+    const PATCH = 'PATCH';
 }
