@@ -1,8 +1,8 @@
 <?php
 
-namespace roydejong\enlighten\routing;
+namespace Enlighten\Routing;
 
-use roydejong\enlighten\http\Request;
+use Enlighten\Http\Request;
 
 /**
  * Represents a route that maps an incoming request to an application code point.

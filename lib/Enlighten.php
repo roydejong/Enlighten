@@ -1,11 +1,11 @@
 <?php
 
-namespace roydejong\enlighten;
+namespace Enlighten;
 
-use roydejong\enlighten\http\Request;
-use roydejong\enlighten\http\Response;
-use roydejong\enlighten\http\ResponseCode;
-use roydejong\enlighten\routing\Router;
+use Enlighten\Http\Request;
+use Enlighten\Http\Response;
+use Enlighten\Http\ResponseCode;
+use Enlighten\Routing\Router;
 
 /**
  * Represents an Enlighten application instance.

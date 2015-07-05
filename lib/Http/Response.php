@@ -1,6 +1,6 @@
 <?php
 
-namespace roydejong\enlighten\http;
+namespace Enlighten\Http;
 
 /**
  * The HTTP response sent back based on an incoming Request.

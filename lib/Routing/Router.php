@@ -1,14 +1,14 @@
 <?php
 
-namespace roydejong\enlighten\routing;
+namespace Enlighten\Routing;
 
-use roydejong\enlighten\http\Request;
+use Enlighten\Http\Request;
 
 /**
  * Handles the registration of Routes, and routing incoming Requests.
  *
- * @see roydejong\enlighten\http\Request
- * @see roydejong\enlighten\routing\Route
+ * @see Enlighten\Http\Request
+ * @see Enlighten\\Routing\Route
  */
 class Router
 {

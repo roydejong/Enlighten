@@ -1,6 +1,6 @@
 <?php
 
-namespace roydejong\enlighten\http;
+namespace Enlighten\Http;
 
 /**
  * HTTP response status code constants.

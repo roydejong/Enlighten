@@ -1,11 +1,18 @@
 {
-    "name": "roydejong/enlighten",
-    "description": "A lightweight PHP framework that helps you get shit done.",
+    "name": "enlighten/framework",
+    "description": "A lightweight PHP micro framework that helps you get shit done.",
+    "keywords": ["framework", "micro", "http", "routing"],
     "license": "MIT",
     "authors": [
         {
             "name": "Roy de Jong",
-            "email": "roy@softwarepunt.nl"
+            "email": "hello@roydejong.net"
         }
-    ]
+    ],
+    "require": {
+      "php": ">=5.5"
+    },
+    "psr-4": {
+      "Enlighten\\": "lib/"
+    }
 }
