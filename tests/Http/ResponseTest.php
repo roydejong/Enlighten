@@ -96,4 +96,22 @@ class ResponseTest extends PHPUnit_Framework_TestCase
         $this->expectOutputString('');
         $response->send();
     }
+
+    public function testRedirect()
+    {
+        $response = new Response();
+        $response->doRedirect('/teapot', true);
+
+        $this->assertEquals(ResponseCode::HTTP_MOVED_PERMANENTLY, $response->getResponseCode());
+        $this->assertEquals('/teapot', $response->getHeader('Location'));
+    }
+
+    public function testTemporaryRedirect()
+    {
+        $response = new Response();
+        $response->doRedirect('/kettle');
+
+        $this->assertEquals(ResponseCode::HTTP_TEMPORARY_REDIRECT, $response->getResponseCode());
+        $this->assertEquals('/kettle', $response->getHeader('Location'));
+    }
 }

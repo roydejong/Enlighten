@@ -64,6 +64,19 @@ class Response
     }
 
     /**
+     * Redirect the user to a specific URL.
+     * Performs a HTTP 301 or HTTP 302 redirect.
+     *
+     * @param string $url
+     * @param bool $permanent If true, a 301 Moved Permanently will be issued; otherwise a 307 Temporary Redirect.
+     */
+    public function doRedirect($url, $permanent = false)
+    {
+        $this->setResponseCode($permanent ? ResponseCode::HTTP_MOVED_PERMANENTLY : ResponseCode::HTTP_TEMPORARY_REDIRECT);
+        $this->setHeader('Location', $url);
+    }
+
+    /**
      * Sets a HTTP header to a certain value.
      *
      * @param string $key
