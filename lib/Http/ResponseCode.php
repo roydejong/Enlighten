@@ -49,12 +49,23 @@ abstract class ResponseCode
     const HTTP_UNSUPPORTED_MEDIA_TYPE = 415;
     const HTTP_REQUESTED_RANGE_NOT_SATISFIABLE = 416;
     const HTTP_EXPECTATION_FAILED = 417;
+    const HTTP_IM_A_TEAPOT = 418;
+    const HTTP_UNPROCESSABLE_ENTITY = 422;
+    const HTTP_LOCKED = 423;
+    const HTTP_UPGRADE_REQUIRED = 426;
+    const HTTP_PRECONDITION_REQUIRED = 428;
+    const HTTP_TOO_MANY_REQUESTS = 429;
+    const HTTP_REQUEST_HEADER_FIELDS_TOO_LARGE = 431;
+
     const HTTP_INTERNAL_SERVER_ERROR = 500;
     const HTTP_NOT_IMPLEMENTED = 501;
     const HTTP_BAD_GATEWAY = 502;
     const HTTP_SERVICE_UNAVAILABLE = 503;
     const HTTP_GATEWAY_TIMEOUT = 504;
     const HTTP_VERSION_NOT_SUPPORTED = 505;
+    const HTTP_VARIANT_ALSO_NEGOTIATES = 506;
+    const HTTP_NOT_EXTENDED = 510;
+    const HTTP_NETWORK_AUTHENTICATION_REQUIRED = 511;
 
     private static $messages = [
         100 => '100 Continue',
@@ -95,13 +106,23 @@ abstract class ResponseCode
         415 => '415 Unsupported Media Type',
         416 => '416 Requested Range Not Satisfiable',
         417 => '417 Expectation Failed',
+        418 => '418 I\'m a teapot',
+        422 => '422 Unprocessable Entity',
+        423 => '423 Locked',
+        426 => '426 Upgrade Required',
+        428 => '428 Precondition Required',
+        429 => '429 Too Many Requests',
+        431 => '431 Request Header Fields Too Large',
 
         500 => '500 Internal Server Error',
         501 => '501 Not Implemented',
         502 => '502 Bad Gateway',
         503 => '503 Service Unavailable',
         504 => '504 Gateway Timeout',
-        505 => '505 HTTP Version Not Supported'
+        505 => '505 HTTP Version Not Supported',
+        506 => '506 Variant Also Negotiates',
+        510 => '510 Not Extended',
+        511 => '511 Network Authentication Required'
     ];
 
     /**
