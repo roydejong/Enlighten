@@ -109,6 +109,11 @@ class Enlighten
         $this->response->appendBody(ob_get_contents());
         ob_end_clean();
 
+        if ($this->request->isHead()) {
+            // Do not send a body for HEAD requests
+            $this->response->setBody('');
+        }
+
         $this->response->send();
 
         // That's all folks! Execution has completed successfully.

@@ -1,14 +1,10 @@
 <?php
 
 use Enlighten\Enlighten;
+use Enlighten\Http\Request;
 
 class EnlightenTest extends PHPUnit_Framework_TestCase
 {
-    public function testInit()
-    {
-        $enlighten = new Enlighten();
-    }
-
     /**
      * @runInSeparateProcess
      */
@@ -16,5 +12,22 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
     {
         $enlighten = new Enlighten();
         $this->assertInstanceOf('Enlighten\Http\Response', $enlighten->start());
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @depends testStart
+     */
+    public function testHeadRequest()
+    {
+        $enlighten = new Enlighten();
+
+        $request = new Request();
+        $request->setRequestUri('/');
+        $request->setMethod('HEAD');
+
+        $response = $enlighten->start();
+
+        $this->assertEmpty($response->getBody());
     }
 }
