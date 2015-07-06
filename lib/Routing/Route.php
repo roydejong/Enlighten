@@ -28,7 +28,7 @@ class Route
      *
      * @var string
      */
-    public $regexPattern;
+    protected $regexPattern;
 
     /**
      * The target of this route.
@@ -39,7 +39,7 @@ class Route
      *
      * @var string|callable
      */
-    public $target;
+    protected $target;
 
     /**
      * A collection of constraints this route is subject to.
@@ -61,6 +61,16 @@ class Route
         $this->regexPattern = $this->formatRegex($this->pattern);
         $this->target = $target;
         $this->constraints = [];
+    }
+
+    /**
+     * Returns the target for this route.
+     *
+     * @return callable|string
+     */
+    public function getTarget()
+    {
+        return $this->target;
     }
 
     /**

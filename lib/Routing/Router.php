@@ -62,4 +62,32 @@ class Router
 
         return null;
     }
+
+    /**
+     * Dispatches a Request to a Route.
+     *
+     * @param Route $route
+     * @param Request $request
+     * @return mixed Route target function return value, if any
+     */
+    public function dispatch(Route $route, Request $request)
+    {
+        $targetFunc = null;
+        $params = [];
+
+        if ($route->isCallable()) {
+            // A callable function that should be invoked directly, add the Request as first parameter
+            $targetFunc = $route->getTarget();
+            $params[] = $request;
+        } else {
+            // A string path to a controller: resolve the controller and verify its validity
+            throw new \Exception('Only callable route targets are currently implemented'); // TODO
+        }
+
+        // Inject the route variables into the arguments passed to the function
+        $params = array_merge($params, $route->mapPathVariables($request));
+
+        // Finally, invoke the specified controller function or the specified callable with the appropriate params
+        return call_user_func_array($targetFunc, $params);
+    }
 }

@@ -45,4 +45,26 @@ class RouterTest extends PHPUnit_Framework_TestCase
 
         $this->assertNull($router->route($request));
     }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testDispatch()
+    {
+        $route = new Route('/', function () {
+            echo 'hello world';
+            return 'retVal';
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/');
+
+        $router = new Router();
+        $router->register($route);
+        $router->clear();
+
+        $this->assertEquals('retVal', $router->dispatch($route, $request));
+
+        $this->expectOutputString('hello world');
+    }
 }

@@ -5,6 +5,7 @@ namespace Enlighten;
 use Enlighten\Http\Request;
 use Enlighten\Http\Response;
 use Enlighten\Http\ResponseCode;
+use Enlighten\Routing\Route;
 use Enlighten\Routing\Router;
 
 /**
@@ -101,7 +102,10 @@ class Enlighten
         // Dispatch the request to the router
         $routingResult = $this->router->route($this->request);
 
-        if ($routingResult == null) {
+        if ($routingResult != null) {
+            $this->response->setResponseCode(ResponseCode::HTTP_OK);
+            $this->dispatch($routingResult);
+        } else {
             $this->response->setResponseCode(ResponseCode::HTTP_NOT_FOUND);
         }
 
@@ -118,5 +122,17 @@ class Enlighten
 
         // That's all folks! Execution has completed successfully.
         return $this->response;
+    }
+
+    /**
+     * Dispatches a Route.
+     *
+     * @param Route $route
+     */
+    public function dispatch(Route $route)
+    {
+        $this->beforeStart();
+
+        $this->router->dispatch($route, $this->request);
     }
 }
