@@ -64,6 +64,7 @@ Other functions you can use to register your routes are as follows:
 - `$app->patch($pattern, $target)`: The same as the above example, for PATCH requests
 - `$app->head($pattern, $target)`: The same as the above example, for HEAD requests
 - `$app->options($pattern, $target)`: The same as the above example, for OPTIONS requests
+- `$app->delete($pattern, $target)`: The same as the above example, for DELETE requests
  
 Further reading
 ---

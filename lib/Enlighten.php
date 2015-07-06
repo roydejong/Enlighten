@@ -3,6 +3,7 @@
 namespace Enlighten;
 
 use Enlighten\Http\Request;
+use Enlighten\Http\RequestMethod;
 use Enlighten\Http\Response;
 use Enlighten\Http\ResponseCode;
 use Enlighten\Routing\Route;
@@ -78,6 +79,14 @@ class Enlighten
             $this->setRequest(Request::extractFromEnvironment());
         }
 
+        $this->_bootstrapRouter();
+    }
+
+    /**
+     * Bootstraps a default router, if no router is configured.
+     */
+    private function _bootstrapRouter()
+    {
         // If no user-defined router was supplied (via Enlighten::setRouter()), initialize the default implementation
         if (empty($this->router)) {
             $this->setRouter(new Router());
@@ -134,5 +143,126 @@ class Enlighten
         $this->beforeStart();
 
         $this->router->dispatch($route, $this->request);
+    }
+
+    /**
+     * Internal function to register a new route.
+     * Will bootstrap the router if necessary.
+     *
+     * @param string $pattern The regex pattern to match requests against (supports dynamic variables).
+     * @param mixed|string $target The target function or path for the route.
+     * @param string $requestMethod The request method constraint to apply, or null for no method constraint.
+     * @return Route The generated route.
+     */
+    private function registerRoute($pattern, $target, $requestMethod = null)
+    {
+        $this->_bootstrapRouter();
+
+        $route = new Route($pattern, $target);
+
+        if ($requestMethod != null)
+        {
+            $route->requireMethod($requestMethod);
+        }
+
+        $this->router->register($route);
+
+        return $route;
+    }
+
+    /**
+     * Registers a route for all request methods.
+     *
+     * @param string $pattern The regex pattern to match requests against (supports dynamic variables).
+     * @param mixed|string $target The target function or path for the route.
+     * @return Route The generated route.
+     */
+    public function route($pattern, $target)
+    {
+        return $this->registerRoute($pattern, $target);
+    }
+
+    /**
+     * Registers a route for the GET request method.
+     *
+     * @param string $pattern The regex pattern to match requests against (supports dynamic variables).
+     * @param mixed|string $target The target function or path for the route.
+     * @return Route The generated route.
+     */
+    public function get($pattern, $target)
+    {
+        return $this->registerRoute($pattern, $target, RequestMethod::GET);
+    }
+
+    /**
+     * Registers a route for the POST request method.
+     *
+     * @param string $pattern The regex pattern to match requests against (supports dynamic variables).
+     * @param mixed|string $target The target function or path for the route.
+     * @return Route The generated route.
+     */
+    public function post($pattern, $target)
+    {
+        return $this->registerRoute($pattern, $target, RequestMethod::POST);
+    }
+
+    /**
+     * Registers a route for the PUT request method.
+     *
+     * @param string $pattern The regex pattern to match requests against (supports dynamic variables).
+     * @param mixed|string $target The target function or path for the route.
+     * @return Route The generated route.
+     */
+    public function put($pattern, $target)
+    {
+        return $this->registerRoute($pattern, $target, RequestMethod::PUT);
+    }
+
+    /**
+     * Registers a route for the PATCH request method.
+     *
+     * @param string $pattern The regex pattern to match requests against (supports dynamic variables).
+     * @param mixed|string $target The target function or path for the route.
+     * @return Route The generated route.
+     */
+    public function patch($pattern, $target)
+    {
+        return $this->registerRoute($pattern, $target, RequestMethod::PATCH);
+    }
+
+    /**
+     * Registers a route for the HEAD request method.
+     *
+     * @param string $pattern The regex pattern to match requests against (supports dynamic variables).
+     * @param mixed|string $target The target function or path for the route.
+     * @return Route The generated route.
+     */
+    public function head($pattern, $target)
+    {
+        return $this->registerRoute($pattern, $target, RequestMethod::HEAD);
+    }
+
+    /**
+     * Registers a route for the OPTIONS request method.
+     *
+     * @param string $pattern The regex pattern to match requests against (supports dynamic variables).
+     * @param mixed|string $target The target function or path for the route.
+     * @return Route The generated route.
+     */
+    public function options($pattern, $target)
+    {
+        return $this->registerRoute($pattern, $target, RequestMethod::OPTIONS);
+    }
+
+    /**
+     * Registers a route for the DELETE request method.
+     *
+     * @param string $pattern The regex pattern to match requests against (supports dynamic variables).
+     * @param mixed|string $target The target function or path for the route.
+     * @return Route The generated route.
+     */
+    public function delete($pattern, $target)
+    {
+        return $this->registerRoute($pattern, $target, RequestMethod::DELETE);
     }
 }

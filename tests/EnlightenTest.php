@@ -101,4 +101,190 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('', $response->getBody());
         $this->expectOutputString('');
     }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testRouteRegistration()
+    {
+        $router = new Router();
+
+        $enlighten = new Enlighten();
+        $enlighten->setRouter($router);
+
+        $generatedRoute = $enlighten->route('/test/route.html', function () {
+            echo 'test';
+        });
+
+        $sampleRequest = new Request();
+        $sampleRequest->setRequestUri('/test/route.html');
+        $sampleRequest->setMethod(RequestMethod::POST);
+
+        $this->assertTrue($generatedRoute->matches($sampleRequest));
+
+        $sampleRequest->setMethod(RequestMethod::HEAD);
+
+        $this->assertTrue($generatedRoute->matches($sampleRequest));
+
+        $sampleRequest->setMethod(RequestMethod::PATCH);
+
+        $enlighten->setRequest($sampleRequest);
+        $enlighten->start();
+
+        $this->expectOutputString('test');
+    }
+
+    public function testRouteRegistrationGet()
+    {
+        $router = new Router();
+
+        $enlighten = new Enlighten();
+        $enlighten->setRouter($router);
+
+        $generatedRoute = $enlighten->get('/test/route.html', function () {
+            // ...
+        });
+
+        $sampleRequest = new Request();
+        $sampleRequest->setRequestUri('/test/route.html');
+        $sampleRequest->setMethod(RequestMethod::GET);
+
+        $this->assertTrue($generatedRoute->matches($sampleRequest));
+
+        $sampleRequest->setMethod(RequestMethod::OPTIONS);
+
+        $this->assertFalse($generatedRoute->matches($sampleRequest));
+    }
+
+    public function testRouteRegistrationPost()
+    {
+        $router = new Router();
+
+        $enlighten = new Enlighten();
+        $enlighten->setRouter($router);
+
+        $generatedRoute = $enlighten->post('/test/route.html', function () {
+            // ...
+        });
+
+        $sampleRequest = new Request();
+        $sampleRequest->setRequestUri('/test/route.html');
+        $sampleRequest->setMethod(RequestMethod::POST);
+
+        $this->assertTrue($generatedRoute->matches($sampleRequest));
+
+        $sampleRequest->setMethod(RequestMethod::GET);
+
+        $this->assertFalse($generatedRoute->matches($sampleRequest));
+    }
+
+    public function testRouteRegistrationPut()
+    {
+        $router = new Router();
+
+        $enlighten = new Enlighten();
+        $enlighten->setRouter($router);
+
+        $generatedRoute = $enlighten->put('/test/route.html', function () {
+            // ...
+        });
+
+        $sampleRequest = new Request();
+        $sampleRequest->setRequestUri('/test/route.html');
+        $sampleRequest->setMethod(RequestMethod::PUT);
+
+        $this->assertTrue($generatedRoute->matches($sampleRequest));
+
+        $sampleRequest->setMethod(RequestMethod::POST);
+
+        $this->assertFalse($generatedRoute->matches($sampleRequest));
+    }
+
+    public function testRouteRegistrationPatch()
+    {
+        $router = new Router();
+
+        $enlighten = new Enlighten();
+        $enlighten->setRouter($router);
+
+        $generatedRoute = $enlighten->patch('/test/route.html', function () {
+            // ...
+        });
+
+        $sampleRequest = new Request();
+        $sampleRequest->setRequestUri('/test/route.html');
+        $sampleRequest->setMethod(RequestMethod::PATCH);
+
+        $this->assertTrue($generatedRoute->matches($sampleRequest));
+
+        $sampleRequest->setMethod(RequestMethod::POST);
+
+        $this->assertFalse($generatedRoute->matches($sampleRequest));
+    }
+
+    public function testRouteRegistrationHead()
+    {
+        $router = new Router();
+
+        $enlighten = new Enlighten();
+        $enlighten->setRouter($router);
+
+        $generatedRoute = $enlighten->head('/test/route.html', function () {
+            // ...
+        });
+
+        $sampleRequest = new Request();
+        $sampleRequest->setRequestUri('/test/route.html');
+        $sampleRequest->setMethod(RequestMethod::HEAD);
+
+        $this->assertTrue($generatedRoute->matches($sampleRequest));
+
+        $sampleRequest->setMethod(RequestMethod::PUT);
+
+        $this->assertFalse($generatedRoute->matches($sampleRequest));
+    }
+
+    public function testRouteRegistrationDelete()
+    {
+        $router = new Router();
+
+        $enlighten = new Enlighten();
+        $enlighten->setRouter($router);
+
+        $generatedRoute = $enlighten->delete('/test/route.html', function () {
+            // ...
+        });
+
+        $sampleRequest = new Request();
+        $sampleRequest->setRequestUri('/test/route.html');
+        $sampleRequest->setMethod(RequestMethod::DELETE);
+
+        $this->assertTrue($generatedRoute->matches($sampleRequest));
+
+        $sampleRequest->setMethod(RequestMethod::HEAD);
+
+        $this->assertFalse($generatedRoute->matches($sampleRequest));
+    }
+
+    public function testRouteRegistrationOptions()
+    {
+        $router = new Router();
+
+        $enlighten = new Enlighten();
+        $enlighten->setRouter($router);
+
+        $generatedRoute = $enlighten->options('/test/route.html', function () {
+            // ...
+        });
+
+        $sampleRequest = new Request();
+        $sampleRequest->setRequestUri('/test/route.html');
+        $sampleRequest->setMethod(RequestMethod::OPTIONS);
+
+        $this->assertTrue($generatedRoute->matches($sampleRequest));
+
+        $sampleRequest->setMethod(RequestMethod::DELETE);
+
+        $this->assertFalse($generatedRoute->matches($sampleRequest));
+    }
 }
