@@ -31,7 +31,7 @@ Getting started
 ---
 To get started, add Enlighten as a Composer dependency to your project:
 
-    composer require roydejong/enlighten
+    composer require enlighten/framework
 
 In the entry point (`index.php`) of your application, initialize and start Enlighten:
 
