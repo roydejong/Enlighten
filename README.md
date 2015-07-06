@@ -9,8 +9,6 @@ This is a modern framework for PHP 5 that doesn't get in your way. Just the buil
 
 - Easy HTTP request and response management.
 - Razor fast routing with dynamic variables.
-- Form validation and on-the-fly form HTML generation.
-- MVC building blocks for a well-organized application.
 
 It is awesome because:
 
@@ -20,9 +18,11 @@ It is awesome because:
 
 Coming soon to Enlighten:
 
-- Filters for routing, e.g. for authentication
-- Cookie and session handling
-- More ways of parsing requests: files, headers, cookies
+- MVC building blocks for a well-organized application.
+- Form validation and on-the-fly form HTML generation.
+- Filters for routing, e.g. for authentication.
+- Cookie and session handling.
+- More ways of parsing requests: files, headers, cookies.
 
 
 **Note: This is pre-release information, this does not reflect the current or even a (planned) final state of the project. This is, right now, just an experiment.**
