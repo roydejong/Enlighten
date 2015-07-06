@@ -124,4 +124,24 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($route->matches($request));
     }
+
+    public function testRequireMethodCondition()
+    {
+        $route = new Route('/dir/sample.html', function () {
+            // ...
+        });
+        $route->requireMethod(RequestMethod::PATCH);
+
+        $request = new Request();
+        $request->setRequestUri('/dir/sample.html');
+        $request->setMethod(RequestMethod::POST);
+
+        $this->assertFalse($route->matches($request));
+
+        $request = new Request();
+        $request->setRequestUri('/dir/sample.html');
+        $request->setMethod(RequestMethod::PATCH);
+
+        $this->assertTrue($route->matches($request));
+    }
 }

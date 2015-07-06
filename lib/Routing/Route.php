@@ -85,6 +85,18 @@ class Route
     }
 
     /**
+     * Requires a certain HTTP method for this route to match.
+     *
+     * @param string $method
+     */
+    public function requireMethod($method)
+    {
+        $this->addConstraint(function (Request $request) use ($method) {
+            return $request->getMethod() === $method;
+        });
+    }
+
+    /**
      * Takes user pattern input and converts it to a properly formatted Regex pattern for matching against.
      *
      * @param string $pattern
