@@ -21,7 +21,14 @@ class Route
      *
      * @var string
      */
-    public $pattern;
+    protected $pattern;
+
+    /**
+     * The pattern that the request URI will be matched against, converted to Regex string.
+     *
+     * @var string
+     */
+    public $regexPattern;
 
     /**
      * The target of this route.
@@ -36,8 +43,9 @@ class Route
 
     /**
      * A collection of constraints this route is subject to.
+     * Each constraint is a callable function that should return true or false.
      *
-     * @var Constraint[]
+     * @var callable[]
      */
     protected $constraints;
 
@@ -49,9 +57,21 @@ class Route
      */
     public function __construct($pattern, $target)
     {
-        $this->pattern = $this->formatRegex($pattern);
+        $this->pattern = $pattern;
+        $this->regexPattern = $this->formatRegex($this->pattern);
         $this->target = $target;
         $this->constraints = [];
+    }
+
+    /**
+     * Registers a new constraint to this route.
+     * A constraint should be a callable function, which will be invoked with the Request as parameter.
+     *
+     * @param callable $constraint
+     */
+    public function addConstraint(callable $constraint)
+    {
+        $this->constraints[] = $constraint;
     }
 
     /**
@@ -122,16 +142,16 @@ class Route
      */
     public function matches(Request $request)
     {
-        if (preg_match($this->pattern, $request->getRequestUri()) <= 0) {
+        if (preg_match($this->regexPattern, $request->getRequestUri()) <= 0) {
             return false;
         }
 
         foreach ($this->constraints as $constraint) {
-            if (!$constraint->isSatisfied($request)) {
+            if (!$constraint($request)) {
                 return false;
             }
         }
 
-        return false;
+        return true;
     }
 }
