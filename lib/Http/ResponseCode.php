@@ -155,7 +155,7 @@ abstract class ResponseCode
      */
     public static function isError($code)
     {
-        return is_numeric($code) && $code >= 400;
+        return is_numeric($code) && $code >= 400 && $code != self::HTTP_IM_A_TEAPOT;
     }
 
     /**

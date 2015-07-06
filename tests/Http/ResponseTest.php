@@ -84,12 +84,6 @@ class ResponseTest extends PHPUnit_Framework_TestCase
      */
     public function testBodylessResponse()
     {
-        $this->assertTrue(ResponseCode::canHaveBody(ResponseCode::HTTP_OK));
-        $this->assertFalse(ResponseCode::canHaveBody(ResponseCode::HTTP_CONTINUE));
-        $this->assertFalse(ResponseCode::canHaveBody(ResponseCode::HTTP_SWITCHING_PROTOCOLS));
-        $this->assertFalse(ResponseCode::canHaveBody(ResponseCode::HTTP_NO_CONTENT));
-        $this->assertFalse(ResponseCode::canHaveBody(ResponseCode::HTTP_NOT_MODIFIED));
-
         $response = new Response();
         $response->setResponseCode(ResponseCode::HTTP_NO_CONTENT);
         $response->setBody('test!');

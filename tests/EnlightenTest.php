@@ -20,23 +20,6 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
-     * @depends testStart
-     */
-    public function testHeadRequest()
-    {
-        $enlighten = new Enlighten();
-
-        $request = new Request();
-        $request->setRequestUri('/');
-        $request->setMethod('HEAD');
-
-        $response = $enlighten->start();
-
-        $this->assertEmpty($response->getBody());
-    }
-
-    /**
-     * @runInSeparateProcess
      */
     public function testApplicationRouting()
     {
@@ -61,5 +44,61 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(ResponseCode::HTTP_OK, $response->getResponseCode());
         $this->assertEquals('test output', $response->getBody());
         $this->expectOutputString('test output');
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testApplicationRouting404()
+    {
+        $enlighten = new Enlighten();
+
+        $request = new Request();
+        $request->setRequestUri('/wrong');
+        $request->setMethod(RequestMethod::GET);
+
+        $route = new Route('/', function (Request $request) {
+            echo 'test output';
+        });
+
+        $router = new Router();
+        $router->register($route);
+
+        $enlighten->setRouter($router);
+        $enlighten->setRequest($request);
+
+        $response = $enlighten->start();
+
+        $this->assertEquals(ResponseCode::HTTP_NOT_FOUND, $response->getResponseCode());
+        $this->assertEquals('', $response->getBody());
+        $this->expectOutputString('');
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testHeadersOnlyRequest()
+    {
+        $enlighten = new Enlighten();
+
+        $request = new Request();
+        $request->setRequestUri('/');
+        $request->setMethod(RequestMethod::HEAD);
+
+        $route = new Route('/', function (Request $request) {
+            echo 'test output';
+        });
+
+        $router = new Router();
+        $router->register($route);
+
+        $enlighten->setRouter($router);
+        $enlighten->setRequest($request);
+
+        $response = $enlighten->start();
+
+        $this->assertEquals(ResponseCode::HTTP_OK, $response->getResponseCode());
+        $this->assertEquals('', $response->getBody());
+        $this->expectOutputString('');
     }
 }
