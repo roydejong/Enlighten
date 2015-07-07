@@ -48,7 +48,7 @@ Next, you will want to define routes. Routes map an incoming request (for exampl
 
 It's easy to set up routes. Let's see what the above example looks like in code:
 
-    $app->get('/articles/$name', function (Request $request, $name) {
+    $app->get('/articles/$name', function ($name) {
         echo "You requested an article with this name: $name";
     });
     

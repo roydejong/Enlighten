@@ -2,6 +2,7 @@
 
 namespace Enlighten\Routing;
 
+use Enlighten\EnlightenContext;
 use Enlighten\Http\Request;
 
 /**
@@ -67,25 +68,25 @@ class Router
      * Dispatches a Request to a Route.
      *
      * @param Route $route
-     * @param Request $request
+     * @param EnlightenContext $context
      * @return mixed Route target function return value, if any
      */
-    public function dispatch(Route $route, Request $request)
+    public function dispatch(Route $route, EnlightenContext $context)
     {
         $targetFunc = null;
         $params = [];
 
         if ($route->isCallable()) {
-            // A callable function that should be invoked directly, add the Request as first parameter
+            // A callable function that should be invoked directly
             $targetFunc = $route->getTarget();
-            $params[] = $request;
+            $targetFunc = $targetFunc->bindTo($context);
         } else {
             // A string path to a controller: resolve the controller and verify its validity
             throw new \Exception('Only callable route targets are currently implemented'); // TODO
         }
 
         // Inject the route variables into the arguments passed to the function
-        $params = array_merge($params, $route->mapPathVariables($request));
+        $params = array_merge($params, $route->mapPathVariables($context->getRequest()));
 
         // Finally, invoke the specified controller function or the specified callable with the appropriate params
         return call_user_func_array($targetFunc, $params);

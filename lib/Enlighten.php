@@ -142,7 +142,7 @@ class Enlighten
     {
         $this->beforeStart();
 
-        $this->router->dispatch($route, $this->request);
+        $this->router->dispatch($route, $this->createContext());
     }
 
     /**
@@ -264,5 +264,32 @@ class Enlighten
     public function delete($pattern, $target)
     {
         return $this->registerRoute($pattern, $target, RequestMethod::DELETE);
+    }
+
+    /**
+     * Returns the current application context.
+     * Contexts are used to provide components such as controllers and closures with the data they need to operate.
+     * This function is typically only used internally by the framework when initializing closures and the like.
+     *
+     * @return EnlightenContext
+     */
+    public function createContext()
+    {
+        $context = new EnlightenContext();
+        $this->fillContext($context);
+        return $context;
+    }
+
+    /**
+     * Fills a given $context with the current application state.
+     * Contexts are used to provide components such as controllers and closures with the data they need to operate.
+     * This function is typically only used internally by the framework when initializing controllers and the like.
+     *
+     * @param EnlightenContext $context
+     */
+    public function fillContext(EnlightenContext $context)
+    {
+        $context->_setRequest($this->request);
+        $context->_setResponse($this->response);
     }
 }

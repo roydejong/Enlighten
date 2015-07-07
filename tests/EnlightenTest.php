@@ -29,7 +29,7 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $request->setRequestUri('/');
         $request->setMethod(RequestMethod::GET);
 
-        $route = new Route('/', function (Request $request) {
+        $route = new Route('/', function () {
             echo 'test output';
         });
 
@@ -85,7 +85,7 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $request->setRequestUri('/');
         $request->setMethod(RequestMethod::HEAD);
 
-        $route = new Route('/', function (Request $request) {
+        $route = new Route('/', function () {
             echo 'test output';
         });
 
