@@ -5,4 +5,9 @@ php:
   - hhvm
   - nightly
 install:
-   - composer install
+  - composer install
+addons:
+  code_climate:
+    repo_token: 3f42a1679ff454beb444a954cd66dc50dd04e6dea61f1e5373a1e071e4777876
+after_script:
+  - vendor/bin/test-reporter
