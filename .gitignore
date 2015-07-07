@@ -3,3 +3,6 @@ vendor
 
 # IDE Settings
 .idea/workspace.xml
+
+# Build/coverage output
+build

@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "baef4dd2d3158d6a5fa8526fdea5015e",
+    "hash": "335a8702db728eb804616739d1ad0edc",
     "packages": [],
     "packages-dev": [
         {
             "name": "codeclimate/php-test-reporter",
-            "version": "dev-master",
+            "version": "v0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/codeclimate/php-test-reporter.git",
-                "reference": "418ae782307841ac50fe26daa4cfe04520b0de9c"
+                "reference": "8ed24ff30f3663ecf40f1c12d6c97eb56c69e646"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/codeclimate/php-test-reporter/zipball/418ae782307841ac50fe26daa4cfe04520b0de9c",
-                "reference": "418ae782307841ac50fe26daa4cfe04520b0de9c",
+                "url": "https://api.github.com/repos/codeclimate/php-test-reporter/zipball/8ed24ff30f3663ecf40f1c12d6c97eb56c69e646",
+                "reference": "8ed24ff30f3663ecf40f1c12d6c97eb56c69e646",
                 "shasum": ""
             },
             "require": {
@@ -28,7 +28,6 @@
                 "symfony/console": ">=2.0"
             },
             "require-dev": {
-                "ext-xdebug": "*",
                 "phpunit/phpunit": "3.7.*@stable"
             },
             "bin": [
@@ -63,7 +62,7 @@
                 "codeclimate",
                 "coverage"
             ],
-            "time": "2015-04-18 14:43:54"
+            "time": "2014-07-23 13:42:41"
         },
         {
             "name": "doctrine/instantiator",
@@ -1482,9 +1481,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "codeclimate/php-test-reporter": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
