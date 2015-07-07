@@ -39,11 +39,18 @@ class Request
     protected $query;
 
     /**
-     * Key/value array containg all environment variables (i.e. $_SERVER).
+     * Key/value array containing all environment variables (i.e. $_SERVER).
      *
      * @var array
      */
     protected $environment;
+
+    /**
+     * Key/value array containing all cookies sent in the request (i.e. $_COOKIE).
+     *
+     * @var array
+     */
+    protected $cookies;
 
     /**
      * Initializes a new, blank HTTP request.
@@ -55,6 +62,7 @@ class Request
         $this->post = [];
         $this->query = [];
         $this->environment = [];
+        $this->cookies = [];
     }
 
     /**
@@ -184,12 +192,10 @@ class Request
      */
     public function getPost($key, $defaultValue = null)
     {
-        if (isset($this->post[$key]))
-        {
+        if (isset($this->post[$key])) {
             $value = $this->post[$key];
 
-            if (!is_array($value))
-            {
+            if (!is_array($value)) {
                 return strval($value);
             }
         }
@@ -208,12 +214,10 @@ class Request
      */
     public function getPostArray($key)
     {
-        if (isset($this->post[$key]))
-        {
+        if (isset($this->post[$key])) {
             $value = $this->post[$key];
 
-            if (is_array($value))
-            {
+            if (is_array($value)) {
                 return $value;
             }
         }
@@ -231,8 +235,7 @@ class Request
      */
     public function getQuery($key, $defaultValue = null)
     {
-        if (isset($this->query[$key]))
-        {
+        if (isset($this->query[$key])) {
             $value = $this->query[$key];
             return strval($value);
         }
@@ -250,13 +253,40 @@ class Request
      */
     public function getEnvironment($key, $defaultValue = null)
     {
-        if (isset($this->environment[$key]))
-        {
+        if (isset($this->environment[$key])) {
             $value = $this->environment[$key];
             return strval($value);
         }
 
         return $defaultValue;
+    }
+
+    /**
+     * Returns a cookie value value by its $key.
+     * Returns $defaultValue if a cookie with the given $key was not found in the request.
+     *
+     * @param string $key
+     * @param null $defaultValue The value to return if $key is not found.
+     * @return string|mixed A string value, or $defaultValue if the $key was not found.
+     */
+    public function getCookie($key, $defaultValue = null)
+    {
+        if (isset($this->cookies[$key])) {
+            $value = $this->cookies[$key];
+            return strval($value);
+        }
+
+        return $defaultValue;
+    }
+
+    /**
+     * Returns a key/value array of all cookies contained in this request.
+     *
+     * @return array
+     */
+    public function getCookies()
+    {
+        return $this->cookies;
     }
 
     /**
@@ -284,6 +314,14 @@ class Request
     }
 
     /**
+     * @param array $cookies
+     */
+    public function setCookieData(array $cookies)
+    {
+        $this->cookies = $cookies;
+    }
+
+    /**
      * Creates a default Request based on the current PHP environment superglobals ($_SERVER, $_GET, $_POST, etc).
      */
     public static function extractFromEnvironment()
@@ -298,6 +336,7 @@ class Request
         $request->setPostData($_POST);
         $request->setQueryData($_GET);
         $request->setEnvironmentData($_SERVER);
+        $request->setCookieData($_COOKIE);
         return $request;
     }
 }

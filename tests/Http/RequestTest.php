@@ -101,7 +101,6 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
     public function testSetGetEnvironment()
     {
-        $subTest = ['1', '2', '3'];
         $test = ['a' => 'val', 'b' => ''];
 
         $request = new Request();
@@ -110,6 +109,19 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('123', $request->getEnvironment('bogus', '123'));
         $this->assertEquals('val', $request->getEnvironment('a', '123'));
         $this->assertEquals('', $request->getEnvironment('b', '123'));
+    }
+
+    public function testSetGetCookies()
+    {
+        $testCookies = ['a' => 'val', 'b' => ''];
+
+        $request = new Request();
+        $request->setCookieData($testCookies);
+
+        $this->assertEquals('123', $request->getCookie('bogus', '123'));
+        $this->assertEquals('val', $request->getCookie('a', '123'));
+        $this->assertEquals('', $request->getCookie('b', '123'));
+        $this->assertEquals($testCookies, $request->getCookies());
     }
 
     /**
@@ -122,6 +134,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $_GET = ['test' => 'abc'];
         $_POST = ['abc' => 'test'];
         $_SERVER = ['REQUEST_URI' => '/pots?test=abc', 'REQUEST_METHOD' => RequestMethod::PATCH];
+        $_COOKIE = ['Session' => uniqid()];
 
         $request = Request::extractFromEnvironment();
 
@@ -130,5 +143,6 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('test', $request->getPost('abc', 'POST_DEF'));
         $this->assertEquals('abc', $request->getQuery('test', 'QUERY_DEF'));
         $this->assertEquals('PATCH', $request->getEnvironment('REQUEST_METHOD'));
+        $this->assertEquals($_COOKIE['Session'], $request->getCookie('Session'));
     }
 }
