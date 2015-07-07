@@ -72,10 +72,10 @@ class RequestTest extends PHPUnit_Framework_TestCase
     public function testSetGetPost()
     {
         $subTest = ['1', '2', '3'];
-        $test = ['a' => 'val', 'b' => '', 'c' => $subTest];
+        $postTest = ['a' => 'val', 'b' => '', 'c' => $subTest];
 
         $request = new Request();
-        $request->setPostData($test);
+        $request->setPostData($postTest);
 
         $this->assertEquals('123', $request->getPost('bogus', '123'));
         $this->assertEquals('val', $request->getPost('a', '123'));
@@ -84,31 +84,35 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($subTest, $request->getPostArray('c'));
         $this->assertEquals(null, $request->getPostArray('a'));
+
+        $this->assertEquals($postTest, $request->getPostData());
     }
 
     public function testSetGetQuery()
     {
         $subTest = ['1', '2', '3'];
-        $test = ['a' => 'val', 'b' => ''];
+        $testQueryParams = ['a' => 'val', 'b' => ''];
 
         $request = new Request();
-        $request->setQueryData($test);
+        $request->setQueryData($testQueryParams);
 
-        $this->assertEquals('123', $request->getQuery('bogus', '123'));
-        $this->assertEquals('val', $request->getQuery('a', '123'));
-        $this->assertEquals('', $request->getQuery('b', '123'));
+        $this->assertEquals('123', $request->getQueryParam('bogus', '123'));
+        $this->assertEquals('val', $request->getQueryParam('a', '123'));
+        $this->assertEquals('', $request->getQueryParam('b', '123'));
+        $this->assertEquals($testQueryParams, $request->getQueryParams());
     }
 
     public function testSetGetEnvironment()
     {
-        $test = ['a' => 'val', 'b' => ''];
+        $testEnvironment = ['a' => 'val', 'b' => ''];
 
         $request = new Request();
-        $request->setEnvironmentData($test);
+        $request->setEnvironmentData($testEnvironment);
 
         $this->assertEquals('123', $request->getEnvironment('bogus', '123'));
         $this->assertEquals('val', $request->getEnvironment('a', '123'));
         $this->assertEquals('', $request->getEnvironment('b', '123'));
+        $this->assertEquals($testEnvironment, $request->getEnvironmentData());
     }
 
     public function testSetGetCookies()
@@ -141,7 +145,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($request->isPatch());
         $this->assertEquals('/pots', $request->getRequestUri());
         $this->assertEquals('test', $request->getPost('abc', 'POST_DEF'));
-        $this->assertEquals('abc', $request->getQuery('test', 'QUERY_DEF'));
+        $this->assertEquals('abc', $request->getQueryParam('test', 'QUERY_DEF'));
         $this->assertEquals('PATCH', $request->getEnvironment('REQUEST_METHOD'));
         $this->assertEquals($_COOKIE['Session'], $request->getCookie('Session'));
     }

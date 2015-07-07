@@ -226,6 +226,16 @@ class Request
     }
 
     /**
+     * Returns a key/value array of all posted data.
+     *
+     * @return array
+     */
+    public function getPostData()
+    {
+        return $this->post;
+    }
+
+    /**
      * Returns a query parameter value by its $key.
      * Returns $defaultValue if the key is not found.
      *
@@ -233,7 +243,7 @@ class Request
      * @param null $defaultValue The value to return if $key is not found.
      * @return string|mixed A string value, or $defaultValue if the $key was not found.
      */
-    public function getQuery($key, $defaultValue = null)
+    public function getQueryParam($key, $defaultValue = null)
     {
         if (isset($this->query[$key])) {
             $value = $this->query[$key];
@@ -241,6 +251,16 @@ class Request
         }
 
         return $defaultValue;
+    }
+
+    /**
+     * Returns all query parameters as key/value array.
+     *
+     * @return array
+     */
+    public function getQueryParams()
+    {
+        return $this->query;
     }
 
     /**
@@ -259,6 +279,16 @@ class Request
         }
 
         return $defaultValue;
+    }
+
+    /**
+     * Returns all environment data as a key/value array.
+     *
+     * @return array
+     */
+    public function getEnvironmentData()
+    {
+        return $this->environment;
     }
 
     /**
