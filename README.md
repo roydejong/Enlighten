@@ -15,6 +15,7 @@ It is awesome because:
 - Built for ease of use and performance.
 - Low on fat: small code base with minimal external dependencies.
 - Stable: tested extensively with a battery of unit tests.
+- Future-proof: Fully compatible with HHVM and PHP 7.
 
 Coming soon to Enlighten:
 
