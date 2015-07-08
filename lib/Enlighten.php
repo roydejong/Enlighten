@@ -133,6 +133,9 @@ class Enlighten
 
             $this->filters->trigger(Filters::AfterRoute);
         } catch (\Exception $ex) {
+            ob_clean();
+
+            $this->response = new Response();
             $this->response->setResponseCode(ResponseCode::HTTP_INTERNAL_SERVER_ERROR);
 
             if (!$this->filters->trigger(Filters::OnExeption, $ex)) {
