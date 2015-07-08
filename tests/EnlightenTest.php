@@ -366,4 +366,28 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
 
         $this->expectOutputString('Testex');
     }
+
+    /**
+     * @runInSeparateProcess
+     * @expectedException \Exception
+     */
+    public function testExceptionFilterUncaught()
+    {
+        $route = new Route('/', function () {
+            throw new Exception('Testex');
+        });
+
+        $router = new Router();
+        $router->register($route);
+
+        $request = new Request();
+        $request->setRequestUri('/');
+
+        $enlighten = new Enlighten();
+        $enlighten->setRouter($router);
+        $enlighten->setRequest($request);
+        $enlighten->start();
+
+        $this->expectOutputString('Testex');
+    }
 }

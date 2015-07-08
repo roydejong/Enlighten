@@ -134,7 +134,11 @@ class Enlighten
             $this->filters->trigger(Filters::AfterRoute);
         } catch (\Exception $ex) {
             $this->response->setResponseCode(ResponseCode::HTTP_INTERNAL_SERVER_ERROR);
-            $this->filters->trigger(Filters::OnExeption, $ex);
+
+            if (!$this->filters->trigger(Filters::OnExeption, $ex)) {
+                // If this exception was unhandled, rethrow it so it appears as any old php exception
+                throw $ex;
+            }
         } finally {
             // Clean out the output buffer to the response, and finally send the built-up response to the client
             $this->response->appendBody(ob_get_contents());
