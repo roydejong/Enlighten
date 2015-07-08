@@ -6,6 +6,7 @@ use Enlighten\Http\Request;
 use Enlighten\Http\RequestMethod;
 use Enlighten\Http\Response;
 use Enlighten\Http\ResponseCode;
+use Enlighten\Routing\Filters;
 use Enlighten\Routing\Route;
 use Enlighten\Routing\Router;
 
@@ -40,12 +41,20 @@ class Enlighten
     protected $router;
 
     /**
+     * Represents a collection of global filters that have been registered on this application instance.
+     *
+     * @var Filters
+     */
+    protected $filters;
+
+    /**
      * Initializes a new Enlighten application instance.
      */
     public function __construct()
     {
         $this->request = null;
         $this->response = null;
+        $this->filters = new Filters();
     }
 
     /**
@@ -108,28 +117,44 @@ class Enlighten
 
         $this->response = new Response();
 
-        // Dispatch the request to the router
-        $routingResult = $this->router->route($this->request);
+        try {
+            // Dispatch the request to the router
+            $this->filters->trigger(Filters::BeforeRoute);
 
-        if ($routingResult != null) {
-            $this->response->setResponseCode(ResponseCode::HTTP_OK);
-            $this->dispatch($routingResult);
-        } else {
-            $this->response->setResponseCode(ResponseCode::HTTP_NOT_FOUND);
+            $routingResult = $this->router->route($this->request);
+
+            if ($routingResult != null) {
+                $this->response->setResponseCode(ResponseCode::HTTP_OK);
+                $this->dispatch($routingResult);
+            } else {
+                $this->response->setResponseCode(ResponseCode::HTTP_NOT_FOUND);
+                // TODO 404 error handling (#11)
+            }
+
+            $this->filters->trigger(Filters::AfterRoute);
+        } catch (\Exception $ex) {
+            ob_clean();
+
+            $this->response = new Response();
+            $this->response->setResponseCode(ResponseCode::HTTP_INTERNAL_SERVER_ERROR);
+
+            if (!$this->filters->trigger(Filters::OnExeption, $ex)) {
+                // If this exception was unhandled, rethrow it so it appears as any old php exception
+                throw $ex;
+            }
+        } finally {
+            // Clean out the output buffer to the response, and finally send the built-up response to the client
+            $this->response->appendBody(ob_get_contents());
+            ob_end_clean();
+
+            if ($this->request->isHead()) {
+                // Do not send a body for HEAD requests
+                $this->response->setBody('');
+            }
+
+            $this->response->send();
         }
 
-        // Clean out the output buffer to the response, and finally send the built-up response to the client
-        $this->response->appendBody(ob_get_contents());
-        ob_end_clean();
-
-        if ($this->request->isHead()) {
-            // Do not send a body for HEAD requests
-            $this->response->setBody('');
-        }
-
-        $this->response->send();
-
-        // That's all folks! Execution has completed successfully.
         return $this->response;
     }
 
@@ -160,8 +185,7 @@ class Enlighten
 
         $route = new Route($pattern, $target);
 
-        if ($requestMethod != null)
-        {
+        if ($requestMethod != null) {
             $route->requireMethod($requestMethod);
         }
 
@@ -291,5 +315,41 @@ class Enlighten
     {
         $context->_setRequest($this->request);
         $context->_setResponse($this->response);
+    }
+
+    /**
+     * Registers a filter function to be executed after application routing and execution completes, but before the response is sent.
+     *
+     * @param callable $filter
+     * @return $this
+     */
+    public function after(\Closure $filter)
+    {
+        $this->filters->register(Filters::AfterRoute, $filter);
+        return $this;
+    }
+
+    /**
+     * Registers a filter function to be executed before application routing logic begins.
+     *
+     * @param callable $filter
+     * @return $this
+     */
+    public function before(\Closure $filter)
+    {
+        $this->filters->register(Filters::BeforeRoute, $filter);
+        return $this;
+    }
+
+    /**
+     * Registers a filter function to be executed when an uncaught exception occurs during execution.
+     *
+     * @param callable $filter
+     * @return $this
+     */
+    public function onException(\Closure $filter)
+    {
+        $this->filters->register(Filters::OnExeption, $filter);
+        return $this;
     }
 }

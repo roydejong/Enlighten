@@ -1,5 +1,6 @@
 <?php
 
+use Enlighten\EnlightenContext;
 use Enlighten\Http\Request;
 use Enlighten\Http\RequestMethod;
 use Enlighten\Routing\Route;
@@ -143,5 +144,128 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $request->setMethod(RequestMethod::PATCH);
 
         $this->assertTrue($route->matches($request));
+    }
+
+    public function testRouteActionClosure()
+    {
+        $request = new Request();
+        $request->setRequestUri('/dir/sample.html');
+        $request->setMethod(RequestMethod::GET);
+
+        $route = new Route('/dir/sample.html', function () use ($request) {
+            // Our closure should receive our use variable ($request)
+            // Our closure should also have access to the Context via $this
+            echo $request->getMethod();
+            echo $this->getRequest()->getMethod();
+            return 'test';
+        });
+        $route->requireMethod(RequestMethod::GET);
+
+        $context = new EnlightenContext();
+        $context->_setRequest($request);
+
+        $this->assertTrue($route->matches($request));
+
+        $this->expectOutputString('GETGET');
+        $this->assertEquals('test', $route->action($context));
+    }
+
+    public function testBeforeFilter()
+    {
+        $route = new Route('/dir/sample.html', function () {
+            echo 'during';
+        });
+
+        $route->before(function () {
+            echo 'before';
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/dir/sample.html');
+        $request->setMethod(RequestMethod::GET);
+
+        $this->assertTrue($route->matches($request));
+
+        $context = new EnlightenContext();
+        $context->_setRequest($request);
+
+        $route->action($context);
+
+        $this->expectOutputString('beforeduring');
+    }
+
+    public function testAfterFilter()
+    {
+        $route = new Route('/dir/sample.html', function () {
+            echo 'during';
+        });
+
+        $route->after(function () {
+            echo 'after';
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/dir/sample.html');
+        $request->setMethod(RequestMethod::GET);
+
+        $this->assertTrue($route->matches($request));
+
+        $context = new EnlightenContext();
+        $context->_setRequest($request);
+
+        $route->action($context);
+
+        $this->expectOutputString('duringafter');
+    }
+
+    /**
+     * If an OnException filter is registered, the exception should be passed to any registered filters.
+     * In this scenario, note that the Exception should not be thrown up to the global scope, it is "handled".
+     */
+    public function testExceptionFilter()
+    {
+        $route = new Route('/dir/sample.html', function () {
+            throw new \Exception('TestEx');
+        });
+
+        $route->onException(function (\Exception $ex) {
+            echo $ex->getMessage();
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/dir/sample.html');
+        $request->setMethod(RequestMethod::GET);
+
+        $this->assertTrue($route->matches($request));
+
+        $context = new EnlightenContext();
+        $context->_setRequest($request);
+
+        $route->action($context);
+
+        $this->expectOutputString('TestEx');
+    }
+
+    /**
+     * If no onException filter is registered, the exceptions should be thrown so they can be handled in global scope.
+     *
+     * @expectedException RuntimeException
+     */
+    public function testUnfilteredException()
+    {
+        $route = new Route('/dir/sample.html', function () {
+            throw new RuntimeException();
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/dir/sample.html');
+        $request->setMethod(RequestMethod::GET);
+
+        $this->assertTrue($route->matches($request));
+
+        $context = new EnlightenContext();
+        $context->_setRequest($request);
+
+        $route->action($context);
     }
 }
