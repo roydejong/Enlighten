@@ -9,7 +9,9 @@ install:
 addons:
   code_climate:
     repo_token: 3f42a1679ff454beb444a954cd66dc50dd04e6dea61f1e5373a1e071e4777876
-after_script:
-  - vendor/bin/test-reporter
+before_script:
+  - mkdir -p build/logs
 script:
   - phpunit --configuration phpunit.dist.xml
+after_script:
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then vendor/bin/test-reporter; fi;'
