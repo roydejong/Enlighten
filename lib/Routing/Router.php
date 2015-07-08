@@ -65,30 +65,14 @@ class Router
     }
 
     /**
-     * Dispatches a Request to a Route.
+     * Dispatches a Route, executing its action.
      *
      * @param Route $route
      * @param EnlightenContext $context
-     * @return mixed Route target function return value, if any
+     * @return mixed Route target function return value, if any.
      */
     public function dispatch(Route $route, EnlightenContext $context)
     {
-        $targetFunc = null;
-        $params = [];
-
-        if ($route->isCallable()) {
-            // A callable function that should be invoked directly
-            $targetFunc = $route->getTarget();
-            $targetFunc = $targetFunc->bindTo($context);
-        } else {
-            // A string path to a controller: resolve the controller and verify its validity
-            throw new \Exception('Only callable route targets are currently implemented'); // TODO
-        }
-
-        // Inject the route variables into the arguments passed to the function
-        $params = array_merge($params, $route->mapPathVariables($context->getRequest()));
-
-        // Finally, invoke the specified controller function or the specified callable with the appropriate params
-        return call_user_func_array($targetFunc, $params);
+        return $route->action($context);
     }
 }

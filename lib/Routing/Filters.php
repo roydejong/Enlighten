@@ -45,8 +45,7 @@ class Filters
      */
     public function register($eventType, \Closure $filter)
     {
-        if (!isset($this->handlers[$eventType]))
-        {
+        if (!isset($this->handlers[$eventType])) {
             $this->handlers[$eventType] = [];
         }
 
@@ -58,17 +57,22 @@ class Filters
      *
      * @param string $eventType The type of event, e.g. 'beforeRoute'
      * @param mixed $eventArgs Event arguments to pass to the filter function.
+     * @return bool Returns whether any functions were triggered or not.
      */
     public function trigger($eventType, $eventArgs = null)
     {
-        if (!isset($this->handlers[$eventType]))
-        {
-            return;
+        if (!isset($this->handlers[$eventType])) {
+            return false;
         }
 
-        foreach ($this->handlers[$eventType] as $filterFunction)
-        {
+        $any = false;
+
+        foreach ($this->handlers[$eventType] as $filterFunction) {
             call_user_func($filterFunction, $eventArgs);
+
+            $any = true;
         }
+
+        return $any;
     }
 }

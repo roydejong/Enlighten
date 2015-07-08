@@ -2,8 +2,8 @@
 
 namespace Enlighten\Routing;
 
+use Enlighten\EnlightenContext;
 use Enlighten\Http\Request;
-use Enlighten\Routing\Constraints\Constraint;
 
 /**
  * Represents a route that maps an incoming request to an application code point.
@@ -50,6 +50,13 @@ class Route
     protected $constraints;
 
     /**
+     * Filter actions for this route.
+     *
+     * @var Filters
+     */
+    protected $filters;
+
+    /**
      * Constructs a new Route configuration.
      *
      * @param string $pattern
@@ -61,6 +68,7 @@ class Route
         $this->regexPattern = $this->formatRegex($this->pattern);
         $this->target = $target;
         $this->constraints = [];
+        $this->filters = new Filters();
     }
 
     /**
@@ -175,5 +183,83 @@ class Route
         }
 
         return true;
+    }
+
+    /**
+     * Adds a filter action that should be executed after this route's action completes.
+     *
+     * @param callable $filter
+     * @return $this
+     */
+    public function after(\Closure $filter)
+    {
+        $this->filters->register(Filters::AfterRoute, $filter);
+        return $this;
+    }
+
+    /**
+     * Adds a filter action that should be executed before this route's action starts.
+     *
+     * @param callable $filter
+     * @return $this
+     */
+    public function before(\Closure $filter)
+    {
+        $this->filters->register(Filters::BeforeRoute, $filter);
+        return $this;
+    }
+
+    /**
+     * Adds a filter action that should be executed when an exception occurs in this route's action.
+     *
+     * @param callable $filter
+     * @return $this
+     */
+    public function onException(\Closure $filter)
+    {
+        $this->filters->register(Filters::OnExeption, $filter);
+        return $this;
+    }
+
+    /**
+     * Executes this route's action.
+     *
+     * @param EnlightenContext $context
+     * @throws \Exception For unsupported or invalid action configurations.
+     * @return mixed
+     */
+    public function action(EnlightenContext $context)
+    {
+        $targetFunc = null;
+        $params = [];
+
+        if ($this->isCallable()) {
+            // A callable function that should be invoked directly
+            $targetFunc = $this->getTarget();
+            $targetFunc = $targetFunc->bindTo($context);
+        } else {
+            // A string path to a controller: resolve the controller and verify its validity
+            throw new \Exception('Only callable route targets are currently implemented'); // TODO
+        }
+
+        // Inject the route variables into the arguments passed to the function
+        $params = array_merge($params, $this->mapPathVariables($context->getRequest()));
+
+        // Finally, invoke the specified controller function or the specified callable with the appropriate params
+        $this->filters->trigger(Filters::BeforeRoute, $this);
+        $retVal = null;
+
+        try {
+            $retVal = call_user_func_array($targetFunc, $params);
+        } catch (\Exception $ex) {
+            if (!$this->filters->trigger(Filters::OnExeption, $ex)) {
+                // If this exception was unhandled, rethrow it so it can be handled in the global scope
+                throw $ex;
+            }
+        }
+
+        $this->filters->trigger(Filters::AfterRoute, $this);
+
+        return $retVal;
     }
 }
