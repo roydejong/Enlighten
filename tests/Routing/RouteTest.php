@@ -1,5 +1,7 @@
 <?php
 
+use Enlighten\Enlighten;
+use Enlighten\EnlightenContext;
 use Enlighten\Http\Request;
 use Enlighten\Http\RequestMethod;
 use Enlighten\Routing\Route;
@@ -143,5 +145,29 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $request->setMethod(RequestMethod::PATCH);
 
         $this->assertTrue($route->matches($request));
+    }
+
+    public function testRouteActionClosure()
+    {
+        $request = new Request();
+        $request->setRequestUri('/dir/sample.html');
+        $request->setMethod(RequestMethod::GET);
+
+        $route = new Route('/dir/sample.html', function () use ($request) {
+            // Our closure should receive our use variable ($request)
+            // Our closure should also have access to the Context via $this
+            echo $request->getMethod();
+            echo $this->getRequest()->getMethod();
+            return 'test';
+        });
+        $route->requireMethod(RequestMethod::GET);
+
+        $context = new EnlightenContext();
+        $context->_setRequest($request);
+
+        $this->assertTrue($route->matches($request));
+
+        $this->expectOutputString('GETGET');
+        $this->assertEquals('test', $route->action($context));
     }
 }
