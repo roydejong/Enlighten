@@ -131,6 +131,8 @@ class Enlighten
                 // TODO 404 error handling (#11)
             }
 
+            $this->filters->trigger(Filters::AfterRoute);
+
             // Clean out the output buffer to the response, and finally send the built-up response to the client
             $this->response->appendBody(ob_get_contents());
             ob_end_clean();
@@ -139,8 +141,6 @@ class Enlighten
                 // Do not send a body for HEAD requests
                 $this->response->setBody('');
             }
-
-            $this->filters->trigger(Filters::AfterRoute);
         } catch (\Exception $ex) {
             $this->response->setResponseCode(ResponseCode::HTTP_INTERNAL_SERVER_ERROR);
             $this->filters->trigger(Filters::OnExeption, $ex);
