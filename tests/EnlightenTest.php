@@ -6,6 +6,7 @@ use Enlighten\Http\RequestMethod;
 use Enlighten\Http\ResponseCode;
 use Enlighten\Routing\Route;
 use Enlighten\Routing\Router;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 class EnlightenTest extends PHPUnit_Framework_TestCase
 {
@@ -286,5 +287,83 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $sampleRequest->setMethod(RequestMethod::DELETE);
 
         $this->assertFalse($generatedRoute->matches($sampleRequest));
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testBeforeFilter()
+    {
+        $route = new Route('/', function () {
+            echo 'during';
+        });
+
+        $router = new Router();
+        $router->register($route);
+
+        $request = new Request();
+        $request->setRequestUri('/');
+
+        $enlighten = new Enlighten();
+        $enlighten->setRouter($router);
+        $enlighten->setRequest($request);
+        $enlighten->before(function () {
+            echo 'before';
+        });
+        $enlighten->start();
+
+        $this->expectOutputString('beforeduring');
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testAfterFilter()
+    {
+        $route = new Route('/', function () {
+            echo 'during';
+        });
+
+        $router = new Router();
+        $router->register($route);
+
+        $request = new Request();
+        $request->setRequestUri('/');
+
+        $enlighten = new Enlighten();
+        $enlighten->setRouter($router);
+        $enlighten->setRequest($request);
+        $enlighten->after(function () {
+            echo 'after';
+        });
+        $enlighten->start();
+
+        $this->expectOutputString('duringafter');
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testExceptionFilter()
+    {
+        $route = new Route('/', function () {
+            throw new Exception('Testex');
+        });
+
+        $router = new Router();
+        $router->register($route);
+
+        $request = new Request();
+        $request->setRequestUri('/');
+
+        $enlighten = new Enlighten();
+        $enlighten->setRouter($router);
+        $enlighten->setRequest($request);
+        $enlighten->onException(function (\Exception $ex) {
+            echo $ex->getMessage();
+        });
+        $enlighten->start();
+
+        $this->expectOutputString('Testex');
     }
 }
