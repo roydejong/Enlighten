@@ -268,4 +268,36 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
         $route->action($context);
     }
+
+    public function testRegexPattern()
+    {
+        $route = new Route('/dir/(sample|example)(/?)', function () {
+            // ...
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/dir/example/');
+        $request->setMethod(RequestMethod::GET);
+        $this->assertTrue($route->matches($request));
+
+        $request = new Request();
+        $request->setRequestUri('/dir/example');
+        $request->setMethod(RequestMethod::GET);
+        $this->assertTrue($route->matches($request));
+
+        $request = new Request();
+        $request->setRequestUri('/dir/sample/');
+        $request->setMethod(RequestMethod::GET);
+        $this->assertTrue($route->matches($request));
+
+        $request = new Request();
+        $request->setRequestUri('/dir/sample');
+        $request->setMethod(RequestMethod::GET);
+        $this->assertTrue($route->matches($request));
+
+        $request = new Request();
+        $request->setRequestUri('/dir/samples');
+        $request->setMethod(RequestMethod::GET);
+        $this->assertFalse($route->matches($request));
+    }
 }

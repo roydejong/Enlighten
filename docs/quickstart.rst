@@ -72,7 +72,7 @@ You can use Regex patterns for a bit more flexibility:
 
 .. code-block:: php
 
-    $app->route('/(index|home)(/)', function () {
+    $app->route('/(index|home)(/?)', function () {
         // Matches "/index" or "/home", with an optional trailing slash
     });
     
