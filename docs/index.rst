@@ -1,8 +1,13 @@
-Welcome to Enlighten's documentation!
+Enlighten Documentation
 =====================================
 
+.. toctree::
+    :hidden:
+
+    quickstart
+
 What is Enlighten?
-^^^^^^^^^^^^^^^^^^
+------------------
 **Enlighten is a micro framework that helps you rapidly build PHP web applications.**
 
 It takes the pain out of parsing and routing requests, handling form submissions, taking care of sessions and authentication and quickly getting an application up and running.
@@ -23,7 +28,13 @@ https://github.com/roydejong/Enlighten
 
 
 The documentation
-^^^^^^^^^^^^^^^^^
+-----------------
 You can always find the latest documentation on readthedocs.org:
 
 https://enlighten.readthedocs.org/en/latest/
+
+.. tip::
+
+    Want to see why Enlighten is awesome, and start building cool stuff right away?
+    Check out the aptly named :doc:`Quickstart <quickstart>` section for the quick and dirty code examples.
+    
