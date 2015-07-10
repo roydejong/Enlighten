@@ -1,22 +1,29 @@
-.. Enlighten documentation master file, created by
-   sphinx-quickstart on Mon Jul  6 23:32:06 2015.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to Enlighten's documentation!
 =====================================
 
-Contents:
+What is Enlighten?
+^^^^^^^^^^^^^^^^^^
+**Enlighten is a micro framework that helps you rapidly build PHP web applications.**
 
-.. toctree::
-   :maxdepth: 2
+It takes the pain out of parsing and routing requests, handling form submissions, taking care of sessions and authentication and quickly getting an application up and running.
+
+.. code-block:: php
+
+    $app = new Enlighten();
+
+    $app->get('/hello/$name', function ($name) {
+        echo "Hello there, $name";
+    });
+
+In short: a fat-free framework with very few external dependencies that helps you *get shit done* - without getting in your way.
+
+Enlighten is an open source, MIT licensed project. Check it out on GitHub:
+
+https://github.com/roydejong/Enlighten
 
 
+The documentation
+^^^^^^^^^^^^^^^^^
+You can always find the latest documentation on readthedocs.org:
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+https://enlighten.readthedocs.org/en/latest/
