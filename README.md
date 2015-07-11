@@ -1,7 +1,7 @@
 Enlighten Framework
 ===
 
-[![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](https://readthedocs.org/projects/enlighten/?badge=latest)
+[![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](http://enlighten.readthedocs.org/en/latest/)
 [![Build Status](https://travis-ci.org/roydejong/Enlighten.svg?branch=master)](https://travis-ci.org/roydejong/Enlighten)
 [![Latest Stable Version](https://poser.pugx.org/enlighten/framework/v/stable)](https://packagist.org/packages/enlighten/framework)
 [![Latest Unstable Version](https://poser.pugx.org/enlighten/framework/v/unstable)](https://packagist.org/packages/enlighten/framework)
