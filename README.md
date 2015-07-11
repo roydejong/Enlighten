@@ -29,7 +29,6 @@ Coming soon to Enlighten:
 - Cookie and session handling.
 - More ways of parsing requests: files, headers, cookies.
 
-
 **Note: This is pre-release information, this does not reflect the current or even a (planned) final state of the project. This is, right now, just an experiment.**
 
 Getting started
@@ -43,12 +42,8 @@ In the entry point (`index.php`) of your application, initialize and start Enlig
     $app = new Enlighten();
     $app->start();
     
-You'll need to make sure that your web server redirects all requests you want to handle with Enlighten to this script. For example, it is common to redirect all requests that do not resolve to a static file to `index.php`, which then contains the code you see above.
-    
-This code will initialize a blank application and process the incoming request.
+You'll need to make sure that your web server redirects all requests you want to handle with Enlighten to this script. This code will initialize a blank application and process all incoming requests.
 
-Defining routes
----
 Next, you will want to define routes. Routes map an incoming request to an appropriate function or controller that can respond to it. It's easy to set up:
 
     $app->get('/articles/$name', function ($name) {
@@ -56,5 +51,5 @@ Next, you will want to define routes. Routes map an incoming request to an appro
         echo "You requested an article with this name: $name";
     });
 
-**Check out the full documentation and quickstart guide:
+**Check out the full documentation and quickstart guide at 
 <https://enlighten.readthedocs.org/en/latest/>.**
