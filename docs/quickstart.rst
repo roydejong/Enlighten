@@ -4,7 +4,9 @@ This guide will help you set up Enlighten and start using its powerful tools.
 
 Installation
 ^^^^^^^^^^^^
-Enlighten is a composer library. It couldn't be easier to install: set up your project, initialize composer, and require the framework as a dependency:
+The Enlighten framework is available as a composer library. It couldn't be easier to install. Just set up your project, initialize_ Composer, and require the framework as a dependency:
+
+.. _initialize: https://getcomposer.org/doc/00-intro.md
 
 .. code-block:: bash
 
@@ -12,13 +14,59 @@ Enlighten is a composer library. It couldn't be easier to install: set up your p
     
 Your project is now ready to use Enlighten. Not bad, right?
 
+.. tip::
+
+    Not interested in letting Enlighten handle your entire application flow? The rest of this guide is not for you. Refer to the documentation for the individual components you'd like to use instead.
+
+Configuring your web server
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Enlighten is designed to handle all incoming HTTP requests itself and route them to the appropriate code. To accomplish this, you will need to configure your web server to direct all requests for your web application to a primary entry point, like ``index.php``.
+
+**Example configuration for nginx:**
+
+.. code-block:: nginx
+
+    server {
+        ## Basic configuration
+        listen 80;
+        root /var/www/myapp/public;
+        index index.php;
+        server_name dev.myapp.com;
+
+        ## Restrict all directory listings
+        autoindex off;
+
+        ## Set the error page to index.php. As index.php applies routing
+        ## (based on REQUEST_URI), our own error page will show up.
+        error_page 404 = /index.php;
+
+        ## Rewrite everything to index.php, but maintain query string
+        location / {
+            try_files $uri $uri/ /index.php$is_args$args;
+        }
+
+        ## Proxy requests to php-fpm listening on a Unix socket
+        location ~ \.php$ {
+            fastcgi_pass unix:/var/run/php5-fpm.sock;
+            fastcgi_index index.php;
+            include fastcgi.conf;
+        }
+    }
+
+**Example configuration for Apache**:
+
+.. code-block:: apache
+
+    RewriteEngine on
+
+    RewriteCond %{REQUEST_FILENAME} !index.php
+    RewriteRule .* index.php?url=$0 [QSA,L]
+
+
+
 Set up your application
 ^^^^^^^^^^^^^^^^^^^^^^^
 The ``Enlighten`` class acts as the heart of your application. It ties all the framework's components together into one easy to use package: from request processing and routing to sending a response back to the user.
-
-.. tip::
-
-    Not interested in letting Enlighten handle your entire application flow? The rest of this guide is not for you. Refer to the documentation for the individual components you'd like to use instead.  
     
 To get started, you will want to initialize the composer autoloader and initialize a new instance of `Enlighten`. Here's what a typical ``index.php`` might look like:
 
