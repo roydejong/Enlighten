@@ -1,7 +1,7 @@
 Enlighten Framework
 ===
 
-[![Documentation Status](https://readthedocs.org/projects/enlighten/badge/?version=latest)](https://readthedocs.org/projects/enlighten/?badge=latest)
+[![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](https://readthedocs.org/projects/enlighten/?badge=latest)
 [![Build Status](https://travis-ci.org/roydejong/Enlighten.svg?branch=master)](https://travis-ci.org/roydejong/Enlighten)
 [![Latest Stable Version](https://poser.pugx.org/enlighten/framework/v/stable)](https://packagist.org/packages/enlighten/framework)
 [![Latest Unstable Version](https://poser.pugx.org/enlighten/framework/v/unstable)](https://packagist.org/packages/enlighten/framework)
@@ -49,30 +49,12 @@ This code will initialize a blank application and process the incoming request.
 
 Defining routes
 ---
-Next, you will want to define routes. Routes map an incoming request (for example, `/articles/hello-world`) to an appropriate function or controller that can respond to it (for example, the `viewArticle` function in the `ArticlesController`).
-
-It's easy to set up routes. Let's see what the above example looks like in code:
+Next, you will want to define routes. Routes map an incoming request to an appropriate function or controller that can respond to it. It's easy to set up:
 
     $app->get('/articles/$name', function ($name) {
+        // Triggered for all GET requests to /articles/*
         echo "You requested an article with this name: $name";
     });
-    
-Cool, huh? The dollar sign `$` indicates this URL contains a dynamic variable. This will cause any HTTP GET requests that match our pattern to be sent to the function you've defined, with the dynamic variables you have defined as parameters. You can pass any *callable* when you register a new route.
 
-Helpful tip: Remember to use single quotes `'` rather than double quotes `"` when defining these patterns, or things will go bad when you try to use the dollar `$` sign!
- 
-Other functions you can use to register your routes are as follows:
-
-- `$app->route($pattern, $target)`: The same as the above example, for requests of all method types.
-- `$app->post($pattern, $target)`: The same as the above example, for POST requests
-- `$app->put($pattern, $target)`: The same as the above example, for PUT requests
-- `$app->patch($pattern, $target)`: The same as the above example, for PATCH requests
-- `$app->head($pattern, $target)`: The same as the above example, for HEAD requests
-- `$app->options($pattern, $target)`: The same as the above example, for OPTIONS requests
-- `$app->delete($pattern, $target)`: The same as the above example, for DELETE requests
- 
-Further reading
----
-If you need a bit more power and customization, or seek more information, check out the docs:
-
-**<https://enlighten.readthedocs.org/en/latest/>**
+**Check out the full documentation and quickstart guide:
+<https://enlighten.readthedocs.org/en/latest/>.**
