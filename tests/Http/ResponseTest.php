@@ -108,4 +108,48 @@ class ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(ResponseCode::HTTP_TEMPORARY_REDIRECT, $response->getResponseCode());
         $this->assertEquals('/kettle', $response->getHeader('Location'));
     }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testSetCookie()
+    {
+        $expire = time () + 60;
+
+        $response = new Response();
+        $this->assertEquals($response, $response->setCookie('test', 'value', $expire, '/', '.test.com', true, true), 'Fluent API');
+        $response->send();
+
+        if (!function_exists('xdebug_get_headers')) {
+            $this->markTestSkipped('xdebug is not installed');
+        } else {
+            $rawHeader = xdebug_get_headers()[0];
+
+            $this->assertContains('Set-Cookie: test=value; expires=', $rawHeader);
+            $this->assertContains('Max-Age=60; path=/; domain=.test.com; secure; httponly', $rawHeader);
+
+            // Note: Due to locale / formatting issues it is not really possible to reliably test the expire= value
+            //  sent in the header correctly across a variety of systems. Max-age should cover our bases, though.
+        }
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testUnSetCookie()
+    {
+        $response = new Response();
+        $this->assertEquals($response, $response->unsetCookie('testCookieName'), 'Fluent API');
+        $response->send();
+
+        if (!function_exists('xdebug_get_headers')) {
+            $this->markTestSkipped('xdebug is not installed');
+        } else {
+            $rawHeader = xdebug_get_headers()[0];
+
+            $this->assertContains('Set-Cookie:', $rawHeader);
+            $this->assertContains('testCookieName=deleted;', $rawHeader);
+            $this->assertContains('Max-Age=0;', $rawHeader);
+        }
+    }
 }
