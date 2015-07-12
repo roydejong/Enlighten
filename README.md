@@ -6,6 +6,7 @@ Enlighten Framework
 [![Latest Stable Version](https://poser.pugx.org/enlighten/framework/v/stable)](https://packagist.org/packages/enlighten/framework)
 [![Latest Unstable Version](https://poser.pugx.org/enlighten/framework/v/unstable)](https://packagist.org/packages/enlighten/framework)
 [![License](https://poser.pugx.org/enlighten/framework/license)](https://github.com/roydejong/Enlighten/blob/master/LICENSE.md)
+[![Test Coverage](https://codeclimate.com/github/roydejong/Enlighten/badges/coverage.svg)](https://codeclimate.com/github/roydejong/Enlighten/coverage)
 
 **Enlighten is a simple, lean, high-performance PHP micro framework that acts as the foundation for your web application.**
 
