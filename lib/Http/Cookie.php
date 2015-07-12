@@ -9,8 +9,23 @@ namespace Enlighten\Http;
 class Cookie
 {
     /**
+     * Initializes a new, blank Cookie object with default settings.
+     */
+    public function __construct()
+    {
+        $this->name = '';
+        $this->value = '';
+        $this->expire = null;
+        $this->path = null;
+        $this->domain = null;
+        $this->secure = false;
+        $this->httpOnly = false;
+    }
+
+    /**
      * The name of the cookie.
      *
+     * @default Empty string
      * @var string
      */
     protected $name;
@@ -18,6 +33,7 @@ class Cookie
     /**
      * The value of the cookie.
      *
+     * @default Empty string
      * @var string
      */
     protected $value;
@@ -26,6 +42,7 @@ class Cookie
      * The date and time on which the cookie expires. This expiration is managed by the client.
      * If set to null, the cookie will expire at the end of the session (on browser close).
      *
+     * @default null
      * @var \DateTime|null
      */
     protected $expire;
@@ -36,7 +53,8 @@ class Cookie
      * If set to '/foo/', the cookie will only be available within the /foo/ directory and all sub-directories.
      * The default value is the current directory that the cookie is being set in.
      *
-     * @var string
+     * @default null
+     * @var string|null
      */
     protected $path;
 
@@ -45,7 +63,8 @@ class Cookie
      * Setting the domain to 'www.example.com' will make the cookie available in www and higher subdomains.
      * Cookies available to a lower domain, such as 'example.com' will be available to higher subdomains, such as www.
      *
-     * @var string
+     * @default null
+     * @var string|null
      */
     protected $domain;
 
@@ -53,6 +72,7 @@ class Cookie
      * Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client.
      * When set to TRUE, the cookie will only be set if a secure connection exists.
      *
+     * @default false
      * @var bool
      */
     protected $secure;
@@ -62,6 +82,7 @@ class Cookie
      * This means that the cookie won't be accessible by scripting languages, such as JavaScript.
      * It has been suggested that this setting can effectively help to reduce identity theft through XSS attacks.
      *
+     * @default false
      * @var bool
      */
     protected $httpOnly;
@@ -169,7 +190,7 @@ class Cookie
      */
     public function setExpireOnSession()
     {
-        $this->setExpire(null);
+        $this->expire = null;
         return $this;
     }
 
