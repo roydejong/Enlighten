@@ -225,7 +225,7 @@ class Route
      * Executes this route's action.
      *
      * @param EnlightenContext $context
-     * @throws \Exception For unsupported or invalid action configurations.
+     * @throws RoutingException For unsupported or invalid action configurations.
      * @return mixed
      */
     public function action(EnlightenContext $context)
@@ -239,7 +239,27 @@ class Route
             $targetFunc = $targetFunc->bindTo($context);
         } else {
             // A string path to a controller: resolve the controller and verify its validity
-            throw new \Exception('Only callable route targets are currently implemented'); // TODO
+            $targetParts = explode('@', $this->getTarget(), 2);
+            $targetClass = $targetParts[0];
+            $targetFuncName = count($targetParts) > 1 ? $targetParts[1] : 'action';
+
+            if (!class_exists($targetClass, true)) {
+                throw new RoutingException('Could not locate class: ' . $targetClass);
+            }
+
+            $classObj = null;
+
+            try {
+                $classObj = new $targetClass();
+            } catch (\Exception $ex) {
+                throw new RoutingException('Exception thrown when calling default constructor on ' . $targetClass, 0, $ex);
+            }
+
+            $targetFunc = [$classObj, $targetFuncName];
+
+            if (!is_callable($targetFunc)) {
+                throw new RoutingException('Route target function is not callable: ' . $this->getTarget());
+            }
         }
 
         // Inject the route variables into the arguments passed to the function

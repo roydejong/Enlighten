@@ -18,7 +18,8 @@
     },
     "autoload": {
       "psr-4": {
-        "Enlighten\\": "lib/"
+        "Enlighten\\": "lib/",
+        "Enlighten\\Tests\\": "tests/"
       }
     }
 }

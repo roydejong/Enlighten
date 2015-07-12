@@ -4,6 +4,7 @@ use Enlighten\EnlightenContext;
 use Enlighten\Http\Request;
 use Enlighten\Http\RequestMethod;
 use Enlighten\Routing\Route;
+use Enlighten\Routing\RoutingException;
 
 class RouteTest extends PHPUnit_Framework_TestCase
 {
@@ -299,5 +300,91 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $request->setRequestUri('/dir/samples');
         $request->setMethod(RequestMethod::GET);
         $this->assertFalse($route->matches($request));
+    }
+
+    public function testControllerDispatchingWithDefaultFunction()
+    {
+        $context = new EnlightenContext();
+
+        $request = new Request();
+        $context->setRequest($request);
+
+        $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleController');
+
+        $this->assertEquals('defaultReturn', $route->action($context));
+        $this->expectOutputString('defaultAction');
+    }
+
+    public function testControllerDispatchingWithCustomFunction()
+    {
+        $context = new EnlightenContext();
+
+        $request = new Request();
+        $context->setRequest($request);
+
+        $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleController@myAction');
+
+        $this->assertEquals('myReturn', $route->action($context));
+        $this->expectOutputString('myAction');
+    }
+
+    /**
+     * @expectedException Enlighten\Routing\RoutingException
+     * @expectedExceptionMessage Route target function is not callable
+     */
+    public function testControllerDispatchingWithBadCustomFunction()
+    {
+        $context = new EnlightenContext();
+
+        $request = new Request();
+        $context->setRequest($request);
+
+        $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleController@badAction');
+        $route->action($context);
+    }
+
+    /**
+     * @expectedException Enlighten\Routing\RoutingException
+     * @expectedExceptionMessage Could not locate class
+     */
+    public function testControllerDispatchingWithBadClassName()
+    {
+        $context = new EnlightenContext();
+
+        $request = new Request();
+        $context->setRequest($request);
+
+        $route = new Route('/', 'Enlighten\Tests\Routing\Sample\BogusController');
+        $route->action($context);
+    }
+
+    /**
+     * @expectedException Enlighten\Routing\RoutingException
+     * @expectedExceptionMessage Exception thrown when calling default constructor
+     */
+    public function testControllerDispatchingWithBadConstructor()
+    {
+        $context = new EnlightenContext();
+
+        $request = new Request();
+        $context->setRequest($request);
+
+        $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleBadConstructorController');
+        $route->action($context);
+    }
+
+    /**
+     * @expectedException Enlighten\Routing\RoutingException
+     * @expectedExceptionMessage Route target function is not callable
+     */
+    public function testControllerDispatchingWithNoDefaultAction()
+    {
+        $context = new EnlightenContext();
+
+        $request = new Request();
+        $context->setRequest($request);
+
+        $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleNoDefaultActionController');
+        $route->action($context);
     }
 }
