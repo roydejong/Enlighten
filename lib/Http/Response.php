@@ -196,6 +196,18 @@ class Response
     }
 
     /**
+     * Tries to destroy a client cookie based on its name, by setting its expiration to a date in the future.
+     *
+     * @param $name
+     * @return $this
+     */
+    public function unsetCookie($name)
+    {
+        $this->setCookie($name, '', time() - 3600, '/');
+        return $this;
+    }
+
+    /**
      * Sends the HTTP cookies to the client.
      * Causes output!
      */
