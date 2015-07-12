@@ -12,9 +12,11 @@ Enlighten Framework
 This is a modern framework for PHP 5 that doesn't get in your way. Just the building blocks you need to accelerate your application development and simply *get shit done*. 
 
 - Easy HTTP request and response management.
-- Razor fast routing with dynamic variables.
+- Razor fast routing with dynamic URL variables.
+- Application and route filters for authentication, exception handling, etc.
+- 
 
-It is awesome because:
+It is awesome because it is:
 
 - Built for ease of use and performance.
 - Low on fat: small code base with minimal external dependencies.
@@ -25,9 +27,8 @@ Coming soon to Enlighten:
 
 - MVC building blocks for a well-organized application.
 - Form validation and on-the-fly form HTML generation.
-- Filters for routing, e.g. for authentication.
-- Cookie and session handling.
-- More ways of parsing requests: files, headers, cookies.
+- Session handling.
+- More ways of parsing requests: files, headers.
 
 **Note: This is pre-release information, this does not reflect the current or even a (planned) final state of the project. This is, right now, just an experiment.**
 
