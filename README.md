@@ -14,7 +14,6 @@ This is a modern framework for PHP 5 that doesn't get in your way. Just the buil
 - Easy HTTP request and response management.
 - Razor fast routing with dynamic URL variables.
 - Application and route filters for authentication, exception handling, etc.
-- 
 
 It is awesome because it is:
 
