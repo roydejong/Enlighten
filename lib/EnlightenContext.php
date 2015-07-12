@@ -36,6 +36,19 @@ class EnlightenContext
     }
 
     /**
+     * Sets this context's response.
+     * This function should only be called when the context is created.
+     *
+     * @param Request $request
+     * @return $this;
+     */
+    public function setRequest(Request $request)
+    {
+        $this->request = $request;
+        return $this;
+    }
+
+    /**
      * Gets the response being built.
      *
      * @return Response
@@ -49,21 +62,12 @@ class EnlightenContext
      * Sets this context's response.
      * This function should only be called when the context is created.
      *
-     * @param Request $request
-     */
-    public function _setRequest(Request $request)
-    {
-        $this->request = $request;
-    }
-
-    /**
-     * Sets this context's response.
-     * This function should only be called when the context is created.
-     *
      * @param Response $response
+     * @return $this
      */
-    public function _setResponse(Response $response)
+    public function setResponse(Response $response)
     {
         $this->response = $response;
+        return $this;
     }
 }

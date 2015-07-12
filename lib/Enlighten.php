@@ -313,8 +313,8 @@ class Enlighten
      */
     public function fillContext(EnlightenContext $context)
     {
-        $context->_setRequest($this->request);
-        $context->_setResponse($this->response);
+        $context->setRequest($this->request);
+        $context->setResponse($this->response);
     }
 
     /**

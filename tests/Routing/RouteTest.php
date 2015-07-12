@@ -162,7 +162,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $route->requireMethod(RequestMethod::GET);
 
         $context = new EnlightenContext();
-        $context->_setRequest($request);
+        $context->setRequest($request);
 
         $this->assertTrue($route->matches($request));
 
@@ -187,7 +187,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($route->matches($request));
 
         $context = new EnlightenContext();
-        $context->_setRequest($request);
+        $context->setRequest($request);
 
         $route->action($context);
 
@@ -211,7 +211,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($route->matches($request));
 
         $context = new EnlightenContext();
-        $context->_setRequest($request);
+        $context->setRequest($request);
 
         $route->action($context);
 
@@ -239,7 +239,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($route->matches($request));
 
         $context = new EnlightenContext();
-        $context->_setRequest($request);
+        $context->setRequest($request);
 
         $route->action($context);
 
@@ -264,7 +264,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($route->matches($request));
 
         $context = new EnlightenContext();
-        $context->_setRequest($request);
+        $context->setRequest($request);
 
         $route->action($context);
     }
