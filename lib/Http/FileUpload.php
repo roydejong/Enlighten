@@ -24,6 +24,22 @@ class FileUpload
     protected $temporaryPath;
 
     /**
+     * Flag indicating whether the uploaded file has been moved.
+     *
+     * @default false
+     * @var bool
+     */
+    protected $didMove = false;
+
+    /**
+     * Returns the current path to the uploaded file.
+     * This variable is always updated to reflect the latest location.
+     *
+     * @var string
+     */
+    protected $currentPath;
+
+    /**
      * This is the file type, as published by the client.
      * Warning: user submitted, do not treat this value as truth or safe to use.
      *
@@ -82,7 +98,25 @@ class FileUpload
     public function setTemporaryPath($temporaryPath)
     {
         $this->temporaryPath = $temporaryPath;
+
+        if (!$this->didMove) {
+            $this->currentPath = $temporaryPath;
+        }
+
         return $this;
+    }
+
+    /**
+     * Gets the last known path to the uploaded file.
+     *
+     * If the file was not yet saved or moved, it will be set to the temporary file path (if one is known).
+     * If the file was already moved (for example, using saveTo), it will be set to the path the file was saved to.
+     *
+     * @return string
+     */
+    public function getCurrentPath()
+    {
+        return $this->currentPath;
     }
 
     /**
@@ -174,22 +208,16 @@ class FileUpload
      */
     public function getFileSize()
     {
-        if (!file_exists($this->getTemporaryPath())) {
+        if (!file_exists($this->currentPath)) {
             return 0;
         }
 
-        return filesize($this->getTemporaryPath());
+        return filesize($this->currentPath);
     }
 
     /**
-     * Tries to move the uploaded file to a specified target path.
-     * This will cause the temporary file to be deleted.
-     *
-     * If the destination file already exists, it will be overwritten.
-     *
-     * This function checks to ensure that the file designated by filename is a valid upload file (meaning that it was
-     * uploaded via PHP's HTTP POST upload mechanism). If the file is valid, it will be moved to the filename given by
-     * destination.
+     * Moves the temporary file to a given location, or copies the previously moved file to a new location.
+     * If the destination file already exists, it will be overwritten. The temporary file will be deleted.
      *
      * @param string $targetPath The path to move the file to.
      * @return bool Returns true on success.
@@ -206,7 +234,20 @@ class FileUpload
             return false;
         }
 
-        return move_uploaded_file($this->getTemporaryPath(), $targetPath);
+        $moveOk = false;
+
+        if (!$this->didMove) {
+            $moveOk = move_uploaded_file($this->getTemporaryPath(), $targetPath);
+        } else {
+            $moveOk = copy($this->getCurrentPath(), $targetPath);
+        }
+
+        if ($moveOk) {
+            $this->didMove = true;
+            $this->currentPath = $targetPath;
+        }
+
+        return $moveOk;
     }
 
     /**
