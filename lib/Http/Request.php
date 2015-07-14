@@ -378,11 +378,11 @@ class Request
     {
         $this->fileUploads = [];
 
-        foreach ($files as $fileData) {
+        foreach ($files as $key => $fileData) {
             $uploadObj = FileUpload::createFromFileArray($fileData);
 
             if (!empty($uploadObj)) {
-                $this->fileUploads[] = $uploadObj;
+                $this->fileUploads[$key] = $uploadObj;
             }
         }
     }

@@ -139,6 +139,18 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $_POST = ['abc' => 'test'];
         $_SERVER = ['REQUEST_URI' => '/pots?test=abc', 'REQUEST_METHOD' => RequestMethod::PATCH];
         $_COOKIE = ['Session' => uniqid()];
+        $_FILES = [
+            'badKey' => [
+                'name' => 'missingSomeData'
+            ],
+            'goodKey' => [
+                'name' => 'bookmarks.html',
+                'type' => 'text/html',
+                'tmp_name' => '/tmp/php3D.tmp',
+                'error' => UPLOAD_ERR_OK,
+                'size' => 644563
+            ]
+        ];
 
         $request = Request::extractFromEnvironment();
 
@@ -148,5 +160,37 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('abc', $request->getQueryParam('test', 'QUERY_DEF'));
         $this->assertEquals('PATCH', $request->getEnvironment('REQUEST_METHOD'));
         $this->assertEquals($_COOKIE['Session'], $request->getCookie('Session'));
+        $this->assertCount(1, $request->getFileUploads());
+        $this->assertEquals('text/html', $request->getFileUploads()['goodKey']->getType());
+    }
+
+    public function testUploadProcessing()
+    {
+        $files = [
+            'badKey' => [
+                'name' => 'missingSomeData'
+            ],
+            'goodKey' => [
+                'name' => 'bookmarks.html',
+                'type' => 'text/html',
+                'tmp_name' => '/tmp/php3D.tmp',
+                'error' => UPLOAD_ERR_OK,
+                'size' => 644563
+            ]
+        ];
+
+        $request = new Request();
+        $this->assertCount(0, $request->getFileUploads());
+        $request->setFileData($files);
+
+        $this->assertCount(1, $request->getFileUploads());
+        $this->assertTrue(isset($files['goodKey']), $request->getFileUploads());
+
+        $file = $request->getFileUploads()['goodKey'];
+        $this->assertEquals('bookmarks.html', $file->getOriginalName());
+        $this->assertEquals('text/html', $file->getType());
+        $this->assertEquals('/tmp/php3D.tmp', $file->getTemporaryPath());
+        $this->assertEquals(UPLOAD_ERR_OK, $file->getError());
+        $this->assertEquals(0, $file->getFileSize());
     }
 }
