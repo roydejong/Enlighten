@@ -177,22 +177,44 @@ class FileUpload
      * destination.
      *
      * @param string $targetPath The path to move the file to.
-     * @return bool Returns TRUE on success.
+     * @return bool Returns true on success.
      */
     public function saveTo($targetPath)
     {
-        if ($this->hasError())
-        {
+        if ($this->hasError()) {
             // We cannot process a file that has errored (empty, incomplete, blocked, ...)
             return false;
         }
 
-        if (!file_exists($this->getTemporaryPath()) || filesize($this->getTemporaryPath()) <= 0)
-        {
+        if (!file_exists($this->getTemporaryPath()) || filesize($this->getTemporaryPath()) <= 0) {
             // We cannot process empty source files
             return false;
         }
 
         return move_uploaded_file($this->getTemporaryPath(), $targetPath);
+    }
+
+    /**
+     * Tries to create an FileUpload object for a given $fileArray (item in $_FILES array format).
+     *
+     * @param array $fileArray
+     * @return FileUpload|null
+     */
+    public static function createFromFileArray(array $fileArray)
+    {
+        $requiredKeys = ['name', 'type', 'tmp_name', 'error'];
+
+        foreach ($requiredKeys as $key) {
+            if (!isset($fileArray[$key]) || empty($fileArray[$key])) {
+                // A required key is missing in our file array, so this is invalid: return null
+                return null;
+            }
+        }
+
+        return (new FileUpload())
+            ->setOriginalName($fileArray['name'])
+            ->setType($fileArray['type'])
+            ->setTemporaryPath($fileArray['tmp_name'])
+            ->setError(intval($fileArray['error']));
     }
 }
