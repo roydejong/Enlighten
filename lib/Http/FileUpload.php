@@ -40,6 +40,15 @@ class FileUpload
     protected $currentPath;
 
     /**
+     * The original file size of the uploaded temporary file, in bytes.
+     * May be set to zero if there's a problem with the uploaded file.
+     *
+     * @default 0
+     * @var int
+     */
+    protected $fileSize;
+
+    /**
      * This is the file type, as published by the client.
      * Warning: user submitted, do not treat this value as truth or safe to use.
      *
@@ -101,6 +110,11 @@ class FileUpload
 
         if (!$this->didMove) {
             $this->currentPath = $temporaryPath;
+            $this->fileSize = 0;
+
+            if (file_exists($this->currentPath)) {
+                $this->fileSize = filesize($temporaryPath);
+            }
         }
 
         return $this;
@@ -208,11 +222,7 @@ class FileUpload
      */
     public function getFileSize()
     {
-        if (!file_exists($this->currentPath)) {
-            return 0;
-        }
-
-        return filesize($this->currentPath);
+        return $this->fileSize;
     }
 
     /**
