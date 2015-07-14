@@ -1,9 +1,19 @@
 <?php
 
-use Enlighten\Http\Cookie;
-use Enlighten\Http\FileUpload;
+namespace Enlighten\Http;
 
-class FileUploadTest extends PHPUnit_Framework_TestCase
+function move_uploaded_file($source, $destination)
+{
+    if (!copy($source, $destination)) {
+        return false;
+    }
+
+    @unlink($source);
+
+    return true;
+}
+
+class FileUploadTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetSetOriginalName()
     {
@@ -127,13 +137,18 @@ class FileUploadTest extends PHPUnit_Framework_TestCase
 
     public function testMoveFile()
     {
-        $samplePath = realpath(__DIR__ . '/Sample') . '/upload.txt';
+        $tmpPath = realpath(__DIR__ . '/Sample') . '/upload.tmp';
         $targetPath = realpath(__DIR__ . '/Sample') . '/upload_moved.txt';
+        $targetPath2 = realpath(__DIR__ . '/Sample') . '/upload_moved_xtracopy.txt';
 
-        if (!file_exists($samplePath) || filesize($samplePath) == 0) {
-            $this->markTestSkipped('Sample upload file could not be read correctly: ' . $samplePath);
-            return;
+        if (file_exists($tmpPath)) {
+            if (!unlink($tmpPath)) {
+                $this->markTestSkipped('Temp upload file remains from old test and could not be removed');
+                return;
+            }
         }
+
+        file_put_contents($tmpPath, 'TESTING_123');
 
         if (file_exists($targetPath)) {
             if (!unlink($targetPath)) {
@@ -142,24 +157,41 @@ class FileUploadTest extends PHPUnit_Framework_TestCase
             }
         }
 
-        $expectedSize = filesize($samplePath);
+        if (file_exists($targetPath2)) {
+            if (!unlink($targetPath2)) {
+                $this->markTestSkipped('Moved upload file (2) remains from old test and could not be removed');
+                return;
+            }
+        }
+
+        $expectedSize = filesize($tmpPath);
 
         $file = new FileUpload();
-        $file->setTemporaryPath($samplePath);
+        $file->setTemporaryPath($tmpPath);
 
-        $this->assertFalse($file->saveTo($targetPath));
-        
-        // TODO Real testing will not work because move_uploaded_file ensures that the file is "truly" uploaded, need to mock.
+        // Initial copy
+        $this->assertTrue($file->saveTo($targetPath));
+        // Ensure file is copied OK and temp path is gone
+        $this->assertFileExists($targetPath);
+        $this->assertFileNotExists($tmpPath);
+        $this->assertTrue(filesize($targetPath) == $expectedSize);
+        // Ensure that the file size and current path reported are accurate
+        $this->assertEquals($expectedSize, $file->getFileSize());
+        $this->assertEquals($targetPath, $file->getCurrentPath());
 
-//        $this->assertTrue($file->saveTo($targetPath));
-//
-//        // Ensure file is copied OK and temp path is gone
-//        $this->assertFileExists($targetPath);
-//        $this->assertFileNotExists($samplePath);
-//        $this->assertTrue(filesize($targetPath) == $expectedSize);
-//
-//        // Ensure that the file size and current path reported are accurate
-//        $this->assertEquals($expectedSize, $file->getFileSize());
+        // Copy the file again to a second location
+        $this->assertTrue($file->saveTo($targetPath2));
+        $this->assertTrue(filesize($targetPath2) == $expectedSize);
+        $this->assertFileExists($targetPath);
+        $this->assertFileExists($targetPath2);
+        $this->assertFileNotExists($tmpPath);
+        $this->assertEquals($expectedSize, $file->getFileSize());
+        $this->assertEquals($targetPath2, $file->getCurrentPath());
+
+        // cleanup
+        @unlink($tmpPath);
+        @unlink($targetPath);
+        @unlink($targetPath2);
     }
 
     public function testCreateFromArray()
