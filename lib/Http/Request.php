@@ -53,6 +53,14 @@ class Request
     protected $cookies;
 
     /**
+     * A collection of files that were uploaded in this request.
+     * A key/value array of $id => $fileUpload.
+     *
+     * @var FileUpload[]
+     */
+    protected $fileUploads;
+
+    /**
      * Initializes a new, blank HTTP request.
      */
     public function __construct()
@@ -63,6 +71,7 @@ class Request
         $this->query = [];
         $this->environment = [];
         $this->cookies = [];
+        $this->fileUploads = [];
     }
 
     /**
@@ -320,6 +329,17 @@ class Request
     }
 
     /**
+     * Gets a collection of uploaded files in this request.
+     * Returns a key/value array of $id => $fileUpload.
+     *
+     * @return FileUpload[]
+     */
+    public function getFileUploads()
+    {
+        return $this->fileUploads;
+    }
+
+    /**
      * @param array $post Key/value $_POST array.
      */
     public function setPostData(array $post)
@@ -352,6 +372,22 @@ class Request
     }
 
     /**
+     * @param array $files Key/value $_FILES array.
+     */
+    public function setFileData(array $files)
+    {
+        $this->fileUploads = [];
+
+        foreach ($files as $fileData) {
+            $uploadObj = FileUpload::createFromFileArray($fileData);
+
+            if (!empty($uploadObj)) {
+                $this->fileUploads[] = $uploadObj;
+            }
+        }
+    }
+
+    /**
      * Creates a default Request based on the current PHP environment superglobals ($_SERVER, $_GET, $_POST, etc).
      */
     public static function extractFromEnvironment()
@@ -367,6 +403,7 @@ class Request
         $request->setQueryData($_GET);
         $request->setEnvironmentData($_SERVER);
         $request->setCookieData($_COOKIE);
+        $request->setFileData($_FILES);
         return $request;
     }
 }
