@@ -167,6 +167,21 @@ class FileUpload
     }
 
     /**
+     * Returns the size of the uploaded file.
+     * Will return zero if there is a problem with the file.
+     *
+     * @return int File size in bytes.
+     */
+    public function getFileSize()
+    {
+        if (!file_exists($this->getTemporaryPath())) {
+            return 0;
+        }
+
+        return filesize($this->getTemporaryPath());
+    }
+
+    /**
      * Tries to move the uploaded file to a specified target path.
      * This will cause the temporary file to be deleted.
      *
@@ -186,7 +201,7 @@ class FileUpload
             return false;
         }
 
-        if (!file_exists($this->getTemporaryPath()) || filesize($this->getTemporaryPath()) <= 0) {
+        if ($this->getFileSize() <= 0) {
             // We cannot process empty source files
             return false;
         }
