@@ -181,6 +181,18 @@ class FileUpload
      */
     public function saveTo($targetPath)
     {
+        if ($this->hasError())
+        {
+            // We cannot process a file that has errored (empty, incomplete, blocked, ...)
+            return false;
+        }
+
+        if (!file_exists($this->getTemporaryPath()) || filesize($this->getTemporaryPath()) <= 0)
+        {
+            // We cannot process empty source files
+            return false;
+        }
+
         return move_uploaded_file($this->getTemporaryPath(), $targetPath);
     }
 }
