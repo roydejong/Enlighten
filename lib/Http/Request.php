@@ -372,10 +372,106 @@ class Request
     }
 
     /**
+     * Attempts to deflate a given $_FILES array.
+     * When multiple files are uploaded in to the same form field, we need to process these as individual items.
+     * This function also adds our custom "key" to the file array, which we will need further down the road.
+     *
+     * @param array $files
+     * @return array
+     */
+    private function deflateFilesArray(array $files)
+    {
+        /**
+         * This is where all the magic happens. This function converts a given $_FILES array to an array format that
+         * the Enlighten request handling code can understand. The goal is simple: convert the array to a workable
+         * format, rather than the complex maze the PHP developers created for us. :)
+         *
+         * A typical $_FILES array, with no multiple file uploads, may look like this:
+         *
+         * array {
+         *    "upload" => array {
+         *       "name" => "myfile.jpg",
+         *       "tmp_path" => "/tmp/php5F.tmp",
+         *       (...etc...)
+         *    }
+         * }
+         *
+         * When we combine multiple file uploads into one form field, however, this mess is given to us in $_FILES:
+         *
+         * array {
+         *    "upload" => array {
+         *       "name" => array {
+         *          0 => "myfile.jpg",
+         *          1 => "anotherfile.jpg",
+         *       }
+         *       "tmp_path" => array {
+         *          0 => "/tmp/php5D.tmp",
+         *          1 => "/tmp/php5E.tmp",
+         *       }
+         *       (...etc...)
+         *    }
+         * }
+         *
+         * This function tries to clean up this mess to ensure we get the following instead:
+         *
+         * array {
+         *    0 => array {
+         *       "key" => "upload"
+         *       "name" => "myfile.jpg",
+         *       "tmp_path" => "/tmp/php5D.tmp",
+         *       (...etc...)
+         *    },
+         *    1 => array {
+         *       "key" => "upload"
+         *       "name" => "yourfile.jpg",
+         *       "tmp_path" => "/tmp/php5E.tmp",
+         *       (...etc...)
+         *    }
+         * }
+         */
+
+        $results = array();
+
+        foreach ($files as $fileKey => $fileData) {
+            // NB: $_FILES is structured by PHP so we do not need to be particularly careful - it is safe to assume
+            // we can reliably predict
+
+            if (is_array($fileData['name'])) {
+                // This looks like a multi file array, try to simplify it
+                $newFileItems = [];
+
+                foreach ($fileData as $fieldName => $fieldValues) {
+                    for ($i = 0; $i < count($fieldValues); $i++) {
+                        if (!isset($newFileItems[$i])) {
+                            $newFileItems[$i] = [
+                                'key' => $fileKey
+                            ];
+                        }
+
+                        $newFileItems[$i][$fieldName] = $fieldValues[$i];
+                    }
+                }
+
+                foreach ($newFileItems as $newFileItem) {
+                    $results[] = $newFileItem;
+                }
+            } else {
+                // This does not look to be a fancy multi file array, no need to do extra work
+                $fileData['key'] = $fileKey;
+                $results[] = $fileData;
+            }
+        }
+
+        return $results;
+    }
+
+    /**
      * @param array $files Key/value $_FILES array.
      */
     public function setFileData(array $files)
     {
+        $files = $this->deflateFilesArray($files);
+
         $this->fileUploads = [];
 
         foreach ($files as $key => $fileData) {

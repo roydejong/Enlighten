@@ -9,6 +9,13 @@ namespace Enlighten\Http;
 class FileUpload
 {
     /**
+     * The name of the form field that was used to submit this file.
+     *
+     * @var string
+     */
+    protected $formKey;
+
+    /**
      * This is the name of the file, as published by the client.
      * Warning: user submitted, do not treat this value as truth or safe to use.
      *
@@ -65,6 +72,29 @@ class FileUpload
      */
     protected $error = UPLOAD_ERR_OK;
 
+
+    /**
+     * Gets the name of the form field that was used to submit this file.
+     *
+     * @return string
+     */
+    public function getFormKey()
+    {
+        return $this->formKey;
+    }
+
+    /**
+     * Sets the name of the form field that was used to submit this file.
+     *
+     * @param string $formKey
+     * @return $this
+     */
+    public function setFormKey($formKey)
+    {
+        $this->formKey = $formKey;
+        return $this;
+    }
+
     /**
      * Gets the name of the file, as published by the client.
      * Warning: user submitted, do not treat this value as truth or safe to use.
@@ -80,7 +110,7 @@ class FileUpload
      * Sets the name of the file, as published by the client.
      *
      * @param string $originalName
-     * @return FileUpload
+     * @return $this
      */
     public function setOriginalName($originalName)
     {
@@ -102,7 +132,7 @@ class FileUpload
      * Sets the path to local temporary file that was created to hold this file upload.
      *
      * @param string $temporaryPath
-     * @return FileUpload
+     * @return $this
      */
     public function setTemporaryPath($temporaryPath)
     {
@@ -147,7 +177,7 @@ class FileUpload
      * Sets the file type, as published by the client.
      *
      * @param string $type
-     * @return FileUpload
+     * @return $this
      */
     public function setType($type)
     {
@@ -206,7 +236,7 @@ class FileUpload
      * Sets upload error code as reported by PHP while processing this file.
      *
      * @param int $error
-     * @return FileUpload
+     * @return $this
      */
     public function setError($error)
     {
@@ -268,7 +298,7 @@ class FileUpload
      */
     public static function createFromFileArray(array $fileArray)
     {
-        $requiredKeys = ['name', 'type', 'tmp_name', 'error'];
+        $requiredKeys = ['name', 'type', 'tmp_name', 'error', 'key'];
 
         foreach ($requiredKeys as $key) {
             if (!isset($fileArray[$key]) || ($key != 'error' && empty($fileArray[$key]))
@@ -280,6 +310,7 @@ class FileUpload
         }
 
         return (new FileUpload())
+            ->setFormKey($fileArray['key'])
             ->setOriginalName($fileArray['name'])
             ->setType($fileArray['type'])
             ->setTemporaryPath($fileArray['tmp_name'])

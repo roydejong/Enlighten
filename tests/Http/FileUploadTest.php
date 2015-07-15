@@ -15,6 +15,15 @@ function move_uploaded_file($source, $destination)
 
 class FileUploadTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGetSetFormKey()
+    {
+        $file = new FileUpload();
+
+        $this->assertEquals('', $file->getFormKey(), 'Default is empty');
+        $this->assertEquals($file, $file->setFormKey('Hello.jpg'), 'Fluent API');
+        $this->assertEquals('Hello.jpg', $file->getFormKey());
+    }
+    
     public function testGetSetOriginalName()
     {
         $file = new FileUpload();
@@ -208,7 +217,8 @@ class FileUploadTest extends \PHPUnit_Framework_TestCase
             'type' => 'image/jpeg',
             'tmp_name' => $samplePath,
             'error' => UPLOAD_ERR_EXTENSION,
-            'size' => 1234567890
+            'size' => 1234567890,
+            'key' => 'myKey'
         ]);
 
         $this->assertEquals('my_name.jpg', $file->getOriginalName());
@@ -226,7 +236,8 @@ class FileUploadTest extends \PHPUnit_Framework_TestCase
             'type' => 'image/jpeg',
             'tmp_name' => '/my/tmp/sample.png',
             'error' => UPLOAD_ERR_EXTENSION,
-            'size' => 1234567890
+            'size' => 1234567890,
+            'key' => 'myKey'
         ];
 
         $this->assertNotNull(FileUpload::createFromFileArray($testArray), 'Base array should be OK');
@@ -239,7 +250,8 @@ class FileUploadTest extends \PHPUnit_Framework_TestCase
         $file = FileUpload::createFromFileArray([
             'name' => 'my_name.jpg',
             'type' => 'image/jpeg',
-            'tmp_name' => '/tmp/bogus.jpg'
+            'tmp_name' => '/tmp/bogus.jpg',
+            'key' => 'myKey'
         ]);
 
         $this->assertNull($file, 'Bad array should result in null result');
@@ -252,7 +264,8 @@ class FileUploadTest extends \PHPUnit_Framework_TestCase
             'type' => 'image/jpeg',
             'tmp_name' => ['why', 'is', 'this', 'here'],
             'error' => UPLOAD_ERR_EXTENSION,
-            'size' => 1234567890
+            'size' => 1234567890,
+            'key' => 'myKey'
         ]);
 
         $this->assertNull($file, 'Bad array should result in null result');

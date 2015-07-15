@@ -161,7 +161,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('PATCH', $request->getEnvironment('REQUEST_METHOD'));
         $this->assertEquals($_COOKIE['Session'], $request->getCookie('Session'));
         $this->assertCount(1, $request->getFileUploads());
-        $this->assertEquals('text/html', $request->getFileUploads()['goodKey']->getType());
+        $this->assertEquals('text/html', array_shift($request->getFileUploads())->getType());
     }
 
     public function testUploadProcessing()
@@ -186,11 +186,50 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertCount(1, $request->getFileUploads());
         $this->assertTrue(isset($files['goodKey']), $request->getFileUploads());
 
-        $file = $request->getFileUploads()['goodKey'];
+        $file = array_shift($request->getFileUploads());
         $this->assertEquals('bookmarks.html', $file->getOriginalName());
         $this->assertEquals('text/html', $file->getType());
         $this->assertEquals('/tmp/php3D.tmp', $file->getTemporaryPath());
         $this->assertEquals(UPLOAD_ERR_OK, $file->getError());
         $this->assertEquals(0, $file->getFileSize());
+    }
+
+    public function testMultiFileUploadProcessing()
+    {
+        $files = [
+            'combinedFiles' => [
+                'name' => ['one.jpg', 'two.jpg'],
+                'type' => ['image/jpg', 'image/jpeg'],
+                'tmp_name' => ['/tmp/php3A.tmp', '/tmp/php3B.tmp'],
+                'error' => [UPLOAD_ERR_OK, UPLOAD_ERR_EXTENSION],
+                'size' => [644563, 365446]
+            ],
+            'anotherLooseFile' => [
+                'name' => 'bookmarks.html',
+                'type' => 'text/html',
+                'tmp_name' => '/tmp/php3D.tmp',
+                'error' => UPLOAD_ERR_OK,
+                'size' => 644563
+            ]
+        ];
+
+        $request = new Request();
+        $request->setFileData($files);
+
+        $ups = $request->getFileUploads();
+
+        $this->assertCount(3, $ups);
+
+        $fileOne = array_shift($ups);
+        $this->assertEquals('combinedFiles', $fileOne->getFormKey());
+        $this->assertEquals('one.jpg', $fileOne->getOriginalName());
+
+        $fileTwo = array_shift($ups);
+        $this->assertEquals('combinedFiles', $fileTwo->getFormKey());
+        $this->assertEquals('two.jpg', $fileTwo->getOriginalName());
+
+        $fileThree = array_shift($ups);
+        $this->assertEquals('anotherLooseFile', $fileThree->getFormKey());
+        $this->assertEquals('bookmarks.html', $fileThree->getOriginalName());
     }
 }
