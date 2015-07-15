@@ -161,7 +161,11 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('PATCH', $request->getEnvironment('REQUEST_METHOD'));
         $this->assertEquals($_COOKIE['Session'], $request->getCookie('Session'));
         $this->assertCount(1, $request->getFileUploads());
-        $this->assertEquals('text/html', array_shift($request->getFileUploads())->getType());
+
+        $files = $request->getFileUploads();
+        $file = array_shift($files);
+
+        $this->assertEquals('text/html', $file->getType());
     }
 
     public function testUploadProcessing()
@@ -186,7 +190,9 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertCount(1, $request->getFileUploads());
         $this->assertTrue(isset($files['goodKey']), $request->getFileUploads());
 
-        $file = array_shift($request->getFileUploads());
+        $files = $request->getFileUploads();
+        $file = array_shift($files);
+
         $this->assertEquals('bookmarks.html', $file->getOriginalName());
         $this->assertEquals('text/html', $file->getType());
         $this->assertEquals('/tmp/php3D.tmp', $file->getTemporaryPath());
