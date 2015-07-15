@@ -244,5 +244,18 @@ class FileUploadTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($file, 'Bad array should result in null result');
     }
+
+    public function testCreateFromSubArray()
+    {
+        $file = FileUpload::createFromFileArray([
+            'name' => 'my_name.jpg',
+            'type' => 'image/jpeg',
+            'tmp_name' => ['why', 'is', 'this', 'here'],
+            'error' => UPLOAD_ERR_EXTENSION,
+            'size' => 1234567890
+        ]);
+
+        $this->assertNull($file, 'Bad array should result in null result');
+    }
 }
 

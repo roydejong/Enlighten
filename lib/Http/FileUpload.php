@@ -271,8 +271,10 @@ class FileUpload
         $requiredKeys = ['name', 'type', 'tmp_name', 'error'];
 
         foreach ($requiredKeys as $key) {
-            if (!isset($fileArray[$key]) || ($key != 'error' && empty($fileArray[$key]))) {
-                // A required key is missing in our file array, so this is invalid: return null
+            if (!isset($fileArray[$key]) || ($key != 'error' && empty($fileArray[$key]))
+                || is_array($fileArray[$key])
+            ) {
+                // A required key is missing or invalid in our file array, so this is invalid: return null
                 return null;
             }
         }
