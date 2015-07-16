@@ -387,4 +387,24 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleNoDefaultActionController');
         $route->action($context);
     }
+
+    public function testGetSetMatchSubdirectory()
+    {
+        $route = new Route('/bla.html', null);
+
+        $request = new Request();
+        $request->setRequestUri('/my/proj/bla.html');
+
+        $this->assertNull($route->getSubdirectory(), 'Default should be null');
+        $this->assertFalse($route->matches($request));
+
+        $this->assertEquals($route, $route->setSubdirectory('/my/proj'), 'Fluent API return');
+
+        $this->assertEquals('/my/proj', $route->getSubdirectory());
+        $this->assertTrue($route->matches($request));
+
+        $request->setRequestUri('/bla.html');
+        $route->setSubdirectory(null);
+        $this->assertTrue($route->matches($request), 'Nullifying subdirectory should disable subdir matching');
+    }
 }

@@ -21,10 +21,20 @@ class Router
     protected $routes;
 
     /**
+     * A subdirectory that should be ignored for all routes.
+     *
+     * @default null
+     * @var string
+     */
+    protected $subdirectory;
+
+    /**
      * Initializes a new, blank router.
      */
     public function __construct()
     {
+        $this->subdirectory = null;
+
         $this->clear();
     }
 
@@ -45,6 +55,38 @@ class Router
     public function register(Route $route)
     {
         $this->routes[] = $route;
+    }
+
+    /**
+     * Gets the base subdirectory for all requests processed by this router.
+     *
+     * @return string
+     */
+    public function getSubdirectory()
+    {
+        return $this->subdirectory;
+    }
+
+    /**
+     * Sets the base subdirectory for all requests processed by this router.
+     *
+     * For example, if you set "/projects/one" as your subdirectory, the router will assume that all routes begin with
+     * that value. A route for "/test.html" will then match against requests for "/projects/one/test.html".
+     *
+     * NB: You should not use a trailing slash in your subdirectory names.
+     *
+     * @param $subdirectory
+     * @return $this
+     */
+    public function setSubdirectory($subdirectory)
+    {
+        $this->subdirectory = $subdirectory;
+
+        foreach ($this->routes as $route) {
+            $route->setSubdirectory($subdirectory);
+        }
+
+        return $this;
     }
 
     /**

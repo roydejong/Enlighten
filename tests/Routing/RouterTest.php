@@ -98,4 +98,17 @@ class RouterTest extends PHPUnit_Framework_TestCase
 
         $this->expectOutputString('/hello/world');
     }
+
+    public function testGetSetSubdirectory()
+    {
+        $router = new Router();
+
+        $route = new Route('/bla.html', null);
+        $router->register($route);
+
+        $this->assertNull($router->getSubdirectory(), 'Default should be null');
+        $this->assertEquals($router, $router->setSubdirectory('/my/dir'), 'Fluent API return');
+        $this->assertEquals('/my/dir', $router->getSubdirectory());
+        $this->assertEquals($router->getSubdirectory(), '/my/dir', 'Routes should inherit subdirectory setting');
+    }
 }

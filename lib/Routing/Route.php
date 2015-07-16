@@ -16,6 +16,13 @@ class Route
     const VARIABLE_SEP = '$';
 
     /**
+     * A subdirectory for this route, effectively a prefix for all patterns we match against.
+     *
+     * @var string
+     */
+    protected $subdirectory;
+
+    /**
      * The pattern that the request URI will be matched against.
      * Can contain dynamic variables (indicated by $) that will be injected as dependencies.
      *
@@ -69,6 +76,29 @@ class Route
         $this->target = $target;
         $this->constraints = [];
         $this->filters = new Filters();
+    }
+
+    /**
+     * Gets the subdirectory prefix for this route.
+     *
+     * @return string
+     */
+    public function getSubdirectory()
+    {
+        return $this->subdirectory;
+    }
+
+    /**
+     * Sets the subdirectory prefix for this route.
+     *
+     * @param string $subdirectory
+     * @return $this
+     */
+    public function setSubdirectory($subdirectory)
+    {
+        $this->subdirectory = $subdirectory;
+        $this->regexPattern = $this->formatRegex($subdirectory . $this->pattern);
+        return $this;
     }
 
     /**
