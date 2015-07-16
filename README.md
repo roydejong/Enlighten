@@ -13,7 +13,7 @@ Enlighten Framework
 This is a modern framework for PHP 5 that doesn't get in your way. Just the building blocks you need to accelerate your application development and simply *get shit done*. 
 
 - Easy HTTP request and response management.
-- Razor fast routing with dynamic URL variables.
+- Razor fast routing with dynamic URL variables, even in subdirectories.
 - Application and route filters for authentication, exception handling, etc.
 
 It is awesome because it is:
