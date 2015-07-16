@@ -291,6 +291,24 @@ class Enlighten
     }
 
     /**
+     * Marks the application as being in a subdirectory. This affects how routes are matched.
+     *
+     * For example, if you set "/projects/one" as your subdirectory, the router will assume that all routes begin with
+     * that value. A route for "/test.html" will then match against requests for "/projects/one/test.html".
+     *
+     * NB: You should not use a trailing slash in your subdirectory names.
+     *
+     * @param $subdirectory
+     * @return $this
+     */
+    public function setSubdirectory($subdirectory)
+    {
+        $this->_bootstrapRouter();
+        $this->router->setSubdirectory($subdirectory);
+        return $this;
+    }
+
+    /**
      * Returns the current application context.
      * Contexts are used to provide components such as controllers and closures with the data they need to operate.
      * This function is typically only used internally by the framework when initializing closures and the like.

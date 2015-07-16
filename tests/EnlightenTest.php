@@ -390,4 +390,15 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
 
         $this->expectOutputString('Testex');
     }
+
+    public function testSetSubdirectory()
+    {
+        $router = new Router();
+
+        $app = new Enlighten();
+        $app->setRouter($router);
+
+        $this->assertEquals($app, $app->setSubdirectory('/dir/bla'), 'Fluent API return');
+        $this->assertEquals('/dir/bla', $router->getSubdirectory());
+    }
 }
