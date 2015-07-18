@@ -346,4 +346,14 @@ class RequestTest extends PHPUnit_Framework_TestCase
         ]);
         $this->assertEquals('http://my.uri.com/bla.html', $request->getReferrer());
     }
+
+    public function testGetUserAgent()
+    {
+        $request = new Request();
+        $this->assertEquals(null, $request->getUserAgent());
+        $request->setEnvironmentData([
+            'HTTP_USER_AGENT' => 'MyBrowser (v1.0; test; hello world)'
+        ]);
+        $this->assertEquals('MyBrowser (v1.0; test; hello world)', $request->getUserAgent());
+    }
 }

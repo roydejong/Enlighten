@@ -429,6 +429,17 @@ class Request
     }
 
     /**
+     * Gets the User Agent string provided, if there is one provided.
+     * This value is provided by the client and should be used with caution.
+     *
+     * @return string|null The user agent string or NULL if was not provided.
+     */
+    public function getUserAgent()
+    {
+        return $this->getHeader('User-Agent', null);
+    }
+
+    /**
      * Returns whether the user's remote IP address is IPv6 or not.
      *
      * @return bool True if the user's IP address appears to be in IPv6 format.
