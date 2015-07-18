@@ -288,4 +288,22 @@ class RequestTest extends PHPUnit_Framework_TestCase
         ]);
         $this->assertFalse($request->isHttps());
     }
+
+    public function testIsAjax()
+    {
+        $request = new Request();
+        $request->setEnvironmentData([
+            'HTTP_X_REQUESTED_WITH' => 'xmlHttpREQUEST'
+        ]);
+        $this->assertTrue($request->isAjax(), 'Ajax requests should be determined, without case sensitivity, based on X-Requested-With equaling XMLHttpRequest');
+    }
+
+    public function testIsNotAjax()
+    {
+        $request = new Request();
+        $request->setEnvironmentData([
+            'HTTP_X_REQUESTED_WITH' => 'bogus'
+        ]);
+        $this->assertFalse($request->isAjax());
+    }
 }

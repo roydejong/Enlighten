@@ -395,6 +395,16 @@ class Request
     }
 
     /**
+     * Gets whether Ajax was used to issue this request, based on the X-Requested-With header.
+     *
+     * @return bool True if X-Requested-With equals XMLHttpRequest (case-insensitive).
+     */
+    public function isAjax()
+    {
+        return strtolower($this->getHeader('X-Requested-With', '')) === 'xmlhttprequest';
+    }
+
+    /**
      * Sets $_POST data for this request object.
      *
      * @param array $post Key/value $_POST array.
