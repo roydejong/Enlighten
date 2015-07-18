@@ -356,4 +356,14 @@ class RequestTest extends PHPUnit_Framework_TestCase
         ]);
         $this->assertEquals('MyBrowser (v1.0; test; hello world)', $request->getUserAgent());
     }
+
+    public function testGetHostname()
+    {
+        $request = new Request();
+        $this->assertEquals(null, $request->getHostname());
+        $request->setEnvironmentData([
+            'HTTP_HOST' => 'your.web.com'
+        ]);
+        $this->assertEquals('your.web.com', $request->getHostname());
+    }
 }

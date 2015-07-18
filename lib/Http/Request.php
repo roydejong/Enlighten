@@ -440,6 +440,17 @@ class Request
     }
 
     /**
+     * Gets the hostname used in this request.
+     * This value is provided by the client and should be used with caution.
+     *
+     * @return string|null The hostname or NULL if it was not provided.
+     */
+    public function getHostname()
+    {
+        return $this->getHeader('Host', null);
+    }
+
+    /**
      * Returns whether the user's remote IP address is IPv6 or not.
      *
      * @return bool True if the user's IP address appears to be in IPv6 format.
