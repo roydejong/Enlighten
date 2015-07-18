@@ -380,4 +380,31 @@ class RequestTest extends PHPUnit_Framework_TestCase
         ]);
         $this->assertEquals(8090, $request->getPort());
     }
+
+    public function testGetUrl()
+    {
+        $request = new Request();
+        $request->setRequestUri('/web/page.html?action=eat&what=pie');
+        $request->setEnvironmentData([
+            'HTTPS' => 'On',
+            'SERVER_PORT' => 1337,
+            'HTTP_HOST' => 'web.com'
+        ]);
+
+        $expectedFullUrl = 'https://web.com:1337/web/page.html';
+        $expectedFullUrlWithParams = $expectedFullUrl . '?action=eat&what=pie';
+
+        $this->assertEquals($expectedFullUrl, $request->getUrl(false));
+        $this->assertEquals($expectedFullUrlWithParams, $request->getUrl(true));
+        $this->assertEquals($expectedFullUrlWithParams, $request->getUrl(), 'Params should be included by default');
+
+        $request->setEnvironmentData([
+            'HTTPS' => 'On',
+            'SERVER_PORT' => 443,
+            'HTTP_HOST' => 'web.com'
+        ]);
+
+        $expectedFullUrl = 'https://web.com/web/page.html';
+        $this->assertEquals($expectedFullUrl, $request->getUrl(false), 'Regular port numbers should be hidden');
+    }
 }

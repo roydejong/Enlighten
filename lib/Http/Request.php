@@ -471,6 +471,30 @@ class Request
     }
 
     /**
+     * Returns the full URL that was requested, including protocol, hostname, port, and request URI.
+     *
+     * @param bool $includeQueryString Include query string parameters?
+     * @return string
+     */
+    public function getUrl($includeQueryString = true)
+    {
+        $url = $this->getProtocol() . '://';
+        $url .= $this->getHostname();
+
+        $isAbnormalPort = ($this->isHttps() && $this->getPort() != 443) || (!$this->isHttps() && $this->getPort() != 80);
+
+        if ($isAbnormalPort) {
+            $url .= ':' . $this->getPort();
+        }
+
+        var_dump($url);
+        var_dump($includeQueryString);
+
+        $url .= $this->getRequestUri($includeQueryString);
+        return $url;
+    }
+
+    /**
      * Returns whether the user's remote IP address is IPv6 or not.
      *
      * @return bool True if the user's IP address appears to be in IPv6 format.
