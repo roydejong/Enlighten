@@ -369,4 +369,15 @@ class RequestTest extends PHPUnit_Framework_TestCase
         ]);
         $this->assertEquals('your.web.com', $request->getHostname());
     }
+
+    public function testGetPort()
+    {
+        $request = new Request();
+        $this->assertEquals(80, $request->getPort(), 'Default port should be 80 (HTTP)');
+        $request->setEnvironmentData([
+            'HTTPS' => 'On',
+            'SERVER_PORT' => '8090'
+        ]);
+        $this->assertEquals(8090, $request->getPort());
+    }
 }

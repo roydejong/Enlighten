@@ -461,6 +461,16 @@ class Request
     }
 
     /**
+     * Returns the port number on the server machine that this request was issued to.
+     *
+     * @return int The TCP port number used for this request. Typically 80 for HTTP and 443 for HTTPS.
+     */
+    public function getPort()
+    {
+        return intval($this->getEnvironment('SERVER_PORT', 80));
+    }
+
+    /**
      * Returns whether the user's remote IP address is IPv6 or not.
      *
      * @return bool True if the user's IP address appears to be in IPv6 format.
