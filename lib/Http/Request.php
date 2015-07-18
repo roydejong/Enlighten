@@ -424,11 +424,11 @@ class Request
         foreach ($this->environment as $key => $value) {
             if (!empty($value) && substr($key, 0, 5) == 'HTTP_') {
                 $headerName = substr($key, 5); // Remove HTTP_ prefix from the name
-                $headerName = str_replace('_', ' ', $key); // Swap underscores with space so we can use ucwords()
-                $headerName = ucwords(strtolower($key)); // Convert casing to the standard notation (Bla-Bla)
-                $headerName = str_replace(' ', '-', $key); // Swap spaces back for dashes
+                $headerName = str_replace('_', ' ', $headerName); // Swap underscores with space so we can use ucwords()
+                $headerName = ucwords(strtolower($headerName)); // Convert casing to the standard notation (Bla-Bla)
+                $headerName = str_replace(' ', '-', $headerName); // Swap spaces back for dashes
 
-                $this->headers[$headerName] = trim($value);
+                $this->headers[$headerName] = $value;
             }
         }
     }

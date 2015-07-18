@@ -238,4 +238,25 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('anotherLooseFile', $fileThree->getFormKey());
         $this->assertEquals('bookmarks.html', $fileThree->getOriginalName());
     }
+
+    public function testHeaderParseAndGet()
+    {
+        $request = new Request();
+
+        $request->setEnvironmentData([
+            'REQUEST_METHOD' => 'POST',
+            'HTTP_FAKE_ASS_HEADER' => 'testing One TWO Three ',
+            'HTTP_X_FORWARDED_FOR' => '127.0.0.1'
+        ]);
+
+        $expectedHeaders = [
+            'Fake-Ass-Header' => 'testing One TWO Three ',
+            'X-Forwarded-For' => '127.0.0.1'
+        ];
+
+        $this->assertEquals($expectedHeaders, $request->getHeaders(), 'Headers should be parsed correctly, and their casings modified appropriately. Values should not change.');
+        $this->assertEquals(null, $request->getHeader('Request-Method', null, 'Only HTTP_ prefixed $_SERVER data should be considered a header'));
+        $this->assertEquals($expectedHeaders['X-Forwarded-For'], $request->getHeader('X-Forwarded-For'));
+        $this->assertEquals($expectedHeaders['Fake-Ass-Header'], $request->getHeader('Fake-Ass-Header'));
+    }
 }
