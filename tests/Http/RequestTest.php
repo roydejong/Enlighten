@@ -258,5 +258,153 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(null, $request->getHeader('Request-Method', null, 'Only HTTP_ prefixed $_SERVER data should be considered a header'));
         $this->assertEquals($expectedHeaders['X-Forwarded-For'], $request->getHeader('X-Forwarded-For'));
         $this->assertEquals($expectedHeaders['Fake-Ass-Header'], $request->getHeader('Fake-Ass-Header'));
+        $this->assertEquals($expectedHeaders['X-Forwarded-For'], $request->getHeader('x-forwarded-for', 'getHeader() should be case insensitive'));
+    }
+
+    public function testIsHttpsForNonEmpty()
+    {
+        $request = new Request();
+        $request->setEnvironmentData([
+            'HTTPS' => 'NonEmptyValue'
+        ]);
+        $this->assertTrue($request->isHttps());
+        $this->assertEquals('https', $request->getProtocol());
+    }
+
+    public function testIsHttpsForEmpty()
+    {
+        $request = new Request();
+        $request->setEnvironmentData([
+            'HTTPS' => ''
+        ]);
+        $this->assertFalse($request->isHttps());
+        $this->assertEquals('http', $request->getProtocol());
+    }
+
+    public function testIsHttpsForOffIIS()
+    {
+        // when using ISAPI with IIS, the value will be off if the request was not made through the HTTPS protocol.
+        $request = new Request();
+        $request->setEnvironmentData([
+            'HTTPS' => 'off'
+        ]);
+        $this->assertFalse($request->isHttps());
+        $this->assertEquals('http', $request->getProtocol());
+    }
+
+    public function testIsAjax()
+    {
+        $request = new Request();
+        $request->setEnvironmentData([
+            'HTTP_X_REQUESTED_WITH' => 'xmlHttpREQUEST'
+        ]);
+        $this->assertTrue($request->isAjax(), 'Ajax requests should be determined, without case sensitivity, based on X-Requested-With equaling XMLHttpRequest');
+    }
+
+    public function testIsNotAjax()
+    {
+        $request = new Request();
+        $request->setEnvironmentData([
+            'HTTP_X_REQUESTED_WITH' => 'bogus'
+        ]);
+        $this->assertFalse($request->isAjax());
+    }
+
+    public function testGetIp()
+    {
+        $request = new Request();
+        $request->setEnvironmentData([
+            'REMOTE_ADDR' => '8.8.4.4',
+            'HTTP_X_FORWARDED_FOR' => '8.8.8.8'
+        ]);
+        $this->assertEquals('8.8.4.4', $request->getIp(), 'REMOTE_ADDR should always be used; X_FORWARDED for should be ignored.');
+    }
+
+    public function testIsIpv6WithIpv4()
+    {
+        $request = new Request();
+        $request->setEnvironmentData([
+            'REMOTE_ADDR' => '8.8.4.4',
+            'HTTP_X_FORWARDED_FOR' => '::1'
+        ]);
+        $this->assertFalse($request->isIpv6());
+    }
+
+    public function testIsIpv6WithIpv6()
+    {
+        $request = new Request();
+        $request->setEnvironmentData([
+            'REMOTE_ADDR' => '0:0:0:0:0:127.0.0.1',
+            'HTTP_X_FORWARDED_FOR' => '8.8.8.8'
+        ]);
+        $this->assertTrue($request->isIpv6());
+    }
+
+    public function testGetReferrer()
+    {
+        $request = new Request();
+        $this->assertEquals(null, $request->getReferrer());
+        $request->setEnvironmentData([
+            'HTTP_REFERRER' => 'http://my.uri.com/bla.html'
+        ]);
+        $this->assertEquals('http://my.uri.com/bla.html', $request->getReferrer());
+    }
+
+    public function testGetUserAgent()
+    {
+        $request = new Request();
+        $this->assertEquals(null, $request->getUserAgent());
+        $request->setEnvironmentData([
+            'HTTP_USER_AGENT' => 'MyBrowser (v1.0; test; hello world)'
+        ]);
+        $this->assertEquals('MyBrowser (v1.0; test; hello world)', $request->getUserAgent());
+    }
+
+    public function testGetHostname()
+    {
+        $request = new Request();
+        $this->assertEquals(null, $request->getHostname());
+        $request->setEnvironmentData([
+            'HTTP_HOST' => 'your.web.com'
+        ]);
+        $this->assertEquals('your.web.com', $request->getHostname());
+    }
+
+    public function testGetPort()
+    {
+        $request = new Request();
+        $this->assertEquals(80, $request->getPort(), 'Default port should be 80 (HTTP)');
+        $request->setEnvironmentData([
+            'HTTPS' => 'On',
+            'SERVER_PORT' => '8090'
+        ]);
+        $this->assertEquals(8090, $request->getPort());
+    }
+
+    public function testGetUrl()
+    {
+        $request = new Request();
+        $request->setRequestUri('/web/page.html?action=eat&what=pie');
+        $request->setEnvironmentData([
+            'HTTPS' => 'On',
+            'SERVER_PORT' => 1337,
+            'HTTP_HOST' => 'web.com'
+        ]);
+
+        $expectedFullUrl = 'https://web.com:1337/web/page.html';
+        $expectedFullUrlWithParams = $expectedFullUrl . '?action=eat&what=pie';
+
+        $this->assertEquals($expectedFullUrl, $request->getUrl(false));
+        $this->assertEquals($expectedFullUrlWithParams, $request->getUrl(true));
+        $this->assertEquals($expectedFullUrlWithParams, $request->getUrl(), 'Params should be included by default');
+
+        $request->setEnvironmentData([
+            'HTTPS' => 'On',
+            'SERVER_PORT' => 443,
+            'HTTP_HOST' => 'web.com'
+        ]);
+
+        $expectedFullUrl = 'https://web.com/web/page.html';
+        $this->assertEquals($expectedFullUrl, $request->getUrl(false), 'Regular port numbers should be hidden');
     }
 }

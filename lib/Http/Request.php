@@ -348,7 +348,7 @@ class Request
     }
 
     /**
-     * Returns a HTTP header value by its $key.
+     * Gets a HTTP header value by its $key.
      * This function is case-insensitive.
      * Returns $defaultValue if the key is not found.
      *
@@ -372,13 +372,133 @@ class Request
     }
 
     /**
-     * Returns all HTTP headers contained in this request.
+     * Gets all HTTP headers contained in this request.
      *
      * @return array Key => value array containing header names => values.
      */
     public function getHeaders()
     {
         return $this->headers;
+    }
+
+    /**
+     * Gets whether the page was requested on a secure (HTTPS) connection.
+     *
+     * @return bool True if HTTPS was used as protocol.
+     */
+    public function isHttps()
+    {
+        // $_SERVER['HTTPS'] contains a non-empty value if HTTPS was used.
+        // For ISAPI with IIS, the value will be "off" instead.
+        $value = $this->getEnvironment('HTTPS', null);
+        return !empty($value) && strtolower($value) != 'off';
+    }
+
+    /**
+     * Gets the protocol name used for this request.
+     *
+     * @return string Either "https" or "http" based on the request.
+     */
+    public function getProtocol()
+    {
+        return $this->isHttps() ? 'https' : 'http';
+    }
+
+    /**
+     * Gets whether Ajax was used to issue this request, based on the X-Requested-With header.
+     *
+     * @return bool True if X-Requested-With equals XMLHttpRequest (case-insensitive).
+     */
+    public function isAjax()
+    {
+        return strtolower($this->getHeader('X-Requested-With', '')) === 'xmlhttprequest';
+    }
+
+    /**
+     * Gets the user's remote IP address.
+     *
+     * This function does not consider X-Forwarded-For values as they can be spoofed.
+     * As a result, the returned IP address may be that of a proxy server but it is correct and safe to use.
+     *
+     * @return string The user's IP address (may be IPv4 or IPv6 format).
+     */
+    public function getIp()
+    {
+        return $this->getEnvironment('REMOTE_ADDR', '127.0.0.1');
+    }
+
+    /**
+     * Gets the referring page URL, if there is any.
+     * This value is provided by the client and should be used with caution.
+     *
+     * @return string|null The referring page URL or NULL if no referrer is known.
+     */
+    public function getReferrer()
+    {
+        return $this->getHeader('Referrer', null);
+    }
+
+    /**
+     * Gets the User Agent string provided, if there is one provided.
+     * This value is provided by the client and should be used with caution.
+     *
+     * @return string|null The user agent string or NULL if was not provided.
+     */
+    public function getUserAgent()
+    {
+        return $this->getHeader('User-Agent', null);
+    }
+
+    /**
+     * Gets the hostname used in this request.
+     * This value is provided by the client and should be used with caution.
+     *
+     * @return string|null The hostname or NULL if it was not provided.
+     */
+    public function getHostname()
+    {
+        return $this->getHeader('Host', null);
+    }
+
+    /**
+     * Returns the port number on the server machine that this request was issued to.
+     *
+     * @return int The TCP port number used for this request. Typically 80 for HTTP and 443 for HTTPS.
+     */
+    public function getPort()
+    {
+        return intval($this->getEnvironment('SERVER_PORT', 80));
+    }
+
+    /**
+     * Returns the full URL that was requested, including protocol, hostname, port, and request URI.
+     *
+     * @param bool $includeQueryString Include query string parameters?
+     * @return string
+     */
+    public function getUrl($includeQueryString = true)
+    {
+        $url = $this->getProtocol() . '://';
+        $url .= $this->getHostname();
+
+        $isAbnormalPort = ($this->isHttps() && $this->getPort() != 443) || (!$this->isHttps() && $this->getPort() != 80);
+
+        if ($isAbnormalPort) {
+            $url .= ':' . $this->getPort();
+        }
+
+        $url .= $this->getRequestUri($includeQueryString);
+        return $url;
+    }
+
+    /**
+     * Returns whether the user's remote IP address is IPv6 or not.
+     *
+     * @return bool True if the user's IP address appears to be in IPv6 format.
+     */
+    public function isIpv6()
+    {
+        return strpos($this->getIp(), ':') !== false;
     }
 
     /**
