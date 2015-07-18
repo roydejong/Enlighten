@@ -336,4 +336,14 @@ class RequestTest extends PHPUnit_Framework_TestCase
         ]);
         $this->assertTrue($request->isIpv6());
     }
+
+    public function testGetReferrer()
+    {
+        $request = new Request();
+        $this->assertEquals(null, $request->getReferrer());
+        $request->setEnvironmentData([
+            'HTTP_REFERRER' => 'http://my.uri.com/bla.html'
+        ]);
+        $this->assertEquals('http://my.uri.com/bla.html', $request->getReferrer());
+    }
 }

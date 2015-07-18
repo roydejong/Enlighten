@@ -408,13 +408,24 @@ class Request
      * Gets the user's remote IP address.
      *
      * This function does not consider X-Forwarded-For values as they can be spoofed.
-     * As a result, the returned IP address may be that of a proxy server.
+     * As a result, the returned IP address may be that of a proxy server but it is correct and safe to use.
      *
      * @return string The user's IP address (may be IPv4 or IPv6 format).
      */
     public function getIp()
     {
         return $this->getEnvironment('REMOTE_ADDR', '127.0.0.1');
+    }
+
+    /**
+     * Gets the referring page URL, if there is any.
+     * This value is provided by the client and should be used with caution.
+     *
+     * @return string|null The referring page URL or NULL if no referrer is known.
+     */
+    public function getReferrer()
+    {
+        return $this->getHeader('Referrer', null);
     }
 
     /**
