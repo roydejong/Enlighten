@@ -259,4 +259,32 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedHeaders['X-Forwarded-For'], $request->getHeader('X-Forwarded-For'));
         $this->assertEquals($expectedHeaders['Fake-Ass-Header'], $request->getHeader('Fake-Ass-Header'));
     }
+
+    public function testIsHttpsForNonEmpty()
+    {
+        $request = new Request();
+        $request->setEnvironmentData([
+            'HTTPS' => 'NonEmptyValue'
+        ]);
+        $this->assertTrue($request->isHttps());
+    }
+
+    public function testIsHttpsForEmpty()
+    {
+        $request = new Request();
+        $request->setEnvironmentData([
+            'HTTPS' => ''
+        ]);
+        $this->assertFalse($request->isHttps());
+    }
+
+    public function testIsHttpsForOffIIS()
+    {
+        // when using ISAPI with IIS, the value will be off if the request was not made through the HTTPS protocol.
+        $request = new Request();
+        $request->setEnvironmentData([
+            'HTTPS' => 'off'
+        ]);
+        $this->assertFalse($request->isHttps());
+    }
 }

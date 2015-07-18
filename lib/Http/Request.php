@@ -348,7 +348,7 @@ class Request
     }
 
     /**
-     * Returns a HTTP header value by its $key.
+     * Gets a HTTP header value by its $key.
      * This function is case-insensitive.
      * Returns $defaultValue if the key is not found.
      *
@@ -372,13 +372,26 @@ class Request
     }
 
     /**
-     * Returns all HTTP headers contained in this request.
+     * Gets all HTTP headers contained in this request.
      *
      * @return array Key => value array containing header names => values.
      */
     public function getHeaders()
     {
         return $this->headers;
+    }
+
+    /**
+     * Gets whether the page was requested on a secure (HTTPS) connection.
+     *
+     * @return bool True if HTTPS was used as protocol.
+     */
+    public function isHttps()
+    {
+        // $_SERVER['HTTPS'] contains a non-empty value if HTTPS was used.
+        // For ISAPI with IIS, the value will be "off" instead.
+        $value = $this->getEnvironment('HTTPS', null);
+        return !empty($value) && strtolower($value) != 'off';
     }
 
     /**
