@@ -487,9 +487,6 @@ class Request
             $url .= ':' . $this->getPort();
         }
 
-        var_dump($url);
-        var_dump($includeQueryString);
-
         $url .= $this->getRequestUri($includeQueryString);
         return $url;
     }
