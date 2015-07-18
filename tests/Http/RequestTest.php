@@ -258,6 +258,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(null, $request->getHeader('Request-Method', null, 'Only HTTP_ prefixed $_SERVER data should be considered a header'));
         $this->assertEquals($expectedHeaders['X-Forwarded-For'], $request->getHeader('X-Forwarded-For'));
         $this->assertEquals($expectedHeaders['Fake-Ass-Header'], $request->getHeader('Fake-Ass-Header'));
+        $this->assertEquals($expectedHeaders['X-Forwarded-For'], $request->getHeader('x-forwarded-for', 'getHeader() should be case insensitive'));
     }
 
     public function testIsHttpsForNonEmpty()
