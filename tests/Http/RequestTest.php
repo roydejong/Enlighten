@@ -268,6 +268,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
             'HTTPS' => 'NonEmptyValue'
         ]);
         $this->assertTrue($request->isHttps());
+        $this->assertEquals('https', $request->getProtocol());
     }
 
     public function testIsHttpsForEmpty()
@@ -277,6 +278,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
             'HTTPS' => ''
         ]);
         $this->assertFalse($request->isHttps());
+        $this->assertEquals('http', $request->getProtocol());
     }
 
     public function testIsHttpsForOffIIS()
@@ -287,6 +289,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
             'HTTPS' => 'off'
         ]);
         $this->assertFalse($request->isHttps());
+        $this->assertEquals('http', $request->getProtocol());
     }
 
     public function testIsAjax()

@@ -395,6 +395,16 @@ class Request
     }
 
     /**
+     * Gets the protocol name used for this request.
+     *
+     * @return string Either "https" or "http" based on the request.
+     */
+    public function getProtocol()
+    {
+        return $this->isHttps() ? 'https' : 'http';
+    }
+
+    /**
      * Gets whether Ajax was used to issue this request, based on the X-Requested-With header.
      *
      * @return bool True if X-Requested-With equals XMLHttpRequest (case-insensitive).
