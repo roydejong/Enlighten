@@ -61,6 +61,13 @@ class Request
     protected $fileUploads;
 
     /**
+     * Key/value array containing all the headers sent as part of this request.
+     *
+     * @var array[]
+     */
+    protected $headers;
+
+    /**
      * Initializes a new, blank HTTP request.
      */
     public function __construct()
@@ -72,6 +79,7 @@ class Request
         $this->environment = [];
         $this->cookies = [];
         $this->fileUploads = [];
+        $this->headers = [];
     }
 
     /**
@@ -340,6 +348,42 @@ class Request
     }
 
     /**
+     * Returns a HTTP header value by its $key.
+     * This function is case-insensitive.
+     * Returns $defaultValue if the key is not found.
+     *
+     * @param string $key Case-insensitive header name.
+     * @param null $defaultValue The value to be returned if the given $key cannot be found.
+     * @return null|string The array value as a string, or the given $defaultValue if the header was not found.
+     */
+    public function getHeader($key, $defaultValue = null)
+    {
+        // Make the headers lookup array and input $key lowercase, so we can use case-insensitive comparison.
+        // We need to make a copy here because the original $headers should still contain the original casing.
+        $key = strtolower($key);
+        $headersCased = array_change_key_case($this->headers, CASE_LOWER);
+
+        if (isset($headersCased[$key])) {
+            $value = $headersCased[$key];
+            return strval($value);
+        }
+
+        return $defaultValue;
+    }
+
+    /**
+     * Returns all HTTP headers contained in this request.
+     *
+     * @return array Key => value array containing header names => values.
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    /**
+     * Sets $_POST data for this request object.
+     *
      * @param array $post Key/value $_POST array.
      */
     public function setPostData(array $post)
@@ -348,6 +392,8 @@ class Request
     }
 
     /**
+     * Sets $_GET data for this request object.
+     *
      * @param array $query Key/value $_GET array.
      */
     public function setQueryData(array $query)
@@ -356,14 +402,40 @@ class Request
     }
 
     /**
+     * Sets $_SERVER data for this request object.
+     *
      * @param array $environment Key/value $_SERVER array.
      */
     public function setEnvironmentData(array $environment)
     {
         $this->environment = $environment;
+        $this->parseHeaders();
     }
 
     /**
+     * Parses headers from the Environment data set in this request object.
+     */
+    private function parseHeaders()
+    {
+        $this->headers = [];
+
+        // NB: We cannot use getallheaders() as it is Apache only, so we have to roll our own implementation.
+
+        foreach ($this->environment as $key => $value) {
+            if (!empty($value) && substr($key, 0, 5) == 'HTTP_') {
+                $headerName = substr($key, 5); // Remove HTTP_ prefix from the name
+                $headerName = str_replace('_', ' ', $headerName); // Swap underscores with space so we can use ucwords()
+                $headerName = ucwords(strtolower($headerName)); // Convert casing to the standard notation (Bla-Bla)
+                $headerName = str_replace(' ', '-', $headerName); // Swap spaces back for dashes
+
+                $this->headers[$headerName] = $value;
+            }
+        }
+    }
+
+    /**
+     * Sets $_COOKIES data for this request object.
+     *
      * @param array $cookies
      */
     public function setCookieData(array $cookies)
