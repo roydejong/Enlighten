@@ -306,4 +306,34 @@ class RequestTest extends PHPUnit_Framework_TestCase
         ]);
         $this->assertFalse($request->isAjax());
     }
+
+    public function testGetIp()
+    {
+        $request = new Request();
+        $request->setEnvironmentData([
+            'REMOTE_ADDR' => '8.8.4.4',
+            'HTTP_X_FORWARDED_FOR' => '8.8.8.8'
+        ]);
+        $this->assertEquals('8.8.4.4', $request->getIp(), 'REMOTE_ADDR should always be used; X_FORWARDED for should be ignored.');
+    }
+
+    public function testIsIpv6WithIpv4()
+    {
+        $request = new Request();
+        $request->setEnvironmentData([
+            'REMOTE_ADDR' => '8.8.4.4',
+            'HTTP_X_FORWARDED_FOR' => '::1'
+        ]);
+        $this->assertFalse($request->isIpv6());
+    }
+
+    public function testIsIpv6WithIpv6()
+    {
+        $request = new Request();
+        $request->setEnvironmentData([
+            'REMOTE_ADDR' => '0:0:0:0:0:127.0.0.1',
+            'HTTP_X_FORWARDED_FOR' => '8.8.8.8'
+        ]);
+        $this->assertTrue($request->isIpv6());
+    }
 }

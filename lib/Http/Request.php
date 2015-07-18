@@ -405,6 +405,29 @@ class Request
     }
 
     /**
+     * Gets the user's remote IP address.
+     *
+     * This function does not consider X-Forwarded-For values as they can be spoofed.
+     * As a result, the returned IP address may be that of a proxy server.
+     *
+     * @return string The user's IP address (may be IPv4 or IPv6 format).
+     */
+    public function getIp()
+    {
+        return $this->getEnvironment('REMOTE_ADDR', '127.0.0.1');
+    }
+
+    /**
+     * Returns whether the user's remote IP address is IPv6 or not.
+     *
+     * @return bool True if the user's IP address appears to be in IPv6 format.
+     */
+    public function isIpv6()
+    {
+        return strpos($this->getIp(), ':') !== false;
+    }
+
+    /**
      * Sets $_POST data for this request object.
      *
      * @param array $post Key/value $_POST array.
