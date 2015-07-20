@@ -4,6 +4,7 @@ use Enlighten\EnlightenContext;
 use Enlighten\Http\Request;
 use Enlighten\Http\RequestMethod;
 use Enlighten\Routing\Route;
+use Enlighten\Routing\RoutingContext;
 use Enlighten\Routing\RoutingException;
 
 class RouteTest extends PHPUnit_Framework_TestCase
@@ -153,22 +154,21 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $request->setRequestUri('/dir/sample.html');
         $request->setMethod(RequestMethod::GET);
 
-        $route = new Route('/dir/sample.html', function () use ($request) {
+        $route = new Route('/dir/sample.html', function (Request $request) {
             // Our closure should receive our use variable ($request)
             // Our closure should also have access to the Context via $this
             echo $request->getMethod();
-            echo $this->getRequest()->getMethod();
             return 'test';
         });
         $route->requireMethod(RequestMethod::GET);
 
-        $context = new EnlightenContext();
-        $context->setRequest($request);
+        $context = new RoutingContext();
+        $context->registerInstance($request);
 
         $this->assertTrue($route->matches($request));
 
-        $this->expectOutputString('GETGET');
-        $this->assertEquals('test', $route->action($context));
+        $this->expectOutputString('GET');
+        $this->assertEquals('test', $route->action($request, $context));
     }
 
     public function testBeforeFilter()
@@ -187,10 +187,10 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($route->matches($request));
 
-        $context = new EnlightenContext();
-        $context->setRequest($request);
+        $context = new RoutingContext();
+        $context->registerInstance($request);
 
-        $route->action($context);
+        $route->action($request, $context);
 
         $this->expectOutputString('beforeduring');
     }
@@ -211,10 +211,10 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($route->matches($request));
 
-        $context = new EnlightenContext();
-        $context->setRequest($request);
+        $context = new RoutingContext();
+        $context->registerInstance($request);
 
-        $route->action($context);
+        $route->action($request, $context);
 
         $this->expectOutputString('duringafter');
     }
@@ -239,10 +239,10 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($route->matches($request));
 
-        $context = new EnlightenContext();
-        $context->setRequest($request);
+        $context = new RoutingContext();
+        $context->registerInstance($request);
 
-        $route->action($context);
+        $route->action($request, $context);
 
         $this->expectOutputString('TestEx');
     }
@@ -264,10 +264,10 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($route->matches($request));
 
-        $context = new EnlightenContext();
-        $context->setRequest($request);
+        $context = new RoutingContext();
+        $context->registerInstance($request);
 
-        $route->action($context);
+        $route->action($request, $context);
     }
 
     public function testRegexPattern()
@@ -304,27 +304,27 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
     public function testControllerDispatchingWithDefaultFunction()
     {
-        $context = new EnlightenContext();
+        $context = new RoutingContext();
 
         $request = new Request();
-        $context->setRequest($request);
+        $context->registerInstance($request);
 
         $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleController');
 
-        $this->assertEquals('defaultReturn', $route->action($context));
+        $this->assertEquals('defaultReturn', $route->action($request, $context));
         $this->expectOutputString('defaultAction');
     }
 
     public function testControllerDispatchingWithCustomFunction()
     {
-        $context = new EnlightenContext();
+        $context = new RoutingContext();
 
         $request = new Request();
-        $context->setRequest($request);
+        $context->registerInstance($request);
 
         $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleController@myAction');
 
-        $this->assertEquals('myReturn', $route->action($context));
+        $this->assertEquals('myReturn', $route->action($request, $context));
         $this->expectOutputString('myAction');
     }
 
@@ -334,13 +334,13 @@ class RouteTest extends PHPUnit_Framework_TestCase
      */
     public function testControllerDispatchingWithBadCustomFunction()
     {
-        $context = new EnlightenContext();
+        $context = new RoutingContext();
 
         $request = new Request();
-        $context->setRequest($request);
+        $context->registerInstance($request);
 
         $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleController@badAction');
-        $route->action($context);
+        $route->action($request, $context);
     }
 
     /**
@@ -349,13 +349,13 @@ class RouteTest extends PHPUnit_Framework_TestCase
      */
     public function testControllerDispatchingWithBadClassName()
     {
-        $context = new EnlightenContext();
+        $context = new RoutingContext();
 
         $request = new Request();
-        $context->setRequest($request);
+        $context->registerInstance($request);
 
         $route = new Route('/', 'Enlighten\Tests\Routing\Sample\BogusController');
-        $route->action($context);
+        $route->action($request, $context);
     }
 
     /**
@@ -364,13 +364,13 @@ class RouteTest extends PHPUnit_Framework_TestCase
      */
     public function testControllerDispatchingWithBadConstructor()
     {
-        $context = new EnlightenContext();
+        $context = new RoutingContext();
 
         $request = new Request();
-        $context->setRequest($request);
+        $context->registerInstance($request);
 
         $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleBadConstructorController');
-        $route->action($context);
+        $route->action($request, $context);
     }
 
     /**
@@ -379,13 +379,13 @@ class RouteTest extends PHPUnit_Framework_TestCase
      */
     public function testControllerDispatchingWithNoDefaultAction()
     {
-        $context = new EnlightenContext();
+        $context = new RoutingContext();
 
         $request = new Request();
-        $context->setRequest($request);
+        $context->registerInstance($request);
 
         $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleNoDefaultActionController');
-        $route->action($context);
+        $route->action($request, $context);
     }
 
     public function testGetSetMatchSubdirectory()

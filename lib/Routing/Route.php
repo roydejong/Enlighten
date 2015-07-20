@@ -254,19 +254,19 @@ class Route
     /**
      * Executes this route's action.
      *
-     * @param EnlightenContext $context
+     * @param Request $request
+     * @param RoutingContext $context
      * @throws RoutingException For unsupported or invalid action configurations.
+     * @throws \Exception If an Exception is raised during the route's action, and no onException filter is registered, the Exception will be rethrown here.
      * @return mixed
      */
-    public function action(EnlightenContext $context)
+    public function action(Request $request, RoutingContext $context)
     {
         $targetFunc = null;
-        $params = [];
 
         if ($this->isCallable()) {
             // A callable function that should be invoked directly
             $targetFunc = $this->getTarget();
-            $targetFunc = $targetFunc->bindTo($context);
         } else {
             // A string path to a controller: resolve the controller and verify its validity
             $targetParts = explode('@', $this->getTarget(), 2);
@@ -292,8 +292,8 @@ class Route
             }
         }
 
-        // Inject the route variables into the arguments passed to the function
-        $params = array_merge($params, $this->mapPathVariables($context->getRequest()));
+        // Perform dependency injection for the target function based on the RoutingContext
+        $params = $context->determineValues($targetFunc);
 
         // Finally, invoke the specified controller function or the specified callable with the appropriate params
         $this->filters->trigger(Filters::BeforeRoute, $this);

@@ -2,11 +2,10 @@
 
 namespace Enlighten\Routing;
 
-use Enlighten\EnlightenContext;
 use Enlighten\Http\Request;
 
 /**
- * Handles the registration of Routes, and routing incoming Requests.
+ * Handles the registration and mcathing of Routes.
  *
  * @see Enlighten\Http\Request
  * @see Enlighten\\Routing\Route
@@ -110,11 +109,13 @@ class Router
      * Dispatches a Route, executing its action.
      *
      * @param Route $route
-     * @param EnlightenContext $context
+     * @param Request $request
+     * @param RoutingContext $context
      * @return mixed Route target function return value, if any.
      */
-    public function dispatch(Route $route, EnlightenContext $context)
+    public function dispatch(Route $route, Request $request, RoutingContext $context)
     {
-        return $route->action($context);
+        $context->registerInstance($route);
+        return $route->action($request, $context);
     }
 }
