@@ -8,4 +8,11 @@
     <logging>
         <log type="coverage-clover" target="build/logs/clover.xml"/>
     </logging>
+    <filter>
+        <blacklist>
+            <exclude>
+                <directory>/tests</directory>
+            </exclude>
+        </blacklist>
+    </filter>
 </phpunit>
