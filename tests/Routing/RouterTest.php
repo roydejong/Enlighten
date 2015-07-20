@@ -89,13 +89,14 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $request = new Request();
         $request->setRequestUri('/hello/world');
 
-        $router = new Router();
-        $router->register($route);
-
         $context = new Context();
         $context->registerInstance($request);
 
-        $this->assertEquals('/hello/world', $router->dispatch($route, $request, $context));
+        $router = new Router();
+        $router->setContext($context);
+        $router->register($route);
+
+        $this->assertEquals('/hello/world', $router->dispatch($route, $request));
 
         $this->expectOutputString('/hello/world');
     }

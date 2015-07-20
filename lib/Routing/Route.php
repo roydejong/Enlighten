@@ -261,7 +261,7 @@ class Route
      * @throws \Exception If an Exception is raised during the route's action, and no onException filter is registered, the Exception will be rethrown here.
      * @return mixed
      */
-    public function action(Request $request, Context $context)
+    public function action(Request $request, Context $context = null)
     {
         $targetFunc = null;
 
@@ -293,8 +293,12 @@ class Route
             }
         }
 
-        // Perform dependency injection for the target function based on the RoutingContext
-        $params = $context->determineValues($targetFunc);
+        // Perform dependency injection for the target function based on the Context
+        $params = [];
+
+        if (!empty($context)) {
+            $params = $context->determineValues($targetFunc);
+        }
 
         // Finally, invoke the specified controller function or the specified callable with the appropriate params
         $this->filters->trigger(Filters::BeforeRoute, $this);

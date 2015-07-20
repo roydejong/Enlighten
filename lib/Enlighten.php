@@ -86,6 +86,7 @@ class Enlighten
     public function setRouter(Router $router)
     {
         $this->router = $router;
+        $this->router->setContext($this->context);
         $this->context->registerInstance($router);
     }
 
@@ -178,8 +179,7 @@ class Enlighten
     public function dispatch(Route $route)
     {
         $this->beforeStart();
-
-        $this->router->dispatch($route, $this->request, $this->context);
+        $this->router->dispatch($route, $this->request);
     }
 
     /**
