@@ -9,6 +9,7 @@ use Enlighten\Http\ResponseCode;
 use Enlighten\Routing\Filters;
 use Enlighten\Routing\Route;
 use Enlighten\Routing\Router;
+use Enlighten\Routing\RoutingContext;
 
 /**
  * Represents an Enlighten application instance.
@@ -48,6 +49,13 @@ class Enlighten
     protected $filters;
 
     /**
+     * The current application context.
+     *
+     * @var RoutingContext
+     */
+    protected $context;
+
+    /**
      * Initializes a new Enlighten application instance.
      */
     public function __construct()
@@ -55,6 +63,8 @@ class Enlighten
         $this->request = null;
         $this->response = null;
         $this->filters = new Filters();
+        $this->context = new RoutingContext();
+        $this->context->registerInstance($this);
     }
 
     /**
@@ -66,6 +76,7 @@ class Enlighten
     public function setRequest(Request $request)
     {
         $this->request = $request;
+        $this->context->registerInstance($request);
     }
 
     /**
@@ -76,6 +87,7 @@ class Enlighten
     public function setRouter(Router $router)
     {
         $this->router = $router;
+        $this->context->registerInstance($router);
     }
 
     /**
@@ -116,6 +128,7 @@ class Enlighten
         ob_start();
 
         $this->response = new Response();
+        $this->context->registerInstance($this->response);
 
         try {
             // Dispatch the request to the router
@@ -167,7 +180,7 @@ class Enlighten
     {
         $this->beforeStart();
 
-        $this->router->dispatch($route, $this->createContext());
+        $this->router->dispatch($route, $this->request, $this->context);
     }
 
     /**
@@ -306,33 +319,6 @@ class Enlighten
         $this->_bootstrapRouter();
         $this->router->setSubdirectory($subdirectory);
         return $this;
-    }
-
-    /**
-     * Returns the current application context.
-     * Contexts are used to provide components such as controllers and closures with the data they need to operate.
-     * This function is typically only used internally by the framework when initializing closures and the like.
-     *
-     * @return EnlightenContext
-     */
-    public function createContext()
-    {
-        $context = new EnlightenContext();
-        $this->fillContext($context);
-        return $context;
-    }
-
-    /**
-     * Fills a given $context with the current application state.
-     * Contexts are used to provide components such as controllers and closures with the data they need to operate.
-     * This function is typically only used internally by the framework when initializing controllers and the like.
-     *
-     * @param EnlightenContext $context
-     */
-    public function fillContext(EnlightenContext $context)
-    {
-        $context->setRequest($this->request);
-        $context->setResponse($this->response);
     }
 
     /**

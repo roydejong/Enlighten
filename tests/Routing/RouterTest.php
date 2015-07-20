@@ -4,6 +4,7 @@ use Enlighten\EnlightenContext;
 use Enlighten\Http\Request;
 use Enlighten\Routing\Route;
 use Enlighten\Routing\Router;
+use Enlighten\Routing\RoutingContext;
 
 class RouterTest extends PHPUnit_Framework_TestCase
 {
@@ -66,10 +67,10 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $router = new Router();
         $router->register($route);
 
-        $context = new EnlightenContext();
-        $context->setRequest($request);
+        $context = new RoutingContext();
+        $context->registerInstance($request);
 
-        $this->assertEquals('retVal', $router->dispatch($route, $context));
+        $this->assertEquals('retVal', $router->dispatch($route, $request, $context));
 
         $this->expectOutputString('hello world');
     }
@@ -79,8 +80,8 @@ class RouterTest extends PHPUnit_Framework_TestCase
      */
     public function testClosureContext()
     {
-        $route = new Route('/hello/world', function () {
-            $uri = $this->getRequest()->getRequestUri();
+        $route = new Route('/hello/world', function (Request $request) {
+            $uri = $request->getRequestUri();
             echo $uri;
             return $uri;
         });
@@ -91,10 +92,10 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $router = new Router();
         $router->register($route);
 
-        $context = new EnlightenContext();
-        $context->setRequest($request);
+        $context = new RoutingContext();
+        $context->registerInstance($request);
 
-        $this->assertEquals('/hello/world', $router->dispatch($route, $context));
+        $this->assertEquals('/hello/world', $router->dispatch($route, $request, $context));
 
         $this->expectOutputString('/hello/world');
     }
