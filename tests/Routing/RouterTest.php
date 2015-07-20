@@ -1,10 +1,10 @@
 <?php
 
+use Enlighten\Context;
 use Enlighten\EnlightenContext;
 use Enlighten\Http\Request;
 use Enlighten\Routing\Route;
 use Enlighten\Routing\Router;
-use Enlighten\Routing\RoutingContext;
 
 class RouterTest extends PHPUnit_Framework_TestCase
 {
@@ -67,7 +67,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $router = new Router();
         $router->register($route);
 
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
         $this->assertEquals('retVal', $router->dispatch($route, $request, $context));
@@ -92,7 +92,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $router = new Router();
         $router->register($route);
 
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
         $this->assertEquals('/hello/world', $router->dispatch($route, $request, $context));

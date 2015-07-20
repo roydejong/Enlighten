@@ -1,8 +1,8 @@
 <?php
 
+use Enlighten\Context;
 use Enlighten\Http\Request;
 use Enlighten\Http\Response;
-use Enlighten\Routing\RoutingContext;
 
 function sampleFunction($nullMeBro, $bogusParam = 'abc', Request $request = null)
 {
@@ -39,7 +39,7 @@ class RoutingContextTest extends PHPUnit_Framework_TestCase
             return $fillMe->getRequestUri();
         };
 
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
         $paramList = $context->determineValues($myFunction);
@@ -65,7 +65,7 @@ class RoutingContextTest extends PHPUnit_Framework_TestCase
 
         $myFunction = 'sampleFunction';
 
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
         $paramList = $context->determineValues($myFunction);
@@ -87,7 +87,7 @@ class RoutingContextTest extends PHPUnit_Framework_TestCase
 
         $myFunction = [$this, 'sampleFunction'];
 
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
         $paramList = $context->determineValues($myFunction);
@@ -113,7 +113,7 @@ class RoutingContextTest extends PHPUnit_Framework_TestCase
      */
     public function testExceptionWhenRegisteringPrimitiveTypes()
     {
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance('bla');
     }
 }

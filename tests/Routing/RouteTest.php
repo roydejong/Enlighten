@@ -1,11 +1,10 @@
 <?php
 
+use Enlighten\Context;
 use Enlighten\EnlightenContext;
 use Enlighten\Http\Request;
 use Enlighten\Http\RequestMethod;
 use Enlighten\Routing\Route;
-use Enlighten\Routing\RoutingContext;
-use Enlighten\Routing\RoutingException;
 
 class RouteTest extends PHPUnit_Framework_TestCase
 {
@@ -162,7 +161,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         });
         $route->requireMethod(RequestMethod::GET);
 
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
         $this->assertTrue($route->matches($request));
@@ -187,7 +186,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($route->matches($request));
 
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
         $route->action($request, $context);
@@ -211,7 +210,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($route->matches($request));
 
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
         $route->action($request, $context);
@@ -239,7 +238,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($route->matches($request));
 
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
         $route->action($request, $context);
@@ -264,7 +263,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($route->matches($request));
 
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
         $route->action($request, $context);
@@ -304,7 +303,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
     public function testControllerDispatchingWithDefaultFunction()
     {
-        $context = new RoutingContext();
+        $context = new Context();
 
         $request = new Request();
         $context->registerInstance($request);
@@ -317,7 +316,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
     public function testControllerDispatchingWithCustomFunction()
     {
-        $context = new RoutingContext();
+        $context = new Context();
 
         $request = new Request();
         $context->registerInstance($request);
@@ -334,7 +333,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
      */
     public function testControllerDispatchingWithBadCustomFunction()
     {
-        $context = new RoutingContext();
+        $context = new Context();
 
         $request = new Request();
         $context->registerInstance($request);
@@ -349,7 +348,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
      */
     public function testControllerDispatchingWithBadClassName()
     {
-        $context = new RoutingContext();
+        $context = new Context();
 
         $request = new Request();
         $context->registerInstance($request);
@@ -364,7 +363,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
      */
     public function testControllerDispatchingWithBadConstructor()
     {
-        $context = new RoutingContext();
+        $context = new Context();
 
         $request = new Request();
         $context->registerInstance($request);
@@ -379,7 +378,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
      */
     public function testControllerDispatchingWithNoDefaultAction()
     {
-        $context = new RoutingContext();
+        $context = new Context();
 
         $request = new Request();
         $context->registerInstance($request);

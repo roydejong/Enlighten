@@ -1,12 +1,12 @@
 <?php
 
-namespace Enlighten\Routing;
+namespace Enlighten;
 
 /**
  * Represents the context for a routing process.
  * This is used to provide a target function with the appropriate data.
  */
-class RoutingContext
+class Context
 {
     /**
      * Contains a mapping of types and instances.

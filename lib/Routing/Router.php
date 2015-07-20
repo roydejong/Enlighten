@@ -2,6 +2,7 @@
 
 namespace Enlighten\Routing;
 
+use Enlighten\Context;
 use Enlighten\Http\Request;
 
 /**
@@ -110,10 +111,10 @@ class Router
      *
      * @param Route $route
      * @param Request $request
-     * @param RoutingContext $context
+     * @param Context $context
      * @return mixed Route target function return value, if any.
      */
-    public function dispatch(Route $route, Request $request, RoutingContext $context)
+    public function dispatch(Route $route, Request $request, Context $context)
     {
         $context->registerInstance($route);
         return $route->action($request, $context);

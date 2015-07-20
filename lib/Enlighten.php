@@ -9,7 +9,6 @@ use Enlighten\Http\ResponseCode;
 use Enlighten\Routing\Filters;
 use Enlighten\Routing\Route;
 use Enlighten\Routing\Router;
-use Enlighten\Routing\RoutingContext;
 
 /**
  * Represents an Enlighten application instance.
@@ -51,7 +50,7 @@ class Enlighten
     /**
      * The current application context.
      *
-     * @var RoutingContext
+     * @var Context
      */
     protected $context;
 
@@ -63,7 +62,7 @@ class Enlighten
         $this->request = null;
         $this->response = null;
         $this->filters = new Filters();
-        $this->context = new RoutingContext();
+        $this->context = new Context();
         $this->context->registerInstance($this);
     }
 
