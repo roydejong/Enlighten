@@ -5,14 +5,12 @@
             <directory suffix="Test.php">./tests</directory>
         </testsuite>
     </testsuites>
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="false" processUncoveredFilesFromWhitelist="false">
+            <directory suffix=".php">lib/</directory>
+        </whitelist>
+    </filter>
     <logging>
         <log type="coverage-clover" target="build/logs/clover.xml"/>
     </logging>
-    <filter>
-        <blacklist>
-            <exclude>
-                <directory>/tests</directory>
-            </exclude>
-        </blacklist>
-    </filter>
 </phpunit>
