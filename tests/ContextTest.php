@@ -150,7 +150,7 @@ class ContextTest extends PHPUnit_Framework_TestCase
         $context->registerInstance($subClass);
         $context->registerInstance($parentClass);
 
-        $myFunc = function (Exception $ex, \InvalidArgumentException $ex) {
+        $myFunc = function (Exception $ex, \InvalidArgumentException $ex2) {
             // ..
         };
 
