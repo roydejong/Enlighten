@@ -3,6 +3,8 @@
 use Enlighten\Context;
 use Enlighten\Http\Request;
 use Enlighten\Http\Response;
+use Enlighten\Routing\RoutingException;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 function sampleFunction($nullMeBro, $bogusParam = 'abc', Request $request = null)
 {
@@ -115,5 +117,51 @@ class ContextTest extends PHPUnit_Framework_TestCase
     {
         $context = new Context();
         $context->registerInstance('bla');
+    }
+
+    public function testWeakSubclasses()
+    {
+        $subClass = new RoutingException('Test');
+
+        $context = new Context();
+        $context->registerInstance($subClass);
+
+        $myFunc = function (Exception $ex, RoutingException $ex) {
+            // ..
+        };
+
+        $expectedParams = [
+            $subClass,
+            $subClass
+        ];
+        $actualParams = $context->determineValues($myFunc);
+
+        // We expect that both Exception and and RoutingException will resolve to the same object.
+        // This is because there is no "stronger" match in this test.
+        $this->assertEquals($expectedParams, $actualParams);
+    }
+
+    public function testMixedStrengthSubclasses()
+    {
+        $subClass = new \InvalidArgumentException();
+        $parentClass = new Exception();
+
+        $context = new Context();
+        $context->registerInstance($subClass);
+        $context->registerInstance($parentClass);
+
+        $myFunc = function (Exception $ex, \InvalidArgumentException $ex) {
+            // ..
+        };
+
+        $expectedParams = [
+            $parentClass,
+            $subClass
+        ];
+        $actualParams = $context->determineValues($myFunc);
+
+        // We expect that both Exception and and RoutingException will resolve to the same object.
+        // This is because there is no "stronger" match in this test.
+        $this->assertEquals($expectedParams, $actualParams);
     }
 }
