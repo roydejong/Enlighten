@@ -132,11 +132,12 @@ class Enlighten
 
         try {
             // Dispatch the request to the router
-            $this->filters->trigger(Filters::BeforeRoute);
+            $this->filters->trigger(Filters::BeforeRoute, $this->context);
 
             $routingResult = $this->router->route($this->request);
 
             if ($routingResult != null) {
+                $this->context->registerInstance($routingResult);
                 $this->response->setResponseCode(ResponseCode::HTTP_OK);
                 $this->dispatch($routingResult);
             } else {
@@ -144,14 +145,16 @@ class Enlighten
                 // TODO 404 error handling (#11)
             }
 
-            $this->filters->trigger(Filters::AfterRoute);
+            $this->filters->trigger(Filters::AfterRoute, $this->context);
         } catch (\Exception $ex) {
             ob_clean();
 
             $this->response = new Response();
             $this->response->setResponseCode(ResponseCode::HTTP_INTERNAL_SERVER_ERROR);
 
-            if (!$this->filters->trigger(Filters::OnExeption, $ex)) {
+            $this->context->registerInstance($ex);
+
+            if (!$this->filters->trigger(Filters::OnExeption, $this->context)) {
                 // If this exception was unhandled, rethrow it so it appears as any old php exception
                 throw $ex;
             }

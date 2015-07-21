@@ -301,19 +301,22 @@ class Route
         }
 
         // Finally, invoke the specified controller function or the specified callable with the appropriate params
-        $this->filters->trigger(Filters::BeforeRoute, $this);
+        $this->filters->trigger(Filters::BeforeRoute, $context);
+
         $retVal = null;
 
         try {
             $retVal = call_user_func_array($targetFunc, $params);
         } catch (\Exception $ex) {
-            if (!$this->filters->trigger(Filters::OnExeption, $ex)) {
+            $context->registerInstance($ex);
+            
+            if (!$this->filters->trigger(Filters::OnExeption, $context)) {
                 // If this exception was unhandled, rethrow it so it can be handled in the global scope
                 throw $ex;
             }
         }
 
-        $this->filters->trigger(Filters::AfterRoute, $this);
+        $this->filters->trigger(Filters::AfterRoute, $context);
 
         return $retVal;
     }
