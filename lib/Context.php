@@ -1,12 +1,12 @@
 <?php
 
-namespace Enlighten\Routing;
+namespace Enlighten;
 
 /**
  * Represents the context for a routing process.
  * This is used to provide a target function with the appropriate data.
  */
-class RoutingContext
+class Context
 {
     /**
      * Contains a mapping of types and instances.
@@ -15,6 +15,18 @@ class RoutingContext
      * @var array
      */
     protected $instances;
+
+    /**
+     * Contains a mapping of class names that are weakly related.
+     *
+     * For example, if an \InvalidArgumentException is added via registerInstance(), this mapping will contain an item
+     * that maps \Exception - its parent class - to \InvalidArgumentException.
+     *
+     * This mapping is used when we don't have an exact (strong) match in $instances.
+     *
+     * @var array
+     */
+    protected $weakLinks;
 
     /**
      * Initializes a blank routing context.
@@ -36,8 +48,23 @@ class RoutingContext
             throw new \InvalidArgumentException('registerInstance(): Must register an object instance');
         }
 
-        $className = get_class($object);
+        $reflectionObject = new \ReflectionObject($object);
+        $className = $reflectionObject->getName();
+
+        // Register strong link in $instance
         $this->instances[$className] = $object;
+
+        // Recursively determine and register weak links
+        $determineParent = function (\ReflectionClass $class) use ($className, &$determineParent) {
+            $parentClass = $class->getParentClass();
+
+            if (!empty($parentClass)) {
+                $this->weakLinks[$parentClass->getName()] = $className;
+                $determineParent($parentClass);
+            }
+        };
+
+        $determineParent($reflectionObject);
     }
 
     /**
@@ -100,8 +127,15 @@ class RoutingContext
         if (!empty($class)) {
             $className = $class->getName();
 
+            // Determine strong type-based link
             if (isset($this->instances[$className])) {
                 return $this->instances[$className];
+            }
+
+            // Determine weak type-based link
+            if (isset($this->weakLinks[$className])) {
+                $lowerClassName = $this->weakLinks[$className];
+                return $this->instances[$lowerClassName];
             }
         }
 

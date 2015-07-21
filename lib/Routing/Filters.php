@@ -1,6 +1,7 @@
 <?php
 
 namespace Enlighten\Routing;
+use Enlighten\Context;
 
 /**
  * A collection of routing filters.
@@ -56,10 +57,10 @@ class Filters
      * Triggers all filter functions for a given $eventType.
      *
      * @param string $eventType The type of event, e.g. 'beforeRoute'
-     * @param mixed $eventArgs Event arguments to pass to the filter function.
+     * @param Context $context The optional context to be applied to the filter functions.
      * @return bool Returns whether any functions were triggered or not.
      */
-    public function trigger($eventType, $eventArgs = null)
+    public function trigger($eventType, Context $context = null)
     {
         if (!isset($this->handlers[$eventType])) {
             return false;
@@ -68,7 +69,13 @@ class Filters
         $any = false;
 
         foreach ($this->handlers[$eventType] as $filterFunction) {
-            call_user_func($filterFunction, $eventArgs);
+            $params = [];
+
+            if (!empty($context)) {
+                $params = $context->determineValues($filterFunction);
+            }
+
+            call_user_func_array($filterFunction, $params);
 
             $any = true;
         }

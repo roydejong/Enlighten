@@ -1,10 +1,10 @@
 <?php
 
+use Enlighten\Context;
 use Enlighten\EnlightenContext;
 use Enlighten\Http\Request;
 use Enlighten\Routing\Route;
 use Enlighten\Routing\Router;
-use Enlighten\Routing\RoutingContext;
 
 class RouterTest extends PHPUnit_Framework_TestCase
 {
@@ -67,7 +67,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $router = new Router();
         $router->register($route);
 
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
         $this->assertEquals('retVal', $router->dispatch($route, $request, $context));
@@ -89,13 +89,14 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $request = new Request();
         $request->setRequestUri('/hello/world');
 
-        $router = new Router();
-        $router->register($route);
-
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
-        $this->assertEquals('/hello/world', $router->dispatch($route, $request, $context));
+        $router = new Router();
+        $router->setContext($context);
+        $router->register($route);
+
+        $this->assertEquals('/hello/world', $router->dispatch($route, $request));
 
         $this->expectOutputString('/hello/world');
     }
@@ -111,5 +112,16 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($router, $router->setSubdirectory('/my/dir'), 'Fluent API return');
         $this->assertEquals('/my/dir', $router->getSubdirectory());
         $this->assertEquals($router->getSubdirectory(), '/my/dir', 'Routes should inherit subdirectory setting');
+    }
+
+    public function testGetSetContext()
+    {
+        $router = new Router();
+
+        $context = new Context();
+
+        $this->assertNull($router->getContext(), 'Default should be null');
+        $this->assertEquals($router, $router->setContext($context), 'Fluent API return');
+        $this->assertEquals($context, $router->getContext());
     }
 }

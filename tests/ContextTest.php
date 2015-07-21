@@ -1,15 +1,17 @@
 <?php
 
+use Enlighten\Context;
 use Enlighten\Http\Request;
 use Enlighten\Http\Response;
-use Enlighten\Routing\RoutingContext;
+use Enlighten\Routing\RoutingException;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 function sampleFunction($nullMeBro, $bogusParam = 'abc', Request $request = null)
 {
     return $request->getRequestUri();
 }
 
-class RoutingContextTest extends PHPUnit_Framework_TestCase
+class ContextTest extends PHPUnit_Framework_TestCase
 {
     /**
      * Determines whether this version of PHP is capable of determining default parameter values for closures via
@@ -39,7 +41,7 @@ class RoutingContextTest extends PHPUnit_Framework_TestCase
             return $fillMe->getRequestUri();
         };
 
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
         $paramList = $context->determineValues($myFunction);
@@ -65,7 +67,7 @@ class RoutingContextTest extends PHPUnit_Framework_TestCase
 
         $myFunction = 'sampleFunction';
 
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
         $paramList = $context->determineValues($myFunction);
@@ -87,7 +89,7 @@ class RoutingContextTest extends PHPUnit_Framework_TestCase
 
         $myFunction = [$this, 'sampleFunction'];
 
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance($request);
 
         $paramList = $context->determineValues($myFunction);
@@ -102,6 +104,21 @@ class RoutingContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('/hello', call_user_func_array($myFunction, $paramList));
     }
 
+    public function testShouldReturnNullForUnresolvedParam()
+    {
+        $myFunction = function (Exception $exception) {
+            // ...
+        };
+
+        // Valid object signature, but cannot resolve in context, expecting NULL
+        $context = new Context();
+        $paramList = $context->determineValues($myFunction);
+        $expectedParams = [
+            null
+        ];
+        $this->assertEquals($expectedParams, $paramList);
+    }
+
     public function sampleFunction($nullMeBro, $bogusParam = 'abc', Request $request = null)
     {
         return $request->getRequestUri();
@@ -113,7 +130,53 @@ class RoutingContextTest extends PHPUnit_Framework_TestCase
      */
     public function testExceptionWhenRegisteringPrimitiveTypes()
     {
-        $context = new RoutingContext();
+        $context = new Context();
         $context->registerInstance('bla');
+    }
+
+    public function testWeakSubclasses()
+    {
+        $subClass = new RoutingException('Test');
+
+        $context = new Context();
+        $context->registerInstance($subClass);
+
+        $myFunc = function (Exception $ex, RoutingException $ex2) {
+            // ..
+        };
+
+        $expectedParams = [
+            $subClass,
+            $subClass
+        ];
+        $actualParams = $context->determineValues($myFunc);
+
+        // We expect that both Exception and and RoutingException will resolve to the same object.
+        // This is because there is no "stronger" match in this test.
+        $this->assertEquals($expectedParams, $actualParams);
+    }
+
+    public function testMixedStrengthSubclasses()
+    {
+        $subClass = new \InvalidArgumentException();
+        $parentClass = new Exception();
+
+        $context = new Context();
+        $context->registerInstance($subClass);
+        $context->registerInstance($parentClass);
+
+        $myFunc = function (Exception $ex, \InvalidArgumentException $ex2) {
+            // ..
+        };
+
+        $expectedParams = [
+            $parentClass,
+            $subClass
+        ];
+        $actualParams = $context->determineValues($myFunc);
+
+        // We expect that both Exception and and RoutingException will resolve to the same object.
+        // This is because there is no "stronger" match in this test.
+        $this->assertEquals($expectedParams, $actualParams);
     }
 }

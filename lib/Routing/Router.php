@@ -2,6 +2,7 @@
 
 namespace Enlighten\Routing;
 
+use Enlighten\Context;
 use Enlighten\Http\Request;
 
 /**
@@ -28,13 +29,21 @@ class Router
     protected $subdirectory;
 
     /**
+     * An optional context that will be provided to any functions that are invoked via this router.
+     *
+     * @default null
+     * @var Context
+     */
+    protected $context;
+
+    /**
      * Initializes a new, blank router.
      */
     public function __construct()
     {
         $this->subdirectory = null;
-
-        $this->clear();
+        $this->routes = [];
+        $this->context = null;
     }
 
     /**
@@ -89,6 +98,28 @@ class Router
     }
 
     /**
+     * Gets the application context that is provided to route actions and filters.
+     *
+     * @return mixed
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * Sets the application context that is provided to route actions and filters.
+     *
+     * @param mixed $context
+     * @return Router
+     */
+    public function setContext($context)
+    {
+        $this->context = $context;
+        return $this;
+    }
+
+    /**
      * Attempts to map a given $request to a registered route.
      *
      * @param Request $request
@@ -110,12 +141,14 @@ class Router
      *
      * @param Route $route
      * @param Request $request
-     * @param RoutingContext $context
      * @return mixed Route target function return value, if any.
      */
-    public function dispatch(Route $route, Request $request, RoutingContext $context)
+    public function dispatch(Route $route, Request $request)
     {
-        $context->registerInstance($route);
-        return $route->action($request, $context);
+        if (!empty($this->context)) {
+            $this->context->registerInstance($route);
+        }
+
+        return $route->action($request, $this->context);
     }
 }

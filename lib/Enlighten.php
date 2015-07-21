@@ -9,7 +9,6 @@ use Enlighten\Http\ResponseCode;
 use Enlighten\Routing\Filters;
 use Enlighten\Routing\Route;
 use Enlighten\Routing\Router;
-use Enlighten\Routing\RoutingContext;
 
 /**
  * Represents an Enlighten application instance.
@@ -51,7 +50,7 @@ class Enlighten
     /**
      * The current application context.
      *
-     * @var RoutingContext
+     * @var Context
      */
     protected $context;
 
@@ -63,7 +62,7 @@ class Enlighten
         $this->request = null;
         $this->response = null;
         $this->filters = new Filters();
-        $this->context = new RoutingContext();
+        $this->context = new Context();
         $this->context->registerInstance($this);
     }
 
@@ -87,6 +86,7 @@ class Enlighten
     public function setRouter(Router $router)
     {
         $this->router = $router;
+        $this->router->setContext($this->context);
         $this->context->registerInstance($router);
     }
 
@@ -132,11 +132,12 @@ class Enlighten
 
         try {
             // Dispatch the request to the router
-            $this->filters->trigger(Filters::BeforeRoute);
+            $this->filters->trigger(Filters::BeforeRoute, $this->context);
 
             $routingResult = $this->router->route($this->request);
 
             if ($routingResult != null) {
+                $this->context->registerInstance($routingResult);
                 $this->response->setResponseCode(ResponseCode::HTTP_OK);
                 $this->dispatch($routingResult);
             } else {
@@ -144,14 +145,16 @@ class Enlighten
                 // TODO 404 error handling (#11)
             }
 
-            $this->filters->trigger(Filters::AfterRoute);
+            $this->filters->trigger(Filters::AfterRoute, $this->context);
         } catch (\Exception $ex) {
             ob_clean();
 
             $this->response = new Response();
             $this->response->setResponseCode(ResponseCode::HTTP_INTERNAL_SERVER_ERROR);
 
-            if (!$this->filters->trigger(Filters::OnExeption, $ex)) {
+            $this->context->registerInstance($ex);
+
+            if (!$this->filters->trigger(Filters::OnExeption, $this->context)) {
                 // If this exception was unhandled, rethrow it so it appears as any old php exception
                 throw $ex;
             }
@@ -179,8 +182,7 @@ class Enlighten
     public function dispatch(Route $route)
     {
         $this->beforeStart();
-
-        $this->router->dispatch($route, $this->request, $this->context);
+        $this->router->dispatch($route, $this->request);
     }
 
     /**
