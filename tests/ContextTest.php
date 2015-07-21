@@ -9,7 +9,7 @@ function sampleFunction($nullMeBro, $bogusParam = 'abc', Request $request = null
     return $request->getRequestUri();
 }
 
-class RoutingContextTest extends PHPUnit_Framework_TestCase
+class ContextTest extends PHPUnit_Framework_TestCase
 {
     /**
      * Determines whether this version of PHP is capable of determining default parameter values for closures via
