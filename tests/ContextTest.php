@@ -126,7 +126,7 @@ class ContextTest extends PHPUnit_Framework_TestCase
         $context = new Context();
         $context->registerInstance($subClass);
 
-        $myFunc = function (Exception $ex, RoutingException $ex) {
+        $myFunc = function (Exception $ex, RoutingException $ex2) {
             // ..
         };
 
