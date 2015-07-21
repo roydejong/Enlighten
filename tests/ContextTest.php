@@ -104,6 +104,21 @@ class ContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('/hello', call_user_func_array($myFunction, $paramList));
     }
 
+    public function testShouldReturnNullForUnresolvedParam()
+    {
+        $myFunction = function (Exception $exception) {
+            // ...
+        };
+
+        // Valid object signature, but cannot resolve in context, expecting NULL
+        $context = new Context();
+        $paramList = $context->determineValues($myFunction);
+        $expectedParams = [
+            null
+        ];
+        $this->assertEquals($expectedParams, $paramList);
+    }
+
     public function sampleFunction($nullMeBro, $bogusParam = 'abc', Request $request = null)
     {
         return $request->getRequestUri();

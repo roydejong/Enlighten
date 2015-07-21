@@ -113,4 +113,15 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('/my/dir', $router->getSubdirectory());
         $this->assertEquals($router->getSubdirectory(), '/my/dir', 'Routes should inherit subdirectory setting');
     }
+
+    public function testGetSetContext()
+    {
+        $router = new Router();
+
+        $context = new Context();
+
+        $this->assertNull($router->getContext(), 'Default should be null');
+        $this->assertEquals($router, $router->setContext($context), 'Fluent API return');
+        $this->assertEquals($context, $router->getContext());
+    }
 }

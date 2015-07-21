@@ -135,10 +135,7 @@ class Context
             // Determine weak type-based link
             if (isset($this->weakLinks[$className])) {
                 $lowerClassName = $this->weakLinks[$className];
-
-                if (isset($this->instances[$lowerClassName])) {
-                    return $this->instances[$lowerClassName];
-                }
+                return $this->instances[$lowerClassName];
             }
         }
 
