@@ -362,14 +362,14 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $enlighten->onException(function (\Exception $ex) {
             echo $ex->getMessage();
         });
-        $enlighten->start();
+        $response = $enlighten->start();
 
         $this->expectOutputString('Testex');
+        $this->assertEquals(ResponseCode::HTTP_INTERNAL_SERVER_ERROR, $response->getResponseCode());
     }
 
     /**
      * @runInSeparateProcess
-     * @expectedException \Exception
      */
     public function testExceptionFilterUncaught()
     {
@@ -386,9 +386,18 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $enlighten = new Enlighten();
         $enlighten->setRouter($router);
         $enlighten->setRequest($request);
-        $enlighten->start();
 
-        $this->expectOutputString('Testex');
+        $caughtEx = false;
+
+        try {
+            $enlighten->start();
+        } catch (\Exception $ex) {
+            $this->assertEquals('Testex', $ex->getMessage());
+            $caughtEx = true;
+        }
+
+        $this->assertTrue($caughtEx);
+        $this->expectOutputString('An unexpected error has occurred while processing your request.');
     }
 
     public function testSetSubdirectory()

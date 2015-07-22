@@ -147,31 +147,50 @@ class Enlighten
 
             $this->filters->trigger(Filters::AFTER_ROUTE, $this->context);
         } catch (\Exception $ex) {
-            ob_clean();
-
-            $this->response = new Response();
-            $this->response->setResponseCode(ResponseCode::HTTP_INTERNAL_SERVER_ERROR);
-
-            $this->context->registerInstance($ex);
-
-            if (!$this->filters->trigger(Filters::ON_EXCEPTION, $this->context)) {
-                // If this exception was unhandled, rethrow it so it appears as any old php exception
-                throw $ex;
-            }
+            $this->prepareErrorResponse($ex);
         } finally {
-            // Clean out the output buffer to the response, and finally send the built-up response to the client
-            $this->response->appendBody(ob_get_contents());
-            ob_end_clean();
-
-            if ($this->request->isHead()) {
-                // Do not send a body for HEAD requests
-                $this->response->setBody('');
-            }
-
-            $this->response->send();
+            $this->sendResponse();
         }
 
         return $this->response;
+    }
+
+    /**
+     * Cleans the output buffer and builds a default HTTP 500 error page.
+     * Invokes the appropriate filter if one is registered; otherwise falls back to a default message.
+     */
+    private function prepareErrorResponse(\Exception $ex)
+    {
+        ob_clean();
+
+        $this->response = new Response();
+        $this->response->setResponseCode(ResponseCode::HTTP_INTERNAL_SERVER_ERROR);
+
+        $this->context->registerInstance($ex);
+
+        if (!$this->filters->trigger(Filters::ON_EXCEPTION, $this->context)) {
+            // If this exception was unhandled, rethrow it so it appears as any old php exception
+            // Also build up a simple response so at least something appears on screen
+            $this->response->setBody('An unexpected error has occurred while processing your request.');
+            throw $ex;
+        }
+    }
+
+    /**
+     * Moves the output buffer to the response, and send the built-up response to the client.
+     */
+    private function sendResponse()
+    {
+        // Clean out the output buffer to the response, and send the built-up response to the client
+        $this->response->appendBody(ob_get_contents());
+        ob_end_clean();
+
+        if ($this->request->isHead()) {
+            // Do not send a body for HEAD requests
+            $this->response->setBody('');
+        }
+
+        $this->response->send();
     }
 
     /**
