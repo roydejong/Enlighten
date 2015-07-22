@@ -150,8 +150,7 @@ class Cookie
      */
     public function getExpireTimestamp()
     {
-        if (empty($this->expire))
-        {
+        if (empty($this->expire)) {
             return 0;
         }
 

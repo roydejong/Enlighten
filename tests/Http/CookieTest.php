@@ -12,7 +12,7 @@ class CookieTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($cookie, $cookie->setName('Hello'), 'Fluent API');
         $this->assertEquals('Hello', $cookie->getName());
     }
-    
+
     public function testGetSetValue()
     {
         $cookie = new Cookie();
@@ -21,7 +21,7 @@ class CookieTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($cookie, $cookie->setValue('Hello'), 'Fluent API');
         $this->assertEquals('Hello', $cookie->getValue());
     }
-    
+
     public function testGetSetExpire()
     {
         $cookie = new Cookie();
@@ -58,7 +58,7 @@ class CookieTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $cookie->getExpireTimestamp());
         $this->assertEquals(null, $cookie->getExpire());
     }
-    
+
     public function testGetSetPath()
     {
         $cookie = new Cookie();
@@ -67,7 +67,7 @@ class CookieTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($cookie, $cookie->setPath('Hello'), 'Fluent API');
         $this->assertEquals('Hello', $cookie->getPath());
     }
-    
+
     public function testGetSetDomain()
     {
         $cookie = new Cookie();

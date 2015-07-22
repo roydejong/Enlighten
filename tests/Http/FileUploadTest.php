@@ -23,7 +23,7 @@ class FileUploadTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($file, $file->setFormKey('Hello.jpg'), 'Fluent API');
         $this->assertEquals('Hello.jpg', $file->getFormKey());
     }
-    
+
     public function testGetSetOriginalName()
     {
         $file = new FileUpload();

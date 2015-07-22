@@ -114,7 +114,7 @@ class ResponseTest extends PHPUnit_Framework_TestCase
      */
     public function testSetCookie()
     {
-        $expire = time () + 60;
+        $expire = time() + 60;
 
         $response = new Response();
         $this->assertEquals($response, $response->setCookie('test', 'value', $expire, '/', '.test.com', true, true), 'Fluent API');

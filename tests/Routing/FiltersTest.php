@@ -24,7 +24,7 @@ class FiltersTest extends PHPUnit_Framework_TestCase
         $filters = new Filters();
 
         $filters->register('myEventType', function (Filters $contextFilters) use ($filters) {
-           $this->assertEquals($filters, $contextFilters, 'Context should pass data to our filter function');
+            $this->assertEquals($filters, $contextFilters, 'Context should pass data to our filter function');
         });
 
         $context = new Context();
