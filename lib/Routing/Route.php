@@ -265,32 +265,11 @@ class Route
     {
         $targetFunc = null;
 
+        // Determine target function
         if ($this->isCallable()) {
-            // A callable function that should be invoked directly
             $targetFunc = $this->getTarget();
         } else {
-            // A string path to a controller: resolve the controller and verify its validity
-            $targetParts = explode('@', $this->getTarget(), 2);
-            $targetClass = $targetParts[0];
-            $targetFuncName = count($targetParts) > 1 ? $targetParts[1] : 'action';
-
-            if (!class_exists($targetClass, true)) {
-                throw new RoutingException('Could not locate class: ' . $targetClass);
-            }
-
-            $classObj = null;
-
-            try {
-                $classObj = new $targetClass();
-            } catch (\Exception $ex) {
-                throw new RoutingException('Exception thrown when calling default constructor on ' . $targetClass, 0, $ex);
-            }
-
-            $targetFunc = [$classObj, $targetFuncName];
-
-            if (!is_callable($targetFunc)) {
-                throw new RoutingException('Route target function is not callable: ' . $this->getTarget());
-            }
+            $targetFunc = $this->loadController();
         }
 
         // Perform dependency injection for the target function based on the Context
@@ -300,7 +279,7 @@ class Route
             $params = $context->determineValues($targetFunc);
         }
 
-        // Finally, invoke the specified controller function or the specified callable with the appropriate params
+        // Invoke the specified controller function or the specified callable with the appropriate params
         $this->filters->trigger(Filters::BEFORE_ROUTE, $context);
 
         $retVal = null;
@@ -309,7 +288,7 @@ class Route
             $retVal = call_user_func_array($targetFunc, $params);
         } catch (\Exception $ex) {
             $context->registerInstance($ex);
-            
+
             if (!$this->filters->trigger(Filters::ON_EXCEPTION, $context)) {
                 // If this exception was unhandled, rethrow it so it can be handled in the global scope
                 throw $ex;
@@ -317,7 +296,39 @@ class Route
         }
 
         $this->filters->trigger(Filters::AFTER_ROUTE, $context);
-
         return $retVal;
+    }
+
+    /**
+     * Attempts to translate this route's target to a function within a controller class.
+     *
+     * @return array
+     * @throws RoutingException
+     */
+    private function loadController()
+    {
+        $targetParts = explode('@', strval($this->getTarget()), 2);
+        $targetClass = $targetParts[0];
+        $targetFuncName = count($targetParts) > 1 ? $targetParts[1] : 'action';
+
+        if (!class_exists($targetClass, true)) {
+            throw new RoutingException('Could not locate class: ' . $targetClass);
+        }
+
+        $classObj = null;
+
+        try {
+            $classObj = new $targetClass();
+        } catch (\Exception $ex) {
+            throw new RoutingException('Exception thrown when calling default constructor on ' . $targetClass, 0, $ex);
+        }
+
+        $targetFunc = [$classObj, $targetFuncName];
+
+        if (!is_callable($targetFunc)) {
+            throw new RoutingException('Route target function is not callable: ' . $this->getTarget());
+        }
+
+        return $targetFunc;
     }
 }
