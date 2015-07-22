@@ -100,13 +100,13 @@ class Enlighten
             $this->setRequest(Request::extractFromEnvironment());
         }
 
-        $this->_bootstrapRouter();
+        $this->bootstrapRouter();
     }
 
     /**
      * Bootstraps a default router, if no router is configured.
      */
-    private function _bootstrapRouter()
+    private function bootstrapRouter()
     {
         // If no user-defined router was supplied (via Enlighten::setRouter()), initialize the default implementation
         if (empty($this->router)) {
@@ -196,7 +196,7 @@ class Enlighten
      */
     private function registerRoute($pattern, $target, $requestMethod = null)
     {
-        $this->_bootstrapRouter();
+        $this->bootstrapRouter();
 
         $route = new Route($pattern, $target);
 
@@ -318,7 +318,7 @@ class Enlighten
      */
     public function setSubdirectory($subdirectory)
     {
-        $this->_bootstrapRouter();
+        $this->bootstrapRouter();
         $this->router->setSubdirectory($subdirectory);
         return $this;
     }
