@@ -3,7 +3,6 @@
 namespace Enlighten\Routing;
 
 use Enlighten\Context;
-use Enlighten\EnlightenContext;
 use Enlighten\Http\Request;
 
 /**

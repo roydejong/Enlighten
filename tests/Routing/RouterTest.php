@@ -1,7 +1,6 @@
 <?php
 
 use Enlighten\Context;
-use Enlighten\EnlightenContext;
 use Enlighten\Http\Request;
 use Enlighten\Routing\Route;
 use Enlighten\Routing\Router;
