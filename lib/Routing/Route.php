@@ -224,7 +224,7 @@ class Route
      */
     public function after(\Closure $filter)
     {
-        $this->filters->register(Filters::AfterRoute, $filter);
+        $this->filters->register(Filters::AFTER_ROUTE, $filter);
         return $this;
     }
 
@@ -236,7 +236,7 @@ class Route
      */
     public function before(\Closure $filter)
     {
-        $this->filters->register(Filters::BeforeRoute, $filter);
+        $this->filters->register(Filters::BEFORE_ROUTE, $filter);
         return $this;
     }
 
@@ -248,7 +248,7 @@ class Route
      */
     public function onException(\Closure $filter)
     {
-        $this->filters->register(Filters::OnExeption, $filter);
+        $this->filters->register(Filters::ON_EXCEPTION, $filter);
         return $this;
     }
 
@@ -301,7 +301,7 @@ class Route
         }
 
         // Finally, invoke the specified controller function or the specified callable with the appropriate params
-        $this->filters->trigger(Filters::BeforeRoute, $context);
+        $this->filters->trigger(Filters::BEFORE_ROUTE, $context);
 
         $retVal = null;
 
@@ -310,13 +310,13 @@ class Route
         } catch (\Exception $ex) {
             $context->registerInstance($ex);
             
-            if (!$this->filters->trigger(Filters::OnExeption, $context)) {
+            if (!$this->filters->trigger(Filters::ON_EXCEPTION, $context)) {
                 // If this exception was unhandled, rethrow it so it can be handled in the global scope
                 throw $ex;
             }
         }
 
-        $this->filters->trigger(Filters::AfterRoute, $context);
+        $this->filters->trigger(Filters::AFTER_ROUTE, $context);
 
         return $retVal;
     }

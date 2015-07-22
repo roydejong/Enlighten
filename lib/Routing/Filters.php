@@ -1,6 +1,7 @@
 <?php
 
 namespace Enlighten\Routing;
+
 use Enlighten\Context;
 
 /**
@@ -11,15 +12,15 @@ class Filters
     /**
      * Represents a filter that is triggered before a route is .
      */
-    const BeforeRoute = 'beforeRoute';
+    const BEFORE_ROUTE = 'beforeRoute';
     /**
      * Represents a filter that is triggered after a route completes.
      */
-    const AfterRoute = 'afterRoute';
+    const AFTER_ROUTE = 'afterRoute';
     /**
      * Represents a filter that is triggered before a route is invoked.
      */
-    const OnExeption = 'onException';
+    const ON_EXCEPTION = 'onException';
 
     /**
      * A registry of event handlers.

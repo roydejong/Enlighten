@@ -132,7 +132,7 @@ class Enlighten
 
         try {
             // Dispatch the request to the router
-            $this->filters->trigger(Filters::BeforeRoute, $this->context);
+            $this->filters->trigger(Filters::BEFORE_ROUTE, $this->context);
 
             $routingResult = $this->router->route($this->request);
 
@@ -145,7 +145,7 @@ class Enlighten
                 // TODO 404 error handling (#11)
             }
 
-            $this->filters->trigger(Filters::AfterRoute, $this->context);
+            $this->filters->trigger(Filters::AFTER_ROUTE, $this->context);
         } catch (\Exception $ex) {
             ob_clean();
 
@@ -154,7 +154,7 @@ class Enlighten
 
             $this->context->registerInstance($ex);
 
-            if (!$this->filters->trigger(Filters::OnExeption, $this->context)) {
+            if (!$this->filters->trigger(Filters::ON_EXCEPTION, $this->context)) {
                 // If this exception was unhandled, rethrow it so it appears as any old php exception
                 throw $ex;
             }
@@ -331,7 +331,7 @@ class Enlighten
      */
     public function after(\Closure $filter)
     {
-        $this->filters->register(Filters::AfterRoute, $filter);
+        $this->filters->register(Filters::AFTER_ROUTE, $filter);
         return $this;
     }
 
@@ -343,7 +343,7 @@ class Enlighten
      */
     public function before(\Closure $filter)
     {
-        $this->filters->register(Filters::BeforeRoute, $filter);
+        $this->filters->register(Filters::BEFORE_ROUTE, $filter);
         return $this;
     }
 
@@ -355,7 +355,7 @@ class Enlighten
      */
     public function onException(\Closure $filter)
     {
-        $this->filters->register(Filters::OnExeption, $filter);
+        $this->filters->register(Filters::ON_EXCEPTION, $filter);
         return $this;
     }
 }
