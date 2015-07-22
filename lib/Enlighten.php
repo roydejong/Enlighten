@@ -158,6 +158,9 @@ class Enlighten
     /**
      * Cleans the output buffer and builds a default HTTP 500 error page.
      * Invokes the appropriate filter if one is registered; otherwise falls back to a default message.
+     *
+     * @param \Exception $ex The exception we are handling.
+     * @throws \Exception If unhandled by filters, the original exception will be rethrown.
      */
     private function prepareErrorResponse(\Exception $ex)
     {
@@ -332,7 +335,7 @@ class Enlighten
      *
      * NB: You should not use a trailing slash in your subdirectory names.
      *
-     * @param $subdirectory
+     * @param string $subdirectory
      * @return $this
      */
     public function setSubdirectory($subdirectory)
@@ -345,10 +348,10 @@ class Enlighten
     /**
      * Registers a filter function to be executed after application routing and execution completes, but before the response is sent.
      *
-     * @param callable $filter
+     * @param callable $filter Callable filter function.
      * @return $this
      */
-    public function after(\Closure $filter)
+    public function after(callable $filter)
     {
         $this->filters->register(Filters::AFTER_ROUTE, $filter);
         return $this;
@@ -357,10 +360,10 @@ class Enlighten
     /**
      * Registers a filter function to be executed before application routing logic begins.
      *
-     * @param callable $filter
+     * @param callable $filter Callable filter function.
      * @return $this
      */
-    public function before(\Closure $filter)
+    public function before(callable $filter)
     {
         $this->filters->register(Filters::BEFORE_ROUTE, $filter);
         return $this;
@@ -369,10 +372,10 @@ class Enlighten
     /**
      * Registers a filter function to be executed when an uncaught exception occurs during execution.
      *
-     * @param callable $filter
+     * @param callable $filter Callable filter function.
      * @return $this
      */
-    public function onException(\Closure $filter)
+    public function onException(callable $filter)
     {
         $this->filters->register(Filters::ON_EXCEPTION, $filter);
         return $this;
