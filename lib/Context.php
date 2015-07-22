@@ -100,14 +100,14 @@ class Context
      * @param callable $callable
      * @return array A list of parameter values to be passed to the function, in the appropriate order.
      */
-    public function determineValues(callable $callable)
+    public function determineParamValues(callable $callable)
     {
         $reflectionParams = $this->getReflectionParameters($callable);
 
         $paramList = [];
 
         foreach ($reflectionParams as $reflectionParam) {
-            $paramList[] = $this->determineValue($reflectionParam);
+            $paramList[] = $this->determineParamValue($reflectionParam);
         }
 
         return $paramList;
@@ -119,7 +119,7 @@ class Context
      * @param \ReflectionParameter The function parameter to analyze and determine a value for.
      * @return mixed
      */
-    public function determineValue(\ReflectionParameter $parameter)
+    private function determineParamValue(\ReflectionParameter $parameter)
     {
         $class = $parameter->getClass();
 

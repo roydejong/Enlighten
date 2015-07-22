@@ -44,7 +44,7 @@ class ContextTest extends PHPUnit_Framework_TestCase
         $context = new Context();
         $context->registerInstance($request);
 
-        $paramList = $context->determineValues($myFunction);
+        $paramList = $context->determineParamValues($myFunction);
 
         $expectedParams = [
             $this->shouldSupportClosureDefaultValues() ? '123' : null,
@@ -70,7 +70,7 @@ class ContextTest extends PHPUnit_Framework_TestCase
         $context = new Context();
         $context->registerInstance($request);
 
-        $paramList = $context->determineValues($myFunction);
+        $paramList = $context->determineParamValues($myFunction);
 
         $expectedParams = [
             null,
@@ -92,7 +92,7 @@ class ContextTest extends PHPUnit_Framework_TestCase
         $context = new Context();
         $context->registerInstance($request);
 
-        $paramList = $context->determineValues($myFunction);
+        $paramList = $context->determineParamValues($myFunction);
 
         $expectedParams = [
             null,
@@ -112,7 +112,7 @@ class ContextTest extends PHPUnit_Framework_TestCase
 
         // Valid object signature, but cannot resolve in context, expecting NULL
         $context = new Context();
-        $paramList = $context->determineValues($myFunction);
+        $paramList = $context->determineParamValues($myFunction);
         $expectedParams = [
             null
         ];
@@ -149,7 +149,7 @@ class ContextTest extends PHPUnit_Framework_TestCase
             $subClass,
             $subClass
         ];
-        $actualParams = $context->determineValues($myFunc);
+        $actualParams = $context->determineParamValues($myFunc);
 
         // We expect that both Exception and and RoutingException will resolve to the same object.
         // This is because there is no "stronger" match in this test.
@@ -173,7 +173,7 @@ class ContextTest extends PHPUnit_Framework_TestCase
             $parentClass,
             $subClass
         ];
-        $actualParams = $context->determineValues($myFunc);
+        $actualParams = $context->determineParamValues($myFunc);
 
         // We expect that both Exception and and RoutingException will resolve to the same object.
         // This is because there is no "stronger" match in this test.

@@ -275,7 +275,7 @@ class Route
         $params = [];
 
         if (!empty($context)) {
-            $params = $context->determineValues($targetFunc);
+            $params = $context->determineParamValues($targetFunc);
         }
 
         // Invoke the specified controller function or the specified callable with the appropriate params

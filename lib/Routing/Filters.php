@@ -73,7 +73,7 @@ class Filters
             $params = [];
 
             if (!empty($context)) {
-                $params = $context->determineValues($filterFunction);
+                $params = $context->determineParamValues($filterFunction);
             }
 
             call_user_func_array($filterFunction, $params);
