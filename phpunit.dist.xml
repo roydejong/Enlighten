@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="phpunit.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnError="false" stopOnFailure="false" syntaxCheck="true" verbose="true">
+<phpunit bootstrap="phpunit.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnError="false" stopOnFailure="false" syntaxCheck="true" verbose="false">
     <testsuites>
         <testsuite name="Enlighten Framework Tests">
             <directory suffix="Test.php">./tests</directory>
