@@ -17,6 +17,7 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
     {
         $enlighten = new Enlighten();
         $this->assertInstanceOf('Enlighten\Http\Response', $enlighten->start());
+        $this->expectOutputString('Page not found.');
     }
 
     /**
@@ -71,8 +72,10 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $response = $enlighten->start();
 
         $this->assertEquals(ResponseCode::HTTP_NOT_FOUND, $response->getResponseCode());
-        $this->assertEquals('', $response->getBody());
-        $this->expectOutputString('');
+
+        // if no 404 handler is supplied, we should get a default message
+        $this->assertEquals('Page not found.', $response->getBody());
+        $this->expectOutputString('Page not found.');
     }
 
     /**
@@ -364,7 +367,7 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         });
         $response = $enlighten->start();
 
-        $this->expectOutputString('Testex');
+        $this->expectOutputString('Testex', 'An error handler with output is registered; no default message should be returned and only our output should be visible.');
         $this->assertEquals(ResponseCode::HTTP_INTERNAL_SERVER_ERROR, $response->getResponseCode());
     }
 
@@ -398,6 +401,24 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($caughtEx);
         $this->expectOutputString('An unexpected error has occurred while processing your request.');
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testNotFoundFilter()
+    {
+        $request = new Request();
+        $request->setRequestUri('/bla');
+
+        $enlighten = new Enlighten();
+        $enlighten->setRequest($request);
+        $enlighten->notFound(function (Request $request) {
+            echo sprintf("Sorry, but there is no %s here", $request->getRequestUri());
+        });
+        $enlighten->start();
+
+        $this->expectOutputString('Sorry, but there is no /bla here');
     }
 
     public function testSetSubdirectory()

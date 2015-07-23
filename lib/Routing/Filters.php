@@ -5,22 +5,30 @@ namespace Enlighten\Routing;
 use Enlighten\Context;
 
 /**
- * A collection of routing filters.
+ * Manages a collection of routing filters.
  */
 class Filters
 {
     /**
      * Represents a filter that is triggered before a route is .
+     * This filter can be applied to both application and route scope.
      */
     const BEFORE_ROUTE = 'beforeRoute';
     /**
      * Represents a filter that is triggered after a route completes.
+     * This filter can be applied to both application and route scope.
      */
     const AFTER_ROUTE = 'afterRoute';
     /**
      * Represents a filter that is triggered before a route is invoked.
+     * This filter can be applied to both application and route scope.
      */
     const ON_EXCEPTION = 'onException';
+    /**
+     * Represents a filter that is triggered when routing fails (404 error).
+     * This filter only applies to application scope and not to route scope.
+     */
+    const NO_ROUTE_FOUND = 'noRouteFound';
 
     /**
      * A registry of event handlers.
@@ -45,7 +53,7 @@ class Filters
      * @param string $eventType The type of event, see constant values in Filters class. e.g. 'beforeRoute'
      * @param callable $filter
      */
-    public function register($eventType, \Closure $filter)
+    public function register($eventType, callable $filter)
     {
         if (!isset($this->handlers[$eventType])) {
             $this->handlers[$eventType] = [];

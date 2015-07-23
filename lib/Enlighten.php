@@ -55,6 +55,13 @@ class Enlighten
     protected $context;
 
     /**
+     * Indicates whether output buffering is currently active.
+     *
+     * @var boolean
+     */
+    private $isBuffering;
+
+    /**
      * Initializes a new Enlighten application instance.
      */
     public function __construct()
@@ -64,6 +71,7 @@ class Enlighten
         $this->filters = new Filters();
         $this->context = new Context();
         $this->context->registerInstance($this);
+        $this->isBuffering = false;
     }
 
     /**
@@ -125,6 +133,7 @@ class Enlighten
         $this->beforeStart();
 
         // Begin output buffering and begin building the HTTP response
+        $this->isBuffering = true;
         ob_start();
 
         $this->response = new Response();
@@ -141,8 +150,7 @@ class Enlighten
                 $this->response->setResponseCode(ResponseCode::HTTP_OK);
                 $this->dispatch($routingResult);
             } else {
-                $this->response->setResponseCode(ResponseCode::HTTP_NOT_FOUND);
-                // TODO 404 error handling (#11)
+                $this->prepareNotFoundResponse();
             }
 
             $this->filters->trigger(Filters::AFTER_ROUTE, $this->context);
@@ -171,11 +179,56 @@ class Enlighten
 
         $this->context->registerInstance($ex);
 
+        $rethrow = false;
+
         if (!$this->filters->trigger(Filters::ON_EXCEPTION, $this->context)) {
-            // If this exception was unhandled, rethrow it so it appears as any old php exception
-            // Also build up a simple response so at least something appears on screen
+            // If this exception was completely unhandled, rethrow it so it appears as any old php exception
+            $rethrow = true;
+        }
+
+        $this->finalizeOutputBuffer();
+
+        if (empty($this->response->getBody())) {
+            // If nothing was output, then at least present a default message to the user.
             $this->response->setBody('An unexpected error has occurred while processing your request.');
+        }
+
+        if ($rethrow) {
             throw $ex;
+        }
+    }
+
+    /**
+     * Triggers any "not found" filters and prepares an appropriate 404 error response.
+     */
+    private function prepareNotFoundResponse()
+    {
+        ob_clean();
+
+        $this->response = new Response();
+        $this->response->setResponseCode(ResponseCode::HTTP_NOT_FOUND);
+
+        $this->filters->trigger(Filters::NO_ROUTE_FOUND, $this->context);
+
+        $this->finalizeOutputBuffer();
+
+        if (empty($this->response->getBody())) {
+            // If nothing was output, then at least present a default message to the user.
+            $this->response->setBody('Page not found.');
+        }
+    }
+
+    /**
+     * Cleans the output buffer if it is active, moves its contents to the response, and stops output buffering.
+     */
+    private function finalizeOutputBuffer()
+    {
+        // Clean out the output buffer to the response, and send the built-up response to the client
+        if ($this->isBuffering) {
+            $this->response->appendBody(ob_get_contents());
+            $this->isBuffering = false;
+
+            ob_end_clean();
         }
     }
 
@@ -184,9 +237,7 @@ class Enlighten
      */
     private function sendResponse()
     {
-        // Clean out the output buffer to the response, and send the built-up response to the client
-        $this->response->appendBody(ob_get_contents());
-        ob_end_clean();
+        $this->finalizeOutputBuffer();
 
         if ($this->request->isHead()) {
             // Do not send a body for HEAD requests
@@ -378,6 +429,18 @@ class Enlighten
     public function onException(callable $filter)
     {
         $this->filters->register(Filters::ON_EXCEPTION, $filter);
+        return $this;
+    }
+
+    /**
+     * Registers a filter function that is called when routing fails (404 error).
+     *
+     * @param callable $filter
+     * @return $this
+     */
+    public function notFound(callable $filter)
+    {
+        $this->filters->register(Filters::NO_ROUTE_FOUND, $filter);
         return $this;
     }
 }
