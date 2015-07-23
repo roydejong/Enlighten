@@ -17,7 +17,6 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
     {
         $enlighten = new Enlighten();
         $this->assertInstanceOf('Enlighten\Http\Response', $enlighten->start());
-        $this->expectOutputString('Page not found.');
     }
 
     /**
@@ -74,8 +73,7 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(ResponseCode::HTTP_NOT_FOUND, $response->getResponseCode());
 
         // if no 404 handler is supplied, we should get a default message
-        $this->assertEquals('Page not found.', $response->getBody());
-        $this->expectOutputString('Page not found.');
+        $this->assertContains('Page not found.', $response->getBody());
     }
 
     /**
@@ -391,16 +389,17 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $enlighten->setRequest($request);
 
         $caughtEx = false;
+        $resp = null;
 
         try {
-            $enlighten->start();
+            $resp = $enlighten->start();
         } catch (\Exception $ex) {
             $this->assertEquals('Testex', $ex->getMessage());
             $caughtEx = true;
         }
 
         $this->assertTrue($caughtEx);
-        $this->expectOutputString('An unexpected error has occurred while processing your request.');
+        $this->assertContains('Sorry, something went wrong.', ob_get_contents());
     }
 
     /**
@@ -430,5 +429,20 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($app, $app->setSubdirectory('/dir/bla'), 'Fluent API return');
         $this->assertEquals('/dir/bla', $router->getSubdirectory());
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testFirstRunPage()
+    {
+        $request = new Request();
+        $request->setRequestUri('/bla');
+
+        $enlighten = new Enlighten();
+        $enlighten->setRequest($request);
+        $response = $enlighten->start();
+
+        $this->assertContains('Welcome to Enlighten', $response->getBody());
     }
 }

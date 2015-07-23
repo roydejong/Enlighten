@@ -120,6 +120,16 @@ class Router
     }
 
     /**
+     * Gets whether this router is empty (i.e. has no registered routes).
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return empty($this->routes);
+    }
+
+    /**
      * Attempts to map a given $request to a registered route.
      *
      * @param Request $request

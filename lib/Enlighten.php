@@ -62,6 +62,14 @@ class Enlighten
     private $isBuffering;
 
     /**
+     * The absolute path to the framework installation directory root on disk.
+     * This is typically the "enlighten/framework" directory in the "vendor" folder.
+     *
+     * @var string
+     */
+    private $installDirectory;
+
+    /**
      * Initializes a new Enlighten application instance.
      */
     public function __construct()
@@ -72,6 +80,7 @@ class Enlighten
         $this->context = new Context();
         $this->context->registerInstance($this);
         $this->isBuffering = false;
+        $this->installDirectory = realpath(__DIR__ . '/../');
     }
 
     /**
@@ -190,7 +199,7 @@ class Enlighten
 
         if (empty($this->response->getBody())) {
             // If nothing was output, then at least present a default message to the user.
-            $this->response->setBody('An unexpected error has occurred while processing your request.');
+            $this->serveStaticPage('error_page');
         }
 
         if ($rethrow) {
@@ -214,7 +223,25 @@ class Enlighten
 
         if (empty($this->response->getBody())) {
             // If nothing was output, then at least present a default message to the user.
-            $this->response->setBody('Page not found.');
+            if ($this->router->isEmpty()) {
+                $this->serveStaticPage('enlighten_welcome');
+            } else {
+                $this->serveStaticPage('not_found');
+            }
+        }
+    }
+
+    /**
+     * Attempts to serve a internal framework static HTML file to the request.
+     *
+     * @param string $templateFile The name of the HTML file in the "static" subdirectory of the framework.
+     */
+    private function serveStaticPage($templateFile)
+    {
+        $staticFilePath = $this->installDirectory . '/static/' . $templateFile . '.html';
+
+        if (file_exists($staticFilePath)) {
+            $this->response->appendBody(file_get_contents($staticFilePath));
         }
     }
 
