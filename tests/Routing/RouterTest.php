@@ -14,6 +14,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 
         $router = new Router();
         $this->assertNull($router->route($request));
+        $this->assertTrue($router->isEmpty());
     }
 
     public function testSimpleRouteMatch()
@@ -28,6 +29,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $router = new Router();
         $router->register($route);
 
+        $this->assertFalse($router->isEmpty());
         $this->assertEquals($route, $router->route($request));
     }
 

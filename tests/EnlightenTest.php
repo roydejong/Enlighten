@@ -71,8 +71,9 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $response = $enlighten->start();
 
         $this->assertEquals(ResponseCode::HTTP_NOT_FOUND, $response->getResponseCode());
-        $this->assertEquals('', $response->getBody());
-        $this->expectOutputString('');
+
+        // if no 404 handler is supplied, we should get a default message
+        $this->assertContains('Page not found.', $response->getBody());
     }
 
     /**
@@ -364,7 +365,7 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         });
         $response = $enlighten->start();
 
-        $this->expectOutputString('Testex');
+        $this->expectOutputString('Testex', 'An error handler with output is registered; no default message should be returned and only our output should be visible.');
         $this->assertEquals(ResponseCode::HTTP_INTERNAL_SERVER_ERROR, $response->getResponseCode());
     }
 
@@ -388,16 +389,35 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $enlighten->setRequest($request);
 
         $caughtEx = false;
+        $resp = null;
 
         try {
-            $enlighten->start();
+            $resp = $enlighten->start();
         } catch (\Exception $ex) {
             $this->assertEquals('Testex', $ex->getMessage());
             $caughtEx = true;
         }
 
         $this->assertTrue($caughtEx);
-        $this->expectOutputString('An unexpected error has occurred while processing your request.');
+        $this->assertContains('Sorry, something went wrong.', ob_get_contents());
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testNotFoundFilter()
+    {
+        $request = new Request();
+        $request->setRequestUri('/bla');
+
+        $enlighten = new Enlighten();
+        $enlighten->setRequest($request);
+        $enlighten->notFound(function (Request $request) {
+            echo sprintf("Sorry, but there is no %s here", $request->getRequestUri());
+        });
+        $enlighten->start();
+
+        $this->expectOutputString('Sorry, but there is no /bla here');
     }
 
     public function testSetSubdirectory()
@@ -409,5 +429,20 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($app, $app->setSubdirectory('/dir/bla'), 'Fluent API return');
         $this->assertEquals('/dir/bla', $router->getSubdirectory());
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testFirstRunPage()
+    {
+        $request = new Request();
+        $request->setRequestUri('/bla');
+
+        $enlighten = new Enlighten();
+        $enlighten->setRequest($request);
+        $response = $enlighten->start();
+
+        $this->assertContains('Welcome to Enlighten', $response->getBody());
     }
 }
