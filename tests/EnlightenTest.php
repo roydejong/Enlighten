@@ -3,6 +3,7 @@
 use Enlighten\Enlighten;
 use Enlighten\Http\Request;
 use Enlighten\Http\RequestMethod;
+use Enlighten\Http\Response;
 use Enlighten\Http\ResponseCode;
 use Enlighten\Routing\Route;
 use Enlighten\Routing\Router;
@@ -372,6 +373,32 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
     /**
      * @runInSeparateProcess
      */
+    public function testExceptionFilterOutputViaResponseBody()
+    {
+        $route = new Route('/bla', function () {
+            throw new Exception('Testex');
+        });
+
+        $router = new Router();
+        $router->register($route);
+
+        $request = new Request();
+        $request->setRequestUri('/bla');
+
+        $enlighten = new Enlighten();
+        $enlighten->setRouter($router);
+        $enlighten->setRequest($request);
+        $enlighten->onException(function (Response $response) {
+            $response->setBody('my output');
+        });
+        $enlighten->start();
+
+        $this->expectOutputString('my output');
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
     public function testExceptionFilterUncaught()
     {
         $route = new Route('/', function () {
@@ -418,6 +445,24 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $enlighten->start();
 
         $this->expectOutputString('Sorry, but there is no /bla here');
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testNotFoundFilterOutputViaResponseBody()
+    {
+        $request = new Request();
+        $request->setRequestUri('/bla');
+
+        $enlighten = new Enlighten();
+        $enlighten->setRequest($request);
+        $enlighten->notFound(function (Response $response) {
+            $response->setBody('my output');
+        });
+        $enlighten->start();
+
+        $this->expectOutputString('my output');
     }
 
     public function testSetSubdirectory()

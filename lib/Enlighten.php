@@ -186,6 +186,7 @@ class Enlighten
         $this->response = new Response();
         $this->response->setResponseCode(ResponseCode::HTTP_INTERNAL_SERVER_ERROR);
 
+        $this->context->registerInstance($this->response);
         $this->context->registerInstance($ex);
 
         $rethrow = false;
@@ -216,6 +217,8 @@ class Enlighten
 
         $this->response = new Response();
         $this->response->setResponseCode(ResponseCode::HTTP_NOT_FOUND);
+
+        $this->context->registerInstance($this->response);
 
         $this->filters->trigger(Filters::NO_ROUTE_FOUND, $this->context);
 
