@@ -12,9 +12,15 @@ Enlighten Framework
 
 This is a modern framework for PHP 5 that doesn't get in your way. Just the building blocks you need to accelerate your application development and simply *get shit done*. 
 
-- Easy HTTP request and response management.
-- Razor fast routing with dynamic URL variables, even in subdirectories.
-- Application and route filters for authentication, exception handling, etc.
+- Easy HTTP request and response management: forms, headers, cookies, files and more.
+- Razor fast routing with dynamic URL variables and dependency injection.
+- Application and route filters for handling authentication, exceptions, etc.
+
+It's easy to use:
+
+    $app->get('/hello/$name', function ($name) {
+        echo "Hi there, $name";
+    });
 
 It is awesome because it is:
 
@@ -22,15 +28,6 @@ It is awesome because it is:
 - Low on fat: small code base with minimal external dependencies.
 - Stable: tested extensively with a battery of unit tests.
 - Future-proof: Fully compatible with HHVM and PHP 7.
-
-Coming soon to Enlighten:
-
-- MVC building blocks for a well-organized application.
-- Form validation and on-the-fly form HTML generation.
-- Session handling.
-- More ways of parsing requests: files, headers.
-
-**Note: This is pre-release information, this does not reflect the current or even a (planned) final state of the project. This is, right now, just an experiment.**
 
 Getting started
 ---
