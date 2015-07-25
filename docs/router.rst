@@ -32,9 +32,13 @@ You can define a route by simply intializing it. A basic route always consists o
 
 .. code-block:: php
 
+    // Create our route
     $route = new Route('/users/$user/$action', function ($user, $action) {
         // Will match /users/admin/view
     });
+
+    // Register it to our router
+    $router->register($route);
     
 When you use the `Enlighten` class - either with the default router or after registering your own router - you can also use the `route()` function. This function also returns the created `Route` object so you can customize it further as needed - even without ever having to manage your own Router.
 
