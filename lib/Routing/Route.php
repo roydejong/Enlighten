@@ -254,13 +254,12 @@ class Route
     /**
      * Executes this route's action.
      *
-     * @param Request $request
      * @param Context $context
      * @throws RoutingException For unsupported or invalid action configurations.
      * @throws \Exception If an Exception is raised during the route's action, and no onException filter is registered, the Exception will be rethrown here.
      * @return mixed
      */
-    public function action(Request $request, Context $context = null)
+    public function action(Context $context = null)
     {
         $targetFunc = null;
 

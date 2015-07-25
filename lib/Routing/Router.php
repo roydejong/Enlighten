@@ -150,15 +150,14 @@ class Router
      * Dispatches a Route, executing its action.
      *
      * @param Route $route
-     * @param Request $request
      * @return mixed Route target function return value, if any.
      */
-    public function dispatch(Route $route, Request $request)
+    public function dispatch(Route $route)
     {
         if (!empty($this->context)) {
             $this->context->registerInstance($route);
         }
 
-        return $route->action($request, $this->context);
+        return $route->action($this->context);
     }
 }

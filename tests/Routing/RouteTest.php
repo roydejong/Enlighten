@@ -166,7 +166,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($route->matches($request));
 
         $this->expectOutputString('GET');
-        $this->assertEquals('test', $route->action($request, $context));
+        $this->assertEquals('test', $route->action($context));
     }
 
     public function testBeforeFilter()
@@ -188,7 +188,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $context = new Context();
         $context->registerInstance($request);
 
-        $route->action($request, $context);
+        $route->action($context);
 
         $this->expectOutputString('beforeduring');
     }
@@ -212,7 +212,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $context = new Context();
         $context->registerInstance($request);
 
-        $route->action($request, $context);
+        $route->action($context);
 
         $this->expectOutputString('duringafter');
     }
@@ -240,7 +240,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $context = new Context();
         $context->registerInstance($request);
 
-        $route->action($request, $context);
+        $route->action($context);
 
         $this->expectOutputString('TestEx');
     }
@@ -265,7 +265,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $context = new Context();
         $context->registerInstance($request);
 
-        $route->action($request, $context);
+        $route->action($context);
     }
 
     public function testRegexPattern()
@@ -309,7 +309,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
         $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleController');
 
-        $this->assertEquals('defaultReturn', $route->action($request, $context));
+        $this->assertEquals('defaultReturn', $route->action($context));
         $this->expectOutputString('defaultAction');
     }
 
@@ -322,7 +322,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
         $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleController@myAction');
 
-        $this->assertEquals('myReturn', $route->action($request, $context));
+        $this->assertEquals('myReturn', $route->action($context));
         $this->expectOutputString('myAction');
     }
 
@@ -338,7 +338,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $context->registerInstance($request);
 
         $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleController@badAction');
-        $route->action($request, $context);
+        $route->action($context);
     }
 
     /**
@@ -353,7 +353,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $context->registerInstance($request);
 
         $route = new Route('/', 'Enlighten\Tests\Routing\Sample\BogusController');
-        $route->action($request, $context);
+        $route->action($context);
     }
 
     /**
@@ -368,7 +368,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $context->registerInstance($request);
 
         $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleBadConstructorController');
-        $route->action($request, $context);
+        $route->action($context);
     }
 
     /**
@@ -383,7 +383,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $context->registerInstance($request);
 
         $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleNoDefaultActionController');
-        $route->action($request, $context);
+        $route->action($context);
     }
 
     public function testGetSetMatchSubdirectory()
