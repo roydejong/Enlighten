@@ -274,8 +274,6 @@ class FileUpload
             return false;
         }
 
-        $moveOk = false;
-
         if (!$this->didMove) {
             $moveOk = move_uploaded_file($this->getTemporaryPath(), $targetPath);
         } else {

@@ -86,6 +86,7 @@ class Context
             $reflector = new \ReflectionFunction($callable);
             $reflectionParams = $reflector->getParameters();
         } else if (is_a($callable, 'Closure') || is_callable($callable, '__invoke')) {
+            /** @var \Closure $callable */
             $reflector = new \ReflectionObject($callable);
             $reflectionParams = $reflector->getMethod('__invoke')->getParameters();
         }
