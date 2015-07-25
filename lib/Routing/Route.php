@@ -221,7 +221,7 @@ class Route
      * @param callable $filter
      * @return $this
      */
-    public function after(\Closure $filter)
+    public function after(callable $filter)
     {
         $this->filters->register(Filters::AFTER_ROUTE, $filter);
         return $this;
@@ -233,7 +233,7 @@ class Route
      * @param callable $filter
      * @return $this
      */
-    public function before(\Closure $filter)
+    public function before(callable $filter)
     {
         $this->filters->register(Filters::BEFORE_ROUTE, $filter);
         return $this;
@@ -245,7 +245,7 @@ class Route
      * @param callable $filter
      * @return $this
      */
-    public function onException(\Closure $filter)
+    public function onException(callable $filter)
     {
         $this->filters->register(Filters::ON_EXCEPTION, $filter);
         return $this;
