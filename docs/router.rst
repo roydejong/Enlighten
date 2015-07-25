@@ -105,3 +105,23 @@ PHP.net has more examples_ on other ways to use callable functions.
 .. _examples: https://secure.php.net/manual/en/language.types.callable.php
 
 Target functions have access to the `Context` and receive dependency injection.
+
+
+Using subdirectories
+^^^^^^^^^^^^^^^^^^^^
+The Router class supports operating out of a subdirectory. This can be useful if you want to run your entire application from a certain directory or with a certain prefix.
+
+It's easy to set up:
+
+.. code-block:: php
+
+    // Either directly via a custom router
+    $router->setSubdirectory('example');
+    
+    // ..or using the Enlighten class
+    $app->setSubdirectory('example');
+    
+If you follow the above example, the router will assume that all your routes will begin with a "example" directory. For example, if you register a route for `/mypage` it will then only match against requests for `/example/mypage`.
+    
+
+
