@@ -5,6 +5,7 @@ Enlighten Documentation
     :hidden:
 
     quickstart
+    router
 
 What is Enlighten?
 ------------------
