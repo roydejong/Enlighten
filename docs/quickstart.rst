@@ -79,14 +79,21 @@ To get started, you will want to initialize the composer autoloader and initiali
     include '../vendor/autoload.php';
 
     $app = new Enlighten();
+    $app->start();
+    
+This snippet should now print out a "Welcome to Enlighten" page if everything was set up correctly. Let's expand that code to add our first route now:
 
+.. code-block:: php
+
+    $app = new Enlighten();
+    
     $app->get('/', function () {
         echo 'Hello world!';
     });
-
+   
     $app->start();
     
-This snippet of code will simply print out the text ``Hello world!`` when you open ``index.php``.
+This snippet of code will simply print out the text ``Hello world!`` when you visit the root page of your application.
 
 To summarize, here's what we've done so far:
 
@@ -95,7 +102,7 @@ To summarize, here's what we've done so far:
 - Register a new **Route** for all ``GET`` requests sent to ``/``, with a function.
 - Start the application: parse the incoming request, route it to our function, and send a response back.
 
-All that in just a few lines of code. This is just a basic example: we have many more power tools at our disposal to do more cool stuff.
+All that in just a few lines of code. And this is just a basic example: we have many more power tools at our disposal to do more cool stuff.
  
 Router configuration
 ^^^^^^^^^^^^^^^^^^^^
@@ -132,3 +139,37 @@ You can also define dynamic variables in your route definitions which you can th
         echo "You asked to GET a user with ID $id";
     });
     
+**Use the Scope**
+
+There's a lot of power hidden under the hood. For example, you can manipulate the entire request or read out posted data. Enlighten supplies this information to your target functions by using dependency injection. For example:
+
+.. code-block:: php
+
+    $app->get('/hello/$name', function (Request $request, $name, Response $response) {
+        // Read a posted value
+        $age = intval($request->getPost('age', 18));
+        
+        // Manipulate the response code
+        $this->response->setResponseCode(ResponseCode::HTTP_IM_A_TEAPOT);
+        
+        // Say hello to the user
+        echo "Hi there, $name. You are $age years old.";
+    });
+    
+.. tip::
+
+    We will inject the appropriate variables based on the parameters you define in your function. The order doesn't matter. For route variables, make sure the name matches. For other variables, make sure the type is correct. If we can't resolve a variable, a NULL value will be passed.
+
+Using filters
+^^^^^^^^^^^^^
+You can apply filters to handle common tasks like authentication, logging and error handling.
+
+For example, you could log every request:
+
+.. code-block:: php
+
+    $app->before(function (Request $request) {
+        ExampleLogger::writeLog('User requested: ' . $request->getRequestUri());
+    });
+
+
