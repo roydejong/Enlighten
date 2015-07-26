@@ -28,12 +28,6 @@ Custom error pages
 
     <?php
 
-    use Enlighten\Enlighten;
-
-    include '../vendor/autoload.php';
-
-    $app = new Enlighten();
-
     // Generic error handler
     $app->onException(function (\Exception $ex) {
         echo "Sorry, something went wrong!";
@@ -46,4 +40,21 @@ Custom error pages
         echo "You requested: " . $request->getRequestUri();
     });
 
-    $app->start();
+Read and set cookies
+^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: php
+
+    <?php
+
+    $app->get('/', function (Request $request, Response $response) {
+        // Iterate all cookies
+        $cookies = $request->getCookies();
+
+        foreach ($cookies as $name => $value) {
+            echo "Cookie $name = $value" . PHP_EOL;
+        }
+
+        // Set some cookies (follows same format as php set_cookie)
+        $response->setCookie('SomeCookie', 'SomeValue', time() + 60, '/');
+    });
