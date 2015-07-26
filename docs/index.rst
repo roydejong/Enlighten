@@ -4,6 +4,7 @@ Enlighten Documentation
 .. toctree::
     :hidden:
 
+    index
     quickstart
     application
     router
