@@ -4,6 +4,8 @@ Code Examples
 "Hello world" application
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+A simple `index.php` script that will simply set up Enlighten and print out "Hello, World!" when opening the root page.
+
 .. code-block:: php
 
     <?php
@@ -21,8 +23,14 @@ Code Examples
 
     $app->start();
 
+Note that you'll need to configure_ your server to forward all requests to this script first.
+
+.. _configure: quickstart.html#configuring-your-web-server
+
 Forms
 ^^^^^
+
+This code shows you how you can deal with form submissions.
 
 .. code-block:: php
 
@@ -41,6 +49,8 @@ Forms
 Custom error pages
 ^^^^^^^^^^^^^^^^^^
 
+The framework offers some basic error pages by default, but you can override them by using **Filters** on your application object.
+
 .. code-block:: php
 
     <?php
@@ -57,8 +67,12 @@ Custom error pages
         echo "You requested: " . $request->getRequestUri();
     });
 
+If one of your filter functions causes any output to the body, the framework's default error pages will be suppressed.
+
 Read and set cookies
 ^^^^^^^^^^^^^^^^^^^^
+
+The **Request** and **Response** objects can be used for reading and writing cookies, respectively.
 
 .. code-block:: php
 
@@ -78,6 +92,8 @@ Read and set cookies
 
 Handle file uploads
 ^^^^^^^^^^^^^^^^^^^
+
+The **Request** class has an easy to use facility for safely processing file uploads.
 
 .. code-block:: php
 
@@ -99,3 +115,7 @@ Handle file uploads
             $file->saveTo("./uploads/$filename");
         }
     });
+
+You can call the `saveTo` function multiple times if you want more than one copy of a file.
+
+It's a good idea to always generate your own file names, as the user-supplied filename (`$file->getOriginalName()`) is not necessarily safe to use, and is not unique either.
