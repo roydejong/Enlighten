@@ -7,6 +7,7 @@ Enlighten Documentation
     quickstart
     router
     application
+    examples
 
 What is Enlighten?
 ------------------
