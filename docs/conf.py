@@ -46,7 +46,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Enlighten'
+project = u'Enlighten PHP Framework'
 copyright = u'2015, Roy de Jong'
 author = u'Roy de Jong'
 
