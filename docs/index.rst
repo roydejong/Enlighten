@@ -5,8 +5,8 @@ Enlighten Documentation
     :hidden:
 
     quickstart
-    router
     application
+    router
     examples
 
 What is Enlighten?
