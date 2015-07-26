@@ -58,3 +58,27 @@ Read and set cookies
         // Set some cookies (follows same format as php set_cookie)
         $response->setCookie('SomeCookie', 'SomeValue', time() + 60, '/');
     });
+
+Handle file uploads
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: php
+
+    <?php
+
+    $app->post('/', function (Request $request) {
+        // Iterate all uploaded files
+        $files = $request->getFileUploads();
+
+        foreach ($files as $file) {
+            // Is this file okay?
+            if ($file->hasError()) {
+                echo $file->getErrorMessage();
+                continue;
+            }
+
+            // Let's move it to our uploads directory
+            $filename = uniqid() . '.tmp';
+            $file->saveTo("./uploads/$filename");
+        }
+    });
