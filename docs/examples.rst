@@ -21,6 +21,23 @@ Code Examples
 
     $app->start();
 
+Forms
+^^^^^
+
+.. code-block:: php
+
+    <?php
+
+    $app->get('/', function () {
+        // View logic goes here: display your form
+    });
+
+    $app->post('/', function (Request $request) {
+        $name = $request->getPost('name', 'John Doe');
+        echo "Hi there, $name";
+    });
+
+
 Custom error pages
 ^^^^^^^^^^^^^^^^^^
 
