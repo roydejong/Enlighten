@@ -99,3 +99,13 @@ When you have a context, you will also want to use its superpowers to inject its
     call_user_func_array($sampleFunction, $params);
 
 This is the only way you can currently extract values from a context.
+
+Quirks
+^^^^^^
+
+Here is an overview of quirks that you may need to know about when using the `Enlighten` class:
+
+- If any output is sent after `start()` is called and before the HTTP response is sent back, it will be appended to the end of the response body "just in time". That means you can use `echo` freely.
+- If an error occurs (including 404 errors), the output buffer is cleared and the request is emptied. Any output sent by your filter functions, for example, will be discarded.
+- `after()` filters have the final say on any output that is sent out - their output is never discarded. But: they will not be called if an exception occurs in your application.
+- If your :doc:`router` is empty, a default "Welcome to Enlighten" page will be shown.
