@@ -4,7 +4,7 @@ Code Examples
 "Hello world" application
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A simple `index.php` script that will simply set up Enlighten and print out "Hello, World!" when opening the root page.
+A simple ``index.php`` script that will simply set up :doc:`an Enlighten application <application>` and print out "Hello, World!" when opening the root page.
 
 .. code-block:: php
 
@@ -49,7 +49,7 @@ This code shows you how you can deal with form submissions.
 Custom error pages
 ^^^^^^^^^^^^^^^^^^
 
-The framework offers some basic error pages by default, but you can override them by using **Filters** on your application object.
+The framework offers some basic error pages by default, but you can override them by using :doc:`filters` on your application object.
 
 .. code-block:: php
 
@@ -116,6 +116,6 @@ The **Request** class has an easy to use facility for safely processing file upl
         }
     });
 
-You can call the `saveTo` function multiple times if you want more than one copy of a file.
+You can call the ``saveTo()`` function multiple times if you want more than one copy of a file.
 
-It's a good idea to always generate your own file names, as the user-supplied filename (`$file->getOriginalName()`) is not necessarily safe to use, and is not unique either.
+It's a good idea to always generate your own file names, as the user-supplied filename (``$file->getOriginalName()``) is not necessarily safe to use, and is not unique either.
