@@ -66,9 +66,9 @@ Enlighten is designed to handle all incoming HTTP requests itself and route them
 
 Set up your application
 ^^^^^^^^^^^^^^^^^^^^^^^
-The ``Enlighten`` class acts as the heart of your application. It ties all the framework's components together into one easy to use package: from request processing and routing to sending a response back to the user.
+The ``Enlighten`` class acts as the heart of your :doc:`application`. It ties all the framework's components together into one easy to use package: from request processing and routing to sending a response back to the user.
     
-To get started, you will want to initialize the composer autoloader and initialize a new instance of `Enlighten`. Here's what a typical ``index.php`` might look like:
+To get started, you will want to initialize the composer autoloader and initialize a new instance of ``Enlighten``. Here's what a typical ``index.php`` might look like:
 
 .. code-block:: php
 
@@ -85,6 +85,8 @@ This snippet should now print out a "Welcome to Enlighten" page if everything wa
 
 .. code-block:: php
 
+    <?php
+
     $app = new Enlighten();
     
     $app->get('/', function () {
@@ -97,7 +99,7 @@ This snippet of code will simply print out the text ``Hello world!`` when you vi
 
 To summarize, here's what we've done so far:
 
-- Initialize composer's autoloader, which will make our `use` statement work.
+- Initialize composer's autoloader, which will make our ``use`` statement work.
 - Initialize a new application instance (``new Enlighten()``) with a blank configuration.
 - Register a new **Route** for all ``GET`` requests sent to ``/``, with a function.
 - Start the application: parse the incoming request, route it to our function, and send a response back.
@@ -106,13 +108,18 @@ All that in just a few lines of code. And this is just a basic example: we have 
  
 Router configuration
 ^^^^^^^^^^^^^^^^^^^^
+
+A :doc:`route <router>` tells your application what code an incoming request should lead to: the path from HTTP request to application code. A basic route always consists of a **pattern** (what to match) and a **target function** (what should this route do when matched?).
+
 **Request methods**
 
-The `Enlighten::get($pattern)` function we used in the example above registers a new route that only applies to `GET` requests. There are appropriate functions for all other common request methods as well, such as `Enlighten::post($pattern)`.
+The ``$app->get($pattern)`` function we used in the example above registers a new route that only applies to ``GET`` requests. There are appropriate functions for all other common request methods as well, such as ``$app->post($pattern)``.
 
-If you'd like to register a route that applies to all request methods, you can use the `route` function instead:
+If you'd like to register a route that applies to all request methods, you can use the ``route`` function instead:
 
 .. code-block:: php
+
+    <?php
 
     $app->route('/', function () {
         // This function will be called irregardless of request method (GET, POST, etc)
@@ -127,6 +134,8 @@ You can use Regex patterns for a bit more flexibility:
 
 .. code-block:: php
 
+    <?php
+
     $app->route('/(index|home)(/?)', function () {
         // Matches "/index" or "/home", with an optional trailing slash
     });
@@ -135,15 +144,23 @@ You can also define dynamic variables in your route definitions which you can th
 
 .. code-block:: php
 
+    <?php
+
     $app->get('/users/view/$id', function ($id) {
         echo "You asked to GET a user with ID $id";
     });
     
-**Use the Scope**
+**Use the Context**
 
-There's a lot of power hidden under the hood. For example, you can manipulate the entire request or read out posted data. Enlighten supplies this information to your target functions by using dependency injection. For example:
+There's a lot of power hidden under the hood in the form of the `application context`_. For example, you can manipulate the entire request or read out posted data.
+
+.. _`application context`: application.html#context
+
+Enlighten supplies this information to the target functions in your routes by using *dependency injection*.
 
 .. code-block:: php
+
+    <?php
 
     $app->get('/hello/$name', function (Request $request, $name, Response $response) {
         // Read a posted value
@@ -158,18 +175,22 @@ There's a lot of power hidden under the hood. For example, you can manipulate th
     
 .. tip::
 
-    We will inject the appropriate variables based on the parameters you define in your function. The order doesn't matter. For route variables, make sure the name matches. For other variables, make sure the type is correct. If we can't resolve a variable, a NULL value will be passed.
+    We will inject the appropriate variables based on the parameters you define in your function. The order doesn't matter. For route variables, make sure the name matches. For other variables, make sure the type is correct. If we can't resolve a variable, a ``NULL`` value will be passed.
 
 Using filters
 ^^^^^^^^^^^^^
-You can apply filters to handle common tasks like authentication, logging and error handling.
+You can apply :doc:`filters` to handle common tasks like authentication, logging and error handling.
 
-For example, you could log every request:
+For example, you could log every request or add a snazzy header:
 
 .. code-block:: php
+
+    <?php
 
     $app->before(function (Request $request) {
         ExampleLogger::writeLog('User requested: ' . $request->getRequestUri());
     });
 
-
+    $app->after(function (Response $response) {
+        $response->setHeader('X-Powered-By', 'MyAwesomeApp/v1.0');
+    });

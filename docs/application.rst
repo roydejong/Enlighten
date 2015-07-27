@@ -124,16 +124,33 @@ The magic comes from its ability to intelligently inject its contents into a fun
 
 The ``Enlighten`` class normally initializes and manages its own Context, which you cannot directly modify at configuration time. If you manage your own application flow, you'll need to set up your own context to pass around. Because the `Context` class is completely generic you could also apply it to a variety of other uses.
 
-**Contents**
+.. code-block:: php
 
-The ``Enlighten`` class will publish the following data to the context it manages:
+    <?php
+
+    $app->get('/hello/$name', function (Request $request, $name, Response $response) {
+        // Read a posted value
+        $age = intval($request->getPost('age', 18));
+
+        // Manipulate the response code
+        $this->response->setResponseCode(ResponseCode::HTTP_IM_A_TEAPOT);
+
+        // Say hello to the user
+        echo "Hi there, $name. You are $age years old.";
+    });
+
+We will inject the appropriate variables based on the parameters you define in your function. The order doesn't matter. For :doc:`routing <router>` variables, make sure the name matches. For other variables, make sure the type is correct. If we can't resolve a variable, a ``NULL`` value will be passed.
+
+**What does the Context contain?**
+
+The ``Enlighten`` class will always publish the following data to the context it manages:
 
 - **Enlighten**: The application instance itself.
 - **Request**: The parsed incoming HTTP request object.
 - **Response**: The HTTP response that is being built up.
 - **Router**: The router managed by the application.
-- **Route**: If a route was matched, it will be registered to the context.
-- **Exception**: For ``onException`` filters, the relevant exception object will be set.
+- **Route**: The route that matched - if one was successfully matched.
+- **Exception**: The last exception that was raised if there was one - particularly useful for ``onException()`` filters.
 
 **Managing a context**
 
@@ -147,13 +164,13 @@ The ``Enlighten`` class will publish the following data to the context it manage
     $request = new Request();
     $context->registerInstance($context);
 
-When you register an object to a context, it will override any previous registrations of the same type. In the example above, if we had previously set a `Request` on the context, it has now been replaced.
+When you register an object to a context, it will override any previous registrations of the same type. In the example above, if we had previously set a ``Request`` on the context, it has now been replaced.
 
-If the object that you have registered has parent classes, *weak links* will be created for those classes as well. That means if you register an `InvalidArgumentException`, a weak link will also be created for `Exception`. So when a function asks for an `Exception`, they may still get the most recent compatible object instead. However, if an exact match is available in the Context, that object will always be used instead.
+If the object that you have registered has parent classes, *weak links* will be created for those classes as well. That means if you register an ``InvalidArgumentException``, a weak link will also be created for ``Exception``. So when a function asks for an ``Exception``, they may still get the most recent compatible object instead - an ``InvalidArgumentException`` in this example. However, if an exact match is available in the Context, that object will always be used instead.
 
-You can only register *objects* to a context; primitive types are not supported at this time.
+Note that you can currently only register *objects* to a context; primitive types by variable name are not supported at this time.
 
-**Context injection**
+**Manual injection**
 
 When you have a context, you will also want to use its superpowers to inject its values to a function. All you need is a *callable* function with a parameter list.
 
