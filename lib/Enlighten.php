@@ -269,11 +269,6 @@ class Enlighten
     {
         $this->finalizeOutputBuffer();
 
-        if ($this->request->isHead()) {
-            // Do not send a body for HEAD requests
-            $this->response->setBody('');
-        }
-
         $this->response->send();
     }
 

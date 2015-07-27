@@ -80,34 +80,6 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testHeadersOnlyRequest()
-    {
-        $enlighten = new Enlighten();
-
-        $request = new Request();
-        $request->setRequestUri('/');
-        $request->setMethod(RequestMethod::HEAD);
-
-        $route = new Route('/', function () {
-            echo 'test output';
-        });
-
-        $router = new Router();
-        $router->register($route);
-
-        $enlighten->setRouter($router);
-        $enlighten->setRequest($request);
-
-        $response = $enlighten->start();
-
-        $this->assertEquals(ResponseCode::HTTP_OK, $response->getResponseCode());
-        $this->assertEquals('', $response->getBody());
-        $this->expectOutputString('');
-    }
-
-    /**
-     * @runInSeparateProcess
-     */
     public function testRouteRegistration()
     {
         try {
