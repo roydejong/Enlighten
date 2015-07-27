@@ -289,17 +289,17 @@ class Enlighten
      *
      * @param string $pattern The regex pattern to match requests against (supports dynamic variables).
      * @param mixed|string $target The target function or path for the route.
-     * @param string $requestMethod The request method constraint to apply, or null for no method constraint.
+     * @param array $requestMethods A list of acceptable request methods, leave empty to disable constraint.
      * @return Route The generated route.
      */
-    private function registerRoute($pattern, $target, $requestMethod = null)
+    private function registerRoute($pattern, $target, array $requestMethods = [])
     {
         $this->bootstrapRouter();
 
         $route = new Route($pattern, $target);
 
-        if ($requestMethod != null) {
-            $route->requireMethod($requestMethod);
+        if (!empty($requestMethods)) {
+            $route->setAcceptableMethods($requestMethods);
         }
 
         $this->router->register($route);
@@ -320,7 +320,7 @@ class Enlighten
     }
 
     /**
-     * Registers a route for the GET request method.
+     * Registers a route for the GET and linked HEAD request methods.
      *
      * @param string $pattern The regex pattern to match requests against (supports dynamic variables).
      * @param mixed|string $target The target function or path for the route.
@@ -328,7 +328,7 @@ class Enlighten
      */
     public function get($pattern, $target)
     {
-        return $this->registerRoute($pattern, $target, RequestMethod::GET);
+        return $this->registerRoute($pattern, $target, [RequestMethod::GET, RequestMethod::HEAD]);
     }
 
     /**
@@ -340,7 +340,7 @@ class Enlighten
      */
     public function post($pattern, $target)
     {
-        return $this->registerRoute($pattern, $target, RequestMethod::POST);
+        return $this->registerRoute($pattern, $target, [RequestMethod::POST]);
     }
 
     /**
@@ -352,7 +352,7 @@ class Enlighten
      */
     public function put($pattern, $target)
     {
-        return $this->registerRoute($pattern, $target, RequestMethod::PUT);
+        return $this->registerRoute($pattern, $target, [RequestMethod::PUT]);
     }
 
     /**
@@ -364,19 +364,7 @@ class Enlighten
      */
     public function patch($pattern, $target)
     {
-        return $this->registerRoute($pattern, $target, RequestMethod::PATCH);
-    }
-
-    /**
-     * Registers a route for the HEAD request method.
-     *
-     * @param string $pattern The regex pattern to match requests against (supports dynamic variables).
-     * @param mixed|string $target The target function or path for the route.
-     * @return Route The generated route.
-     */
-    public function head($pattern, $target)
-    {
-        return $this->registerRoute($pattern, $target, RequestMethod::HEAD);
+        return $this->registerRoute($pattern, $target, [RequestMethod::PATCH]);
     }
 
     /**
@@ -388,7 +376,7 @@ class Enlighten
      */
     public function options($pattern, $target)
     {
-        return $this->registerRoute($pattern, $target, RequestMethod::OPTIONS);
+        return $this->registerRoute($pattern, $target, [RequestMethod::OPTIONS]);
     }
 
     /**
@@ -400,7 +388,7 @@ class Enlighten
      */
     public function delete($pattern, $target)
     {
-        return $this->registerRoute($pattern, $target, RequestMethod::DELETE);
+        return $this->registerRoute($pattern, $target, [RequestMethod::DELETE]);
     }
 
     /**

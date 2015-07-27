@@ -123,14 +123,14 @@ class Route
     }
 
     /**
-     * Requires a certain HTTP method for this route to match.
+     * Sets a list of acceptable HTTP method for this route to match.
      *
-     * @param string $method
+     * @param array $acceptableMethods
      */
-    public function requireMethod($method)
+    public function setAcceptableMethods(array $acceptableMethods)
     {
-        $this->addConstraint(function (Request $request) use ($method) {
-            return $request->getMethod() === $method;
+        $this->addConstraint(function (Request $request) use ($acceptableMethods) {
+            return in_array($request->getMethod(), $acceptableMethods);
         });
     }
 

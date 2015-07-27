@@ -137,6 +137,10 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $sampleRequest->setMethod(RequestMethod::OPTIONS);
 
         $this->assertFalse($generatedRoute->matches($sampleRequest));
+
+        $sampleRequest->setMethod(RequestMethod::HEAD);
+
+        $this->assertTrue($generatedRoute->matches($sampleRequest), 'HEAD acts as an alias for GET');
     }
 
     public function testRouteRegistrationPost()
@@ -201,28 +205,6 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($generatedRoute->matches($sampleRequest));
 
         $sampleRequest->setMethod(RequestMethod::POST);
-
-        $this->assertFalse($generatedRoute->matches($sampleRequest));
-    }
-
-    public function testRouteRegistrationHead()
-    {
-        $router = new Router();
-
-        $enlighten = new Enlighten();
-        $enlighten->setRouter($router);
-
-        $generatedRoute = $enlighten->head('/test/route.html', function () {
-            // ...
-        });
-
-        $sampleRequest = new Request();
-        $sampleRequest->setRequestUri('/test/route.html');
-        $sampleRequest->setMethod(RequestMethod::HEAD);
-
-        $this->assertTrue($generatedRoute->matches($sampleRequest));
-
-        $sampleRequest->setMethod(RequestMethod::PUT);
 
         $this->assertFalse($generatedRoute->matches($sampleRequest));
     }

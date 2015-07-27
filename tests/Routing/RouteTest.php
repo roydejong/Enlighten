@@ -131,7 +131,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $route = new Route('/dir/sample.html', function () {
             // ...
         });
-        $route->requireMethod(RequestMethod::PATCH);
+        $route->setAcceptableMethods([RequestMethod::PATCH]);
 
         $request = new Request();
         $request->setRequestUri('/dir/sample.html');
@@ -158,7 +158,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
             echo $request->getMethod();
             return 'test';
         });
-        $route->requireMethod(RequestMethod::GET);
+        $route->setAcceptableMethods([RequestMethod::GET]);
 
         $context = new Context();
         $context->registerInstance($request);
