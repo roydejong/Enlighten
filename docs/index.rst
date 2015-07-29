@@ -7,6 +7,9 @@ Enlighten Documentation
     quickstart
     application
     router
+    request
+    response
+    filters
     examples
 
 What is Enlighten?
