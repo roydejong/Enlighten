@@ -179,4 +179,19 @@ class ContextTest extends PHPUnit_Framework_TestCase
         // This is because there is no "stronger" match in this test.
         $this->assertEquals($expectedParams, $actualParams);
     }
+
+    public function testContextSelfReference()
+    {
+        $context = new Context();
+
+        $myFunc = function (Context $ctx) {
+            // ..
+        };
+
+        $expectedParams = [
+            $context
+        ];
+        $actualParams = $context->determineParamValues($myFunc);
+        $this->assertEquals($expectedParams, $actualParams);
+    }
 }
