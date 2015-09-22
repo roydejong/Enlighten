@@ -278,7 +278,9 @@ class Route
         }
 
         // Invoke the specified controller function or the specified callable with the appropriate params
-        $this->filters->trigger(Filters::BEFORE_ROUTE, $context);
+        if (!$this->filters->trigger(Filters::BEFORE_ROUTE, $context)) {
+            return null;
+        }
 
         $retVal = null;
 

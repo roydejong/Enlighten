@@ -452,4 +452,54 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
 
         $this->assertContains('Welcome to Enlighten', $response->getBody());
     }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testBeforeFilterCanPreventContinue()
+    {
+        $app = new Enlighten();
+
+        $app->before(function (Response $r) {
+            // Oh no you don't!
+            $r->setBody('intercept!');
+            return false;
+        });
+
+        $app->get('/', function () {
+            echo 'hi!';
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/');
+
+        $app->setRequest($request);
+        $app->start();
+
+        $this->expectOutputString('intercept!', 'Filter function should interrupt execution');
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testRouteBeforeFilterCanPreventContinueButOutputManipulationStillWorks()
+    {
+        $app = new Enlighten();
+
+        $app->get('/', function () {
+            echo 'hi!';
+        })->before(function (Response $r) {
+            // Oh no you don't!
+            $r->setBody('intercept!');
+            return false;
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/');
+
+        $app->setRequest($request);
+        $app->start();
+
+        $this->expectOutputString('intercept!', 'Filter function should interrupt execution');
+    }
 }

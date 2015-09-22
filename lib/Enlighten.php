@@ -150,7 +150,9 @@ class Enlighten
 
         try {
             // Dispatch the request to the router
-            $this->filters->trigger(Filters::BEFORE_ROUTE, $this->context);
+            if (!$this->filters->trigger(Filters::BEFORE_ROUTE, $this->context)) {
+                return $this->response;
+            }
 
             $routingResult = $this->router->route($this->request);
 
