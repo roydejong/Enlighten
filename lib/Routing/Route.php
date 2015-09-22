@@ -287,7 +287,9 @@ class Route
         } catch (\Exception $ex) {
             $context->registerInstance($ex);
 
-            if (!$this->filters->trigger(Filters::ON_EXCEPTION, $context)) {
+            $this->filters->trigger(Filters::ON_EXCEPTION, $context);
+
+            if (!$this->filters->anyHandlersForEvent(Filters::ON_EXCEPTION)) {
                 // If this exception was unhandled, rethrow it so it can be handled in the global scope
                 throw $ex;
             }

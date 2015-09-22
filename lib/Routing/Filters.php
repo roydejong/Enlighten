@@ -50,7 +50,7 @@ class Filters
     /**
      * Registers a filter function.
      *
-     * @param string $eventType The type of event, see constant values in Filters class. e.g. 'beforeRoute'
+     * @param string $eventType The type of event, see constant values in Filters class. e.g. 'beforeRoute'.
      * @param callable $filter
      */
     public function register($eventType, callable $filter)
@@ -63,19 +63,30 @@ class Filters
     }
 
     /**
+     * Returns whether any filter functions have been registered for a given $eventType.
+     *
+     * @param string $eventType The type of event, e.g. 'beforeRoute'.
+     * @return bool Returns whether any filter functions were registered or not.
+     */
+    public function anyHandlersForEvent($eventType)
+    {
+        return isset($this->handlers[$eventType]) && count($this->handlers[$eventType]) > 0;
+    }
+
+    /**
      * Triggers all filter functions for a given $eventType.
      *
-     * @param string $eventType The type of event, e.g. 'beforeRoute'
+     * @param string $eventType The type of event, e.g. 'beforeRoute'.
      * @param Context $context The optional context to be applied to the filter functions.
-     * @return bool Returns whether any functions were triggered or not.
+     * @return bool Returns whether execution should continue or not.
      */
     public function trigger($eventType, Context $context = null)
     {
-        if (!isset($this->handlers[$eventType])) {
-            return false;
-        }
+        $continue = true;
 
-        $any = false;
+        if (!isset($this->handlers[$eventType])) {
+            return $continue;
+        }
 
         foreach ($this->handlers[$eventType] as $filterFunction) {
             $params = [];
@@ -84,11 +95,14 @@ class Filters
                 $params = $context->determineParamValues($filterFunction);
             }
 
-            call_user_func_array($filterFunction, $params);
+            $returnValue = call_user_func_array($filterFunction, $params);
 
-            $any = true;
+            if ($returnValue === false) {
+                $continue = false;
+                break;
+            }
         }
 
-        return $any;
+        return $continue;
     }
 }

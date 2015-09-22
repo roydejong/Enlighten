@@ -191,7 +191,10 @@ class Enlighten
 
         $rethrow = false;
 
-        if (!$this->filters->trigger(Filters::ON_EXCEPTION, $this->context)) {
+        $this->filters->trigger(Filters::ON_EXCEPTION, $this->context);
+
+        if (!$this->filters->anyHandlersForEvent(Filters::ON_EXCEPTION))
+        {
             // If this exception was completely unhandled, rethrow it so it appears as any old php exception
             $rethrow = true;
         }
