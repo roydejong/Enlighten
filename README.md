@@ -1,4 +1,4 @@
-Enlighten Framework
+Enlighten PHP Framework
 ===
 
 [![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](http://enlighten.readthedocs.org/en/latest/)
