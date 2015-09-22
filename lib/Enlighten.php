@@ -150,7 +150,9 @@ class Enlighten
 
         try {
             // Dispatch the request to the router
-            $this->filters->trigger(Filters::BEFORE_ROUTE, $this->context);
+            if (!$this->filters->trigger(Filters::BEFORE_ROUTE, $this->context)) {
+                return $this->response;
+            }
 
             $routingResult = $this->router->route($this->request);
 
@@ -191,7 +193,10 @@ class Enlighten
 
         $rethrow = false;
 
-        if (!$this->filters->trigger(Filters::ON_EXCEPTION, $this->context)) {
+        $this->filters->trigger(Filters::ON_EXCEPTION, $this->context);
+
+        if (!$this->filters->anyHandlersForEvent(Filters::ON_EXCEPTION))
+        {
             // If this exception was completely unhandled, rethrow it so it appears as any old php exception
             $rethrow = true;
         }

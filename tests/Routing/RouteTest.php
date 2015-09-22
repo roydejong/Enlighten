@@ -405,4 +405,22 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $route->setSubdirectory(null);
         $this->assertTrue($route->matches($request), 'Nullifying subdirectory should disable subdir matching');
     }
+
+    public function testBeforeFilterCanPreventContinue()
+    {
+        $route = new Route('/bla.html', function () {
+            echo 'hello!';
+        });
+
+        $route->before(function () {
+            // Oh no you don't!
+            return false;
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/bla.html');
+
+        $this->assertEquals(null, $route->action());
+        $this->expectOutputString('', 'Filter function should break execution; no output is expected');
+    }
 }
