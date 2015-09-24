@@ -125,4 +125,34 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($router, $router->setContext($context), 'Fluent API return');
         $this->assertEquals($context, $router->getContext());
     }
+
+    public function testPathVariablesMapping()
+    {
+        $route = new Route('/product/id/$id', function (Request $request, $id = null) {
+            $this->assertEquals('test', $id);
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/product/id/test');
+
+        $context = new Context();
+        $context->registerInstance($request);
+
+        $router = new Router();
+        $router->setContext($context);
+        $router->dispatch($route, $request);
+    }
+
+    public function testPathVariablesMappingWithAutoContext()
+    {
+        $route = new Route('/product/id/$id', function (Request $request, $id = null) {
+            $this->assertEquals('test', $id);
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/product/id/test');
+
+        $router = new Router();
+        $router->dispatch($route, $request);
+    }
 }

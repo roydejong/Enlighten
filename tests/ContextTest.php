@@ -104,6 +104,47 @@ class ContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('/hello', call_user_func_array($myFunction, $paramList));
     }
 
+    public function testInjectionWithPrimitiveType()
+    {
+        $myFunction = [$this, 'sampleFunction'];
+
+        $context = new Context();
+        $context->registerVariable('bogusParam', 'hello!');
+
+        $paramList = $context->determineParamValues($myFunction);
+
+        $expectedParams = [
+            null,
+            'hello!',
+            null
+        ];
+
+        $this->assertEquals($expectedParams, $paramList);
+    }
+
+    public function testInjectionWithMixedMethods()
+    {
+        $request = new Request();
+        $request->setRequestUri('/hello');
+
+        $myFunction = [$this, 'sampleFunction'];
+
+        $context = new Context();
+        $context->registerVariable('bogusParam', 'hello!');
+        $context->registerInstance($request);
+
+        $paramList = $context->determineParamValues($myFunction);
+
+        $expectedParams = [
+            null,
+            'hello!',
+            $request
+        ];
+
+        $this->assertEquals($expectedParams, $paramList);
+        $this->assertEquals('/hello', call_user_func_array($myFunction, $paramList));
+    }
+
     public function testShouldReturnNullForUnresolvedParam()
     {
         $myFunction = function (Exception $exception) {
@@ -121,17 +162,28 @@ class ContextTest extends PHPUnit_Framework_TestCase
 
     public function sampleFunction($nullMeBro, $bogusParam = 'abc', Request $request = null)
     {
+        if ($request == null) return null;
         return $request->getRequestUri();
     }
 
     /**
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Must register an object instance
+     * @expectedExceptionMessage can only register an object instance
      */
-    public function testExceptionWhenRegisteringPrimitiveTypes()
+    public function testExceptionWhenRegisteringPrimitiveTypesAsInstance()
     {
         $context = new Context();
         $context->registerInstance('bla');
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage can only register primitive types
+     */
+    public function testExceptionWhenRegisteringObjectsByName()
+    {
+        $context = new Context();
+        $context->registerVariable('bla', new \stdClass());
     }
 
     public function testWeakSubclasses()

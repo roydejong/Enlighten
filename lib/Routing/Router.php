@@ -149,15 +149,36 @@ class Router
     /**
      * Dispatches a Route, executing its action.
      *
-     * @param Route $route
+     * @param Route $route The route to be executed.
+     * @param Request $request The request information, if available. Used for mapping route variables.
      * @return mixed Route target function return value, if any.
      */
-    public function dispatch(Route $route)
+    public function dispatch(Route $route, Request $request = null)
     {
-        if (!empty($this->context)) {
-            $this->context->registerInstance($route);
+        $context = $this->context;
+
+        if (empty($this->context) && !empty($request)) {
+            // If we have no context, but do have a request, prepare a context to store path variables in.
+            // Otherwise routing path variables would be lost for no good reason.
+            $context = new Context();
+            $context->registerInstance($request);
         }
 
-        return $route->action($this->context);
+        if (!empty($context)) {
+            // If we have a context, ensure that the route is made available in it.
+            $context->registerInstance($route);
+
+            if (!empty($request)) {
+                // If we have a request, map the path variables and pass them to the context as primitive types by name.
+                // This will allow us to inject info from a route e.g. "/view/$userId" to a $userId variable.
+                $pathVariables = $route->mapPathVariables($request);
+
+                foreach ($pathVariables as $name => $value) {
+                    $context->registerVariable($name, $value);
+                }
+            }
+        }
+
+        return $route->action($context);
     }
 }
