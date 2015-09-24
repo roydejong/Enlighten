@@ -280,7 +280,7 @@ class Enlighten
     public function dispatch(Route $route)
     {
         $this->beforeStart();
-        $this->router->dispatch($route);
+        $this->router->dispatch($route, $this->request);
     }
 
     /**
