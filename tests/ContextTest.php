@@ -246,4 +246,28 @@ class ContextTest extends PHPUnit_Framework_TestCase
         $actualParams = $context->determineParamValues($myFunc);
         $this->assertEquals($expectedParams, $actualParams);
     }
+
+    public function testGetInstances()
+    {
+        $objOne = new \stdClass();
+        $objTwo = new \InvalidArgumentException();
+
+        $context = new Context();
+        $context->registerInstance($objOne);
+        $context->registerInstance($objTwo);
+
+        $actualParams = $context->getRegisteredInstances();
+        $this->assertEquals($actualParams[0], $context);
+        $this->assertEquals($actualParams[1], $objOne);
+        $this->assertEquals($actualParams[2], $objTwo);
+    }
+
+    public function testGetVariables()
+    {
+        $context = new Context();
+        $context->registerVariable('test1', 'hello');
+        $context->registerVariable('test2', 12.34);
+
+        $this->assertEquals(['test1' => 'hello', 'test2' => 12.34], $context->getRegisteredVariables());
+    }
 }
