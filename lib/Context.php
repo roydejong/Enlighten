@@ -93,6 +93,26 @@ class Context
     }
 
     /**
+     * Gets an array of all registered object instances in this Context.
+     *
+     * @return array
+     */
+    public function getRegisteredInstances()
+    {
+        return array_values($this->instances);
+    }
+
+    /**
+     * Gets an array of all registered variables in this Context, indexed by name.
+     *
+     * @return array
+     */
+    public function getRegisteredVariables()
+    {
+        return $this->variablesByName;
+    }
+
+    /**
      * Given a callable function, attempts to determine the reflection parameters.
      *
      * @param callable $callable
