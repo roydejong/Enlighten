@@ -41,6 +41,7 @@ class Context
     public function __construct()
     {
         $this->instances = [];
+        $this->variablesByName = [];
 
         $this->registerInstance($this);
     }

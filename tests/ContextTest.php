@@ -249,10 +249,12 @@ class ContextTest extends PHPUnit_Framework_TestCase
 
     public function testGetInstances()
     {
+        $context = new Context();
+        $this->assertEquals([$context], $context->getRegisteredInstances());
+
         $objOne = new \stdClass();
         $objTwo = new \InvalidArgumentException();
 
-        $context = new Context();
         $context->registerInstance($objOne);
         $context->registerInstance($objTwo);
 
@@ -265,6 +267,8 @@ class ContextTest extends PHPUnit_Framework_TestCase
     public function testGetVariables()
     {
         $context = new Context();
+        $this->assertEquals([], $context->getRegisteredVariables());
+
         $context->registerVariable('test1', 'hello');
         $context->registerVariable('test2', 12.34);
 
