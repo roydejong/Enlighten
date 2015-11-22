@@ -174,8 +174,10 @@ class RouterTest extends PHPUnit_Framework_TestCase
 
         $route = $router->createRedirect('/redirect/$variable', 'http://www.google.com', true);
         $this->assertEquals('/redirect/$variable', $route->getPattern());
+
         $routeResult = $router->route($request);
         $this->assertEquals($route, $routeResult);
+
         $router->dispatch($routeResult, $request);
         $this->assertEquals(ResponseCode::HTTP_MOVED_PERMANENTLY, $response->getResponseCode());
         $this->assertEquals('http://www.google.com', $response->getHeader('Location'));

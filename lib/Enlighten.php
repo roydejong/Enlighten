@@ -397,6 +397,20 @@ class Enlighten
     }
 
     /**
+     * Registers a new redirection route.
+     *
+     * @param string $from The route mask to match against. Can optionally contain variable components, but they are used for matching only.
+     * @param string $to The static URL to redirect the user to.
+     * @param bool $permanent If true, a HTTP 301 permanent redirect is used. Otherwise, a HTTP 302 temporary redirect is used (default).
+     * @return Route The generated route.
+     */
+    public function redirect($from, $to, $permanent = false)
+    {
+        $this->bootstrapRouter();
+        return $this->router->createRedirect($from, $to, $permanent);
+    }
+
+    /**
      * Marks the application as being in a subdirectory. This affects how routes are matched.
      *
      * For example, if you set "/projects/one" as your subdirectory, the router will assume that all routes begin with
