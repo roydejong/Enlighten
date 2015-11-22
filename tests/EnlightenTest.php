@@ -267,7 +267,7 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $enlighten->setRequest($request);
         $response = $enlighten->start();
 
-        $this->assertEquals(ResponseCode::HTTP_TEMPORARY_REDIRECT, $response->getResponseCode());
+        $this->assertEquals(ResponseCode::HTTP_FOUND, $response->getResponseCode());
         $this->assertEquals('http://target.com', $response->getHeader('Location'));
     }
 
