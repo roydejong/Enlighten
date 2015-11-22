@@ -146,13 +146,13 @@ You can quickly add temporary or permanent redirects using the ``addRedirect()``
 
     <?php
 
-    $router->redirect('/from', '/to', $permanent = false);
+    $router->createRedirect('/from', '/to', $permanent = false);
 
     // Add a permanent redirect to another page
-    $router->redirect('/page/old', '/page/new', true);
+    $router->createRedirect('/page/old', '/page/new', true);
 
     // Add a temporary redirect to an external site
-    $router->redirect('/jfgi', 'http://www.google.com');
+    $router->createRedirect('/jfgi', 'http://www.google.com');
 
 You can use variables in the redirect pattern, but these variables are currently only used for matching and cannot be utilized. If you have more complex redirect requirements, we suggest adding a redirect route manually.
 
