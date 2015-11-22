@@ -4,6 +4,7 @@ namespace Enlighten\Routing;
 
 use Enlighten\Context;
 use Enlighten\Http\Request;
+use Enlighten\Http\Response;
 
 /**
  * Handles the registration and mcathing of Routes.
@@ -63,6 +64,23 @@ class Router
     public function register(Route $route)
     {
         $this->routes[] = $route;
+    }
+
+    /**
+     * Creates and registers a new redirection route.
+     *
+     * @param string $from The route mask to match against. Can optionally contain variable components, but they are used for matching only.
+     * @param string $to The static URL to redirect the user to.
+     * @param bool $permanent If true, a HTTP 301 permanent redirect is used. Otherwise, a HTTP 302 temporary redirect is used (default).
+     * @return Route Returns the Route that was created and registered.
+     */
+    public function createRedirect($from, $to, $permanent = false)
+    {
+        $route = new Route($from, function (Response $response) use ($to, $permanent) {
+            $response->doRedirect($to, $permanent);
+        });
+        $this->register($route);
+        return $route;
     }
 
     /**

@@ -102,6 +102,16 @@ class Route
     }
 
     /**
+     * Returns the pattern for this route.
+     *
+     * @return string
+     */
+    public function getPattern()
+    {
+        return $this->pattern;
+    }
+
+    /**
      * Returns the target for this route.
      *
      * @return callable|string

@@ -92,7 +92,7 @@ class Response
      */
     public function doRedirect($url, $permanent = false)
     {
-        $this->setResponseCode($permanent ? ResponseCode::HTTP_MOVED_PERMANENTLY : ResponseCode::HTTP_TEMPORARY_REDIRECT);
+        $this->setResponseCode($permanent ? ResponseCode::HTTP_MOVED_PERMANENTLY : ResponseCode::HTTP_FOUND);
         $this->setHeader('Location', $url);
         return $this;
     }

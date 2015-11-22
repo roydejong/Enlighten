@@ -1,5 +1,6 @@
 <?php
 
+use Enlighten\Context;
 use Enlighten\Enlighten;
 use Enlighten\Http\Request;
 use Enlighten\Http\RequestMethod;
@@ -251,6 +252,23 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $sampleRequest->setMethod(RequestMethod::DELETE);
 
         $this->assertFalse($generatedRoute->matches($sampleRequest));
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testRedirectRegistration()
+    {
+        $request = new Request();
+        $request->setRequestUri('/test/route.html');
+
+        $enlighten = new Enlighten();
+        $enlighten->redirect('/test/route.html', 'http://target.com', false);
+        $enlighten->setRequest($request);
+        $response = $enlighten->start();
+
+        $this->assertEquals(ResponseCode::HTTP_FOUND, $response->getResponseCode());
+        $this->assertEquals('http://target.com', $response->getHeader('Location'));
     }
 
     /**
