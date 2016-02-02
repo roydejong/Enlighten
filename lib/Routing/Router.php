@@ -4,6 +4,7 @@ namespace Enlighten\Routing;
 
 use Enlighten\Context;
 use Enlighten\Http\Request;
+use Enlighten\Http\Response;
 
 /**
  * Handles the registration and mcathing of Routes.
@@ -63,6 +64,23 @@ class Router
     public function register(Route $route)
     {
         $this->routes[] = $route;
+    }
+
+    /**
+     * Creates and registers a new redirection route.
+     *
+     * @param string $from The route mask to match against. Can optionally contain variable components, but they are used for matching only.
+     * @param string $to The static URL to redirect the user to.
+     * @param bool $permanent If true, a HTTP 301 permanent redirect is used. Otherwise, a HTTP 302 temporary redirect is used (default).
+     * @return Route Returns the Route that was created and registered.
+     */
+    public function createRedirect($from, $to, $permanent = false)
+    {
+        $route = new Route($from, function (Response $response) use ($to, $permanent) {
+            $response->doRedirect($to, $permanent);
+        });
+        $this->register($route);
+        return $route;
     }
 
     /**
@@ -149,15 +167,36 @@ class Router
     /**
      * Dispatches a Route, executing its action.
      *
-     * @param Route $route
+     * @param Route $route The route to be executed.
+     * @param Request $request The request information, if available. Used for mapping route variables.
      * @return mixed Route target function return value, if any.
      */
-    public function dispatch(Route $route)
+    public function dispatch(Route $route, Request $request = null)
     {
-        if (!empty($this->context)) {
-            $this->context->registerInstance($route);
+        $context = $this->context;
+
+        if (empty($this->context) && !empty($request)) {
+            // If we have no context, but do have a request, prepare a context to store path variables in.
+            // Otherwise routing path variables would be lost for no good reason.
+            $context = new Context();
+            $context->registerInstance($request);
         }
 
-        return $route->action($this->context);
+        if (!empty($context)) {
+            // If we have a context, ensure that the route is made available in it.
+            $context->registerInstance($route);
+
+            if (!empty($request)) {
+                // If we have a request, map the path variables and pass them to the context as primitive types by name.
+                // This will allow us to inject info from a route e.g. "/view/$userId" to a $userId variable.
+                $pathVariables = $route->mapPathVariables($request);
+
+                foreach ($pathVariables as $name => $value) {
+                    $context->registerVariable($name, $value);
+                }
+            }
+        }
+
+        return $route->action($context);
     }
 }

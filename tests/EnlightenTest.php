@@ -1,5 +1,6 @@
 <?php
 
+use Enlighten\Context;
 use Enlighten\Enlighten;
 use Enlighten\Http\Request;
 use Enlighten\Http\RequestMethod;
@@ -256,6 +257,23 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
     /**
      * @runInSeparateProcess
      */
+    public function testRedirectRegistration()
+    {
+        $request = new Request();
+        $request->setRequestUri('/test/route.html');
+
+        $enlighten = new Enlighten();
+        $enlighten->redirect('/test/route.html', 'http://target.com', false);
+        $enlighten->setRequest($request);
+        $response = $enlighten->start();
+
+        $this->assertEquals(ResponseCode::HTTP_FOUND, $response->getResponseCode());
+        $this->assertEquals('http://target.com', $response->getHeader('Location'));
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
     public function testBeforeFilter()
     {
         $route = new Route('/', function () {
@@ -451,5 +469,55 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
         $response = $enlighten->start();
 
         $this->assertContains('Welcome to Enlighten', $response->getBody());
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testBeforeFilterCanPreventContinue()
+    {
+        $app = new Enlighten();
+
+        $app->before(function (Response $r) {
+            // Oh no you don't!
+            $r->setBody('intercept!');
+            return false;
+        });
+
+        $app->get('/', function () {
+            echo 'hi!';
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/');
+
+        $app->setRequest($request);
+        $app->start();
+
+        $this->expectOutputString('intercept!', 'Filter function should interrupt execution');
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testRouteBeforeFilterCanPreventContinueButOutputManipulationStillWorks()
+    {
+        $app = new Enlighten();
+
+        $app->get('/', function () {
+            echo 'hi!';
+        })->before(function (Response $r) {
+            // Oh no you don't!
+            $r->setBody('intercept!');
+            return false;
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/');
+
+        $app->setRequest($request);
+        $app->start();
+
+        $this->expectOutputString('intercept!', 'Filter function should interrupt execution');
     }
 }

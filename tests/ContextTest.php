@@ -104,6 +104,47 @@ class ContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('/hello', call_user_func_array($myFunction, $paramList));
     }
 
+    public function testInjectionWithPrimitiveType()
+    {
+        $myFunction = [$this, 'sampleFunction'];
+
+        $context = new Context();
+        $context->registerVariable('bogusParam', 'hello!');
+
+        $paramList = $context->determineParamValues($myFunction);
+
+        $expectedParams = [
+            null,
+            'hello!',
+            null
+        ];
+
+        $this->assertEquals($expectedParams, $paramList);
+    }
+
+    public function testInjectionWithMixedMethods()
+    {
+        $request = new Request();
+        $request->setRequestUri('/hello');
+
+        $myFunction = [$this, 'sampleFunction'];
+
+        $context = new Context();
+        $context->registerVariable('bogusParam', 'hello!');
+        $context->registerInstance($request);
+
+        $paramList = $context->determineParamValues($myFunction);
+
+        $expectedParams = [
+            null,
+            'hello!',
+            $request
+        ];
+
+        $this->assertEquals($expectedParams, $paramList);
+        $this->assertEquals('/hello', call_user_func_array($myFunction, $paramList));
+    }
+
     public function testShouldReturnNullForUnresolvedParam()
     {
         $myFunction = function (Exception $exception) {
@@ -121,17 +162,28 @@ class ContextTest extends PHPUnit_Framework_TestCase
 
     public function sampleFunction($nullMeBro, $bogusParam = 'abc', Request $request = null)
     {
+        if ($request == null) return null;
         return $request->getRequestUri();
     }
 
     /**
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Must register an object instance
+     * @expectedExceptionMessage can only register an object instance
      */
-    public function testExceptionWhenRegisteringPrimitiveTypes()
+    public function testExceptionWhenRegisteringPrimitiveTypesAsInstance()
     {
         $context = new Context();
         $context->registerInstance('bla');
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage can only register primitive types
+     */
+    public function testExceptionWhenRegisteringObjectsByName()
+    {
+        $context = new Context();
+        $context->registerVariable('bla', new \stdClass());
     }
 
     public function testWeakSubclasses()
@@ -178,5 +230,48 @@ class ContextTest extends PHPUnit_Framework_TestCase
         // We expect that both Exception and and RoutingException will resolve to the same object.
         // This is because there is no "stronger" match in this test.
         $this->assertEquals($expectedParams, $actualParams);
+    }
+
+    public function testContextSelfReference()
+    {
+        $context = new Context();
+
+        $myFunc = function (Context $ctx) {
+            // ..
+        };
+
+        $expectedParams = [
+            $context
+        ];
+        $actualParams = $context->determineParamValues($myFunc);
+        $this->assertEquals($expectedParams, $actualParams);
+    }
+
+    public function testGetInstances()
+    {
+        $context = new Context();
+        $this->assertEquals([$context], $context->getRegisteredInstances());
+
+        $objOne = new \stdClass();
+        $objTwo = new \InvalidArgumentException();
+
+        $context->registerInstance($objOne);
+        $context->registerInstance($objTwo);
+
+        $actualParams = $context->getRegisteredInstances();
+        $this->assertEquals($actualParams[0], $context);
+        $this->assertEquals($actualParams[1], $objOne);
+        $this->assertEquals($actualParams[2], $objTwo);
+    }
+
+    public function testGetVariables()
+    {
+        $context = new Context();
+        $this->assertEquals([], $context->getRegisteredVariables());
+
+        $context->registerVariable('test1', 'hello');
+        $context->registerVariable('test2', 12.34);
+
+        $this->assertEquals(['test1' => 'hello', 'test2' => 12.34], $context->getRegisteredVariables());
     }
 }

@@ -29,23 +29,33 @@ class Context
     protected $weakLinks;
 
     /**
+     * Contains a registry of primitive types, indexed by name.
+     *
+     * @var array
+     */
+    protected $variablesByName;
+
+    /**
      * Initializes a blank routing context.
      */
     public function __construct()
     {
         $this->instances = [];
+        $this->variablesByName = [];
+
+        $this->registerInstance($this);
     }
 
     /**
      * Registers an object instance to the context.
      * If an instance with the same type is already registered, this will override it.
      *
-     * @param $object
+     * @param object $object
      */
     public function registerInstance($object)
     {
         if (!is_object($object)) {
-            throw new \InvalidArgumentException('registerInstance(): Must register an object instance');
+            throw new \InvalidArgumentException('registerInstance(): Cannot pass primitive types, can only register an object instance; use registerVariable() instead');
         }
 
         $reflectionObject = new \ReflectionObject($object);
@@ -65,6 +75,42 @@ class Context
         };
 
         $determineParent($reflectionObject);
+    }
+
+    /**
+     * Registers a primitive variable type by its name to the context.
+     * If a variable with the same name is already registered, this will override it.
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public function registerVariable($name, $value)
+    {
+        if (is_object($value)) {
+            throw new \InvalidArgumentException('registerVariable(): Cannot pass objects, can only register primitive types; use registerInstance() instead');
+        }
+
+        $this->variablesByName[$name] = $value;
+    }
+
+    /**
+     * Gets an array of all registered object instances in this Context.
+     *
+     * @return array
+     */
+    public function getRegisteredInstances()
+    {
+        return array_values($this->instances);
+    }
+
+    /**
+     * Gets an array of all registered variables in this Context, indexed by name.
+     *
+     * @return array
+     */
+    public function getRegisteredVariables()
+    {
+        return $this->variablesByName;
     }
 
     /**
@@ -124,8 +170,8 @@ class Context
     {
         $class = $parameter->getClass();
 
-        // If this is a object we may be able to map it to something in our context
         if (!empty($class)) {
+            // If this is a object we may be able to map it to something in our context
             $className = $class->getName();
 
             // Determine strong type-based link
@@ -138,6 +184,13 @@ class Context
                 $lowerClassName = $this->weakLinks[$className];
                 return $this->instances[$lowerClassName];
             }
+        } else {
+            // If this is a primitive type, attempt to determine it by its name
+            $varName = $parameter->getName();
+
+            if (isset($this->variablesByName[$varName])) {
+                return $this->variablesByName[$varName];
+            }
         }
 
         // We were unable to determine a suitable value based on this context. Pass back its default value if possible.
@@ -145,7 +198,7 @@ class Context
             return $parameter->getDefaultValue();
         }
 
-        // As a final fallback we will simple pass NULL and let the function deal with it.
+        // As a final fallback we will primitive pass NULL and let the function deal with it.
         return null;
     }
 }

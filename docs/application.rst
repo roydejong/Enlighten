@@ -99,10 +99,12 @@ You can set up a subdirectory for your application here as well:
 
 You can hook in to certain application events by attaching filter functions to them. These filter functions have access to the Context (see below).
 
-- ``before()``: Called before routing occurs, and before any route is matched.
-- ``after()``: Called after routing has finished, and before the request is sent. Not used when an exception occurs.
+- ``before()``: Called after the application has initialized, but before matching the request.
+- ``after()``: Called after routing has finished, and before the request is sent. Skipped when an exception occurs.
 - ``onException()``: Called if an Exception is raised during application execution.
 - ``notFound()``: Found when no suitable route can be found. Note that both ``before()`` and ``after()`` are still called as well.
+
+If a filter function explicitly returns ``false``, then no other filter functions of the same type will be executed after that. In the case of the ``before`` filter, this will also prevent the application from continuing.
 
 .. code-block:: php
 
@@ -118,6 +120,7 @@ You can also apply filter functions to specific routes rather than the applicati
 
 Context
 ^^^^^^^
+
 The application context (class ``Context``) is a collection of data that represents the current state of the application. At its core, it is simply a bag of objects that is filled up and passed around the application, constantly being fed with the most up-to-date information.
 
 The magic comes from its ability to intelligently inject its contents into a function based on its parameter list. For example, if the context contains a `Request` object, and a function requests that type of data in its parameter list, it can be passed as a value to that function. This is used throughout the framework as a way to flexibly pass data on-demand without making your code more verbose.
@@ -151,6 +154,7 @@ The ``Enlighten`` class will always publish the following data to the context it
 - **Router**: The router managed by the application.
 - **Route**: The route that matched - if one was successfully matched.
 - **Exception**: The last exception that was raised if there was one - particularly useful for ``onException()`` filters.
+- **Context**: The ``Context`` itself: use this reference to inject your own variables.
 
 **Managing a context**
 
@@ -199,7 +203,7 @@ Quirks
 
 Here is an overview of quirks that you may need to know about when using the ``Enlighten`` class:
 
-- If any output is sent after ``start()`` is called and before the HTTP response is sent back, it will be appended to the end of the response body "just in time". That means you can use `echo` freely.
-- If an error occurs (including 404 errors), the output buffer is cleared and the request is emptied. Any output sent by your filter functions, for example, will be discarded.
+- If any output is sent after ``start()`` is called and before the HTTP response is sent back, it will be appended to the end of the response body "just in time". That means you can use `echo` freely throughout your code, but note your output will appear at the very end of the response.
+- If an error occurs (including 404 errors), the output buffer is cleared and the response is emptied. Any output sent by your filter functions, for example, will be discarded.
 - ``after()`` filters have the final say on any output that is sent out - their output is never discarded. But: they will not be called if an exception occurs in your application.
 - If your :doc:`router` is empty, a default "Welcome to Enlighten" page will be shown.

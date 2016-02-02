@@ -2,6 +2,8 @@
 
 use Enlighten\Context;
 use Enlighten\Http\Request;
+use Enlighten\Http\Response;
+use Enlighten\Http\ResponseCode;
 use Enlighten\Routing\Route;
 use Enlighten\Routing\Router;
 
@@ -124,5 +126,60 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $this->assertNull($router->getContext(), 'Default should be null');
         $this->assertEquals($router, $router->setContext($context), 'Fluent API return');
         $this->assertEquals($context, $router->getContext());
+    }
+
+    public function testPathVariablesMapping()
+    {
+        $route = new Route('/product/id/$id', function (Request $request, $id = null) {
+            $this->assertEquals('test', $id);
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/product/id/test');
+
+        $context = new Context();
+        $context->registerInstance($request);
+
+        $router = new Router();
+        $router->setContext($context);
+        $router->dispatch($route, $request);
+    }
+
+    public function testPathVariablesMappingWithAutoContext()
+    {
+        $route = new Route('/product/id/$id', function (Request $request, $id = null) {
+            $this->assertEquals('test', $id);
+        });
+
+        $request = new Request();
+        $request->setRequestUri('/product/id/test');
+
+        $router = new Router();
+        $router->dispatch($route, $request);
+    }
+
+    public function testCreateRedirect()
+    {
+        // Prepare: Prepare environment to capture response
+        $response = new Response();
+
+        $context = new Context();
+        $context->registerInstance($response);
+
+        $router = new Router();
+        $router->setContext($context);
+
+        $request = new Request();
+        $request->setRequestUri('/redirect/bla');
+
+        $route = $router->createRedirect('/redirect/$variable', 'http://www.google.com', true);
+        $this->assertEquals('/redirect/$variable', $route->getPattern());
+
+        $routeResult = $router->route($request);
+        $this->assertEquals($route, $routeResult);
+
+        $router->dispatch($routeResult, $request);
+        $this->assertEquals(ResponseCode::HTTP_MOVED_PERMANENTLY, $response->getResponseCode());
+        $this->assertEquals('http://www.google.com', $response->getHeader('Location'));
     }
 }

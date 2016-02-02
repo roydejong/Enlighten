@@ -102,6 +102,16 @@ class Route
     }
 
     /**
+     * Returns the pattern for this route.
+     *
+     * @return string
+     */
+    public function getPattern()
+    {
+        return $this->pattern;
+    }
+
+    /**
      * Returns the target for this route.
      *
      * @return callable|string
@@ -278,7 +288,9 @@ class Route
         }
 
         // Invoke the specified controller function or the specified callable with the appropriate params
-        $this->filters->trigger(Filters::BEFORE_ROUTE, $context);
+        if (!$this->filters->trigger(Filters::BEFORE_ROUTE, $context)) {
+            return null;
+        }
 
         $retVal = null;
 
@@ -287,7 +299,9 @@ class Route
         } catch (\Exception $ex) {
             $context->registerInstance($ex);
 
-            if (!$this->filters->trigger(Filters::ON_EXCEPTION, $context)) {
+            $this->filters->trigger(Filters::ON_EXCEPTION, $context);
+
+            if (!$this->filters->anyHandlersForEvent(Filters::ON_EXCEPTION)) {
                 // If this exception was unhandled, rethrow it so it can be handled in the global scope
                 throw $ex;
             }

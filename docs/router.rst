@@ -136,7 +136,30 @@ The Router class supports operating out of a subdirectory. This can be useful if
     // ..or using the Enlighten class
     $app->setSubdirectory('example');
     
-If you follow the above example, the router will assume that all your routes will begin with a "example" directory. For example, if you register a route for `/mypage` it will then only match against requests for `/example/mypage`.
+If you follow the above example, the router will assume that all your routes will begin with a "example" directory. For example, if you register a route for ``/mypage`` it will then only match against requests for ``/example/mypage``.
     
+Redirects
+^^^^^^^^^
+You can quickly add temporary or permanent redirects using the ``addRedirect()`` function. Internally, this will create and register a route that performs a redirection.
 
+.. code-block:: php
 
+    <?php
+
+    $router->createRedirect('/from', '/to', $permanent = false);
+
+    // Add a permanent redirect to another page
+    $router->createRedirect('/page/old', '/page/new', true);
+
+    // Add a temporary redirect to an external site
+    $router->createRedirect('/jfgi', 'http://www.google.com');
+
+You can use variables in the redirect pattern, but these variables are currently only used for matching and cannot be utilized. If you have more complex redirect requirements, we suggest adding a redirect route manually.
+
+The ``Enlighten`` class also offers a convenience function to register redirect routes:
+
+.. code-block:: php
+
+    <?php
+
+    $app->redirect('/from', '/to', $permanent = false);

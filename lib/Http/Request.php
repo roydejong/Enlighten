@@ -158,10 +158,12 @@ class Request
      *
      * @see Enlighten\Http\RequestMethod
      * @param string $method
+     * @return $this
      */
     public function setMethod($method)
     {
         $this->method = $method;
+        return $this;
     }
 
     /**
@@ -190,10 +192,12 @@ class Request
      * NB: This function does not currently affect Request::$query.
      *
      * @param string $uri
+     * @return $this
      */
     public function setRequestUri($uri)
     {
         $this->uri = $uri;
+        return $this;
     }
 
     /**
@@ -505,31 +509,37 @@ class Request
      * Sets $_POST data for this request object.
      *
      * @param array $post Key/value $_POST array.
+     * @return $this
      */
     public function setPostData(array $post)
     {
         $this->post = $post;
+        return $this;
     }
 
     /**
      * Sets $_GET data for this request object.
      *
      * @param array $query Key/value $_GET array.
+     * @return $this
      */
     public function setQueryData(array $query)
     {
         $this->query = $query;
+        return $this;
     }
 
     /**
      * Sets $_SERVER data for this request object.
      *
      * @param array $environment Key/value $_SERVER array.
+     * @return $this
      */
     public function setEnvironmentData(array $environment)
     {
         $this->environment = $environment;
         $this->parseHeaders();
+        return $this;
     }
 
     /**
@@ -557,10 +567,12 @@ class Request
      * Sets $_COOKIES data for this request object.
      *
      * @param array $cookies
+     * @return $this
      */
     public function setCookieData(array $cookies)
     {
         $this->cookies = $cookies;
+        return $this;
     }
 
     /**
@@ -658,7 +670,10 @@ class Request
     }
 
     /**
+     * Sets $_FILES data for this request object.
+     *
      * @param array $files Key/value $_FILES array.
+     * @return $this
      */
     public function setFileData(array $files)
     {
@@ -673,6 +688,8 @@ class Request
                 $this->fileUploads[$key] = $uploadObj;
             }
         }
+
+        return $this;
     }
 
     /**

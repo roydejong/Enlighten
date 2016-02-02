@@ -105,7 +105,7 @@ class ResponseTest extends PHPUnit_Framework_TestCase
         $response = new Response();
         $response->doRedirect('/kettle');
 
-        $this->assertEquals(ResponseCode::HTTP_TEMPORARY_REDIRECT, $response->getResponseCode());
+        $this->assertEquals(ResponseCode::HTTP_FOUND, $response->getResponseCode());
         $this->assertEquals('/kettle', $response->getHeader('Location'));
     }
 

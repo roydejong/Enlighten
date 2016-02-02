@@ -150,7 +150,9 @@ class Enlighten
 
         try {
             // Dispatch the request to the router
-            $this->filters->trigger(Filters::BEFORE_ROUTE, $this->context);
+            if (!$this->filters->trigger(Filters::BEFORE_ROUTE, $this->context)) {
+                return $this->response;
+            }
 
             $routingResult = $this->router->route($this->request);
 
@@ -191,7 +193,10 @@ class Enlighten
 
         $rethrow = false;
 
-        if (!$this->filters->trigger(Filters::ON_EXCEPTION, $this->context)) {
+        $this->filters->trigger(Filters::ON_EXCEPTION, $this->context);
+
+        if (!$this->filters->anyHandlersForEvent(Filters::ON_EXCEPTION))
+        {
             // If this exception was completely unhandled, rethrow it so it appears as any old php exception
             $rethrow = true;
         }
@@ -280,7 +285,7 @@ class Enlighten
     public function dispatch(Route $route)
     {
         $this->beforeStart();
-        $this->router->dispatch($route);
+        $this->router->dispatch($route, $this->request);
     }
 
     /**
@@ -389,6 +394,20 @@ class Enlighten
     public function delete($pattern, $target)
     {
         return $this->registerRoute($pattern, $target, [RequestMethod::DELETE]);
+    }
+
+    /**
+     * Registers a new redirection route.
+     *
+     * @param string $from The route mask to match against. Can optionally contain variable components, but they are used for matching only.
+     * @param string $to The static URL to redirect the user to.
+     * @param bool $permanent If true, a HTTP 301 permanent redirect is used. Otherwise, a HTTP 302 temporary redirect is used (default).
+     * @return Route The generated route.
+     */
+    public function redirect($from, $to, $permanent = false)
+    {
+        $this->bootstrapRouter();
+        return $this->router->createRedirect($from, $to, $permanent);
     }
 
     /**
