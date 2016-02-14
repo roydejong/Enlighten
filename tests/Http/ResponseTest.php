@@ -126,7 +126,7 @@ class ResponseTest extends PHPUnit_Framework_TestCase
             $rawHeader = xdebug_get_headers()[0];
 
             $this->assertContains('Set-Cookie: test=value; expires=', $rawHeader);
-            $this->assertContains('Max-Age=60; path=/; domain=.test.com; secure; httponly', $rawHeader);
+            $this->assertContains(strtolower('Max-Age=60; path=/; domain=.test.com; secure; httponly'), strtolower($rawHeader));
 
             // Note: Due to locale / formatting issues it is not really possible to reliably test the expire= value
             //  sent in the header correctly across a variety of systems. Max-age should cover our bases, though.
