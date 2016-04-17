@@ -159,7 +159,18 @@ class Enlighten
             if ($routingResult != null) {
                 $this->context->registerInstance($routingResult);
                 $this->response->setResponseCode(ResponseCode::HTTP_OK);
-                $this->dispatch($routingResult);
+
+                $returnValue = $this->dispatch($routingResult);
+
+                // If a Response object was returned by the target code, use that object from now on
+                if ($returnValue instanceof Response) {
+                    if ($this->isBuffering) {
+                        ob_clean();
+                    }
+
+                    $this->response = $returnValue;
+                    $this->context->registerInstance($this->response);
+                }
             } else {
                 $this->prepareNotFoundResponse();
             }
@@ -281,11 +292,13 @@ class Enlighten
      * Dispatches a Route.
      *
      * @param Route $route
+     * @return mixed Dispatched route return value, if any
      */
     public function dispatch(Route $route)
     {
         $this->beforeStart();
-        $this->router->dispatch($route, $this->request);
+
+        return $this->router->dispatch($route, $this->request);
     }
 
     /**

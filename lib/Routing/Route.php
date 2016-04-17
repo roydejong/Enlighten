@@ -267,7 +267,7 @@ class Route
      * @param Context $context
      * @throws RoutingException For unsupported or invalid action configurations.
      * @throws \Exception If an Exception is raised during the route's action, and no onException filter is registered, the Exception will be rethrown here.
-     * @return mixed
+     * @return mixed Action return value
      */
     public function action(Context $context = null)
     {
