@@ -374,7 +374,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Enlighten\Routing\RoutingException
-     * @expectedExceptionMessage Exception thrown when calling constructor
+     * @expectedExceptionMessage Type error thrown when calling constructor
      */
     public function testControllerDispatchingWithBadConstructor()
     {
