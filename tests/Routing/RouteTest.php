@@ -378,6 +378,12 @@ class RouteTest extends PHPUnit_Framework_TestCase
      */
     public function testControllerDispatchingWithBadConstructor()
     {
+        if (!defined('PHP_MAJOR_VERSION') || PHP_MAJOR_VERSION < 7)
+        {
+            $this->markTestSkipped('This test does not work under < PHP 7');
+            return;
+        }
+
         $context = new Context();
 
         $request = new Request();
