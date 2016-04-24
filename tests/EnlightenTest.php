@@ -52,6 +52,37 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
     /**
      * @runInSeparateProcess
      */
+    public function testOutputsReturnedResponses()
+    {
+        $enlighten = new Enlighten();
+
+        $request = new Request();
+        $request->setRequestUri('/');
+        $request->setMethod(RequestMethod::GET);
+
+        $route = new Route('/', function () {
+            $customResponse = new Response();
+            $customResponse->setResponseCode(ResponseCode::HTTP_IM_A_TEAPOT);
+            $customResponse->setBody('bla');
+            return $customResponse;
+        });
+
+        $router = new Router();
+        $router->register($route);
+
+        $enlighten->setRouter($router);
+        $enlighten->setRequest($request);
+
+        $response = $enlighten->start();
+
+        $this->assertEquals(ResponseCode::HTTP_IM_A_TEAPOT, $response->getResponseCode());
+        $this->assertEquals('bla', $response->getBody());
+        $this->expectOutputString('bla');
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
     public function testApplicationRouting404()
     {
         $enlighten = new Enlighten();
