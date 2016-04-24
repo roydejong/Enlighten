@@ -2,16 +2,12 @@
 
 namespace Enlighten\Tests\Routing\Sample;
 
-class SampleBadConstructorController
-{
-    public function __construct($ass)
-    {
-        // ...
-    }
+use Enlighten\Http\Request;
 
-    public function action()
+class SampleBadConstructorController extends SampleContextConstructorController
+{
+    public function __construct(Request $request, \Exception $badArg)
     {
-        echo 'defaultAction';
-        return 'defaultReturn';
+        parent::__construct($request);
     }
 }

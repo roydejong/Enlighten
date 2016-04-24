@@ -161,6 +161,27 @@ class Context
     }
 
     /**
+     * Given a class and the current context, attempt to determine the appropriate list of parameters to pass to the
+     * constructor when it is called.
+     *
+     * @param $className
+     * @return array
+     */
+    public function determineParamValuesForConstructor($className)
+    {
+        $reflection = new \ReflectionClass($className);
+        $instance = $reflection->newInstanceWithoutConstructor();
+        $callable = [$instance, '__construct'];
+
+        if (!is_callable($callable)) {
+            // This class does not have a constructor function
+            return [];
+        }
+
+        return $this->determineParamValues($callable);
+    }
+
+    /**
      * Based on the current context, attempts to determine an appropriate value for a given parameter.
      *
      * @param \ReflectionParameter The function parameter to analyze and determine a value for.

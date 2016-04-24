@@ -356,9 +356,25 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $route->action($context);
     }
 
+    public function testControllerDispatchingWithConstructorContext()
+    {
+        $context = new Context();
+
+        $request = new Request();
+        $request->setEnvironmentData(['HTTP_HOST' => 'hostTest']);
+        $request->setRequestUri('/bla');
+
+        $context->registerInstance($request);
+
+        $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleContextConstructorController');
+        $retVal = $route->action($context);
+
+        $this->assertEquals('hostTest', $retVal);
+    }
+
     /**
      * @expectedException Enlighten\Routing\RoutingException
-     * @expectedExceptionMessage Exception thrown when calling default constructor
+     * @expectedExceptionMessage Exception thrown when calling constructor
      */
     public function testControllerDispatchingWithBadConstructor()
     {

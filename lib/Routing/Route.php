@@ -277,7 +277,7 @@ class Route
         if ($this->isCallable()) {
             $targetFunc = $this->getTarget();
         } else {
-            $targetFunc = $this->loadController();
+            $targetFunc = $this->loadController($context);
         }
 
         // Perform dependency injection for the target function based on the Context
@@ -314,10 +314,11 @@ class Route
     /**
      * Attempts to translate this route's target to a function within a controller class.
      *
+     * @param Context $context
      * @return array
      * @throws RoutingException
      */
-    private function loadController()
+    private function loadController(Context $context = null)
     {
         $targetParts = explode('@', strval($this->getTarget()), 2);
         $targetClass = $targetParts[0];
@@ -328,11 +329,13 @@ class Route
         }
 
         $classObj = null;
+        
+        $parameterList = $context->determineParamValuesForConstructor($targetClass);
 
         try {
-            $classObj = new $targetClass();
-        } catch (\Exception $ex) {
-            throw new RoutingException('Exception thrown when calling default constructor on ' . $targetClass, 0, $ex);
+            $classObj = new $targetClass(...$parameterList);
+        } catch (\TypeError $ex) {
+            throw new RoutingException('Type error thrown when calling constructor on ' . $targetClass, 0, $ex);
         }
 
         $targetFunc = [$classObj, $targetFuncName];
