@@ -333,7 +333,8 @@ class Route
         $parameterList = $context->determineParamValuesForConstructor($targetClass);
 
         try {
-            $classObj = new $targetClass(...$parameterList);
+            $reflection = new \ReflectionClass($targetClass);
+            $classObj = $reflection->newInstanceArgs($parameterList);
         } catch (\TypeError $ex) {
             throw new RoutingException('Type error thrown when calling constructor on ' . $targetClass, 0, $ex);
         }
