@@ -445,4 +445,33 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(null, $route->action());
         $this->expectOutputString('', 'Filter function should break execution; no output is expected');
     }
+    
+    public function testControllerDispatchingWithBeforeFunction()
+    {
+        $context = new Context();
+
+        $request = new Request();
+        $context->registerInstance($request);
+
+        $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleControllerWithBefore');
+
+        $this->assertEquals('defaultReturn', $route->action($context));
+        $this->expectOutputString('beforedefaultAction');
+    }
+
+    public function testControllerDispatchingWithBeforeResponseSkipsPrimaryAction()
+    {
+        $context = new Context();
+
+        $request = new Request();
+        $context->registerInstance($request);
+
+        $route = new Route('/', 'Enlighten\Tests\Routing\Sample\SampleControllerWithBeforeResponse');
+
+        $this->assertInstanceOf('Enlighten\Http\Response', $route->action($context));
+        $this->expectOutputString('');
+        
+        // This test SHOULD result in the route's primary action NOT being called.
+        // (if it is called, an exception is thrown - see the SampleControllerWithBeforeResponse class)
+    }
 }

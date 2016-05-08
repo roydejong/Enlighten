@@ -4,6 +4,7 @@ namespace Enlighten\Routing;
 
 use Enlighten\Context;
 use Enlighten\Http\Request;
+use Enlighten\Http\Response;
 
 /**
  * Represents a route that maps an incoming request to an application code point.
@@ -272,30 +273,69 @@ class Route
     public function action(Context $context = null)
     {
         $targetFunc = null;
+        $classObject = null;
+        
+        // Create a dummy context if needed
+        if (empty($context)) {
+            $context = new Context();
+        }
 
         // Determine target function
         if ($this->isCallable()) {
             $targetFunc = $this->getTarget();
         } else {
-            $targetFunc = $this->loadController($context);
+            $targetFunc = $this->translateToClassCallable($context);
+            $classObject = $targetFunc[0];
         }
 
-        // Perform dependency injection for the target function based on the Context
-        $params = [];
-
-        if (!empty($context)) {
-            $params = $context->determineParamValues($targetFunc);
-        }
-
-        // Invoke the specified controller function or the specified callable with the appropriate params
+        // Route filter: before function
         if (!$this->filters->trigger(Filters::BEFORE_ROUTE, $context)) {
             return null;
         }
+        
+        $returnValue = null;
+        $continue = true;
 
-        $retVal = null;
+        // Execute a "before" function, if it is defined in the target class
+        if ($classObject != null) {
+            $beforeCallable = [$classObject, 'before'];
+
+            if (is_callable($beforeCallable)) {
+                $returnValue = $this->executeAction($beforeCallable, $context);
+
+                if ($returnValue && $returnValue instanceof Response) {
+                    // A respone was sent by the "before" function, stop execution
+                    $continue = false;
+                }
+            }
+        }
+
+        if ($continue) {
+            // Invoke the specified controller function or the specified callable with the appropriate params
+            $returnValue = $this->executeAction($targetFunc, $context);
+        }
+
+        // Route filter: After function
+        $this->filters->trigger(Filters::AFTER_ROUTE, $context);
+        return $returnValue;
+    }
+
+    /**
+     * Executes a route action, given a callable and a context.
+     * 
+     * @param callable $targetFunc The target function to be executed.
+     * @param Context $context The context the target function should be executed under (for dependency injection).
+     * @return mixed The function's return value.
+     * @throws \Exception If an exception is raised during execution, it will be rethrown.
+     */
+    private function executeAction(callable $targetFunc, Context $context)
+    {
+        $returnValue = null;
+
+        $paramValues = $context->determineParamValues($targetFunc);
 
         try {
-            $retVal = call_user_func_array($targetFunc, $params);
+            $returnValue = call_user_func_array($targetFunc, $paramValues);
         } catch (\Exception $ex) {
             $context->registerInstance($ex);
 
@@ -306,9 +346,8 @@ class Route
                 throw $ex;
             }
         }
-
-        $this->filters->trigger(Filters::AFTER_ROUTE, $context);
-        return $retVal;
+        
+        return $returnValue;
     }
 
     /**
@@ -318,8 +357,9 @@ class Route
      * @return array
      * @throws RoutingException
      */
-    private function loadController(Context $context = null)
+    private function translateToClassCallable(Context $context)
     {
+        // Load the class and create an instance of it
         $targetParts = explode('@', strval($this->getTarget()), 2);
         $targetClass = $targetParts[0];
         $targetFuncName = count($targetParts) > 1 ? $targetParts[1] : 'action';
@@ -329,7 +369,8 @@ class Route
         }
 
         $classObj = null;
-        
+
+        // Invoke constructor with dependency injection
         $parameterList = $context->determineParamValuesForConstructor($targetClass);
 
         try {
@@ -339,6 +380,7 @@ class Route
             throw new RoutingException('Type error thrown when calling constructor on ' . $targetClass, 0, $ex);
         }
 
+        // Verify target function and return a callable
         $targetFunc = [$classObj, $targetFuncName];
 
         if (!is_callable($targetFunc)) {
