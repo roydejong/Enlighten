@@ -69,14 +69,22 @@ class Router
     /**
      * Creates and registers a new redirection route.
      *
-     * @param string $from The route mask to match against. Can optionally contain variable components, but they are used for matching only.
-     * @param string $to The static URL to redirect the user to.
+     * @param string $from The route mask to match against. Supports variables.
+     * @param string $to The static URL to redirect the user to. Supports variables.
      * @param bool $permanent If true, a HTTP 301 permanent redirect is used. Otherwise, a HTTP 302 temporary redirect is used (default).
      * @return Route Returns the Route that was created and registered.
      */
     public function createRedirect($from, $to, $permanent = false)
     {
-        $route = new Route($from, function (Response $response) use ($to, $permanent) {
+        $route = new Route($from, function (Request $request, Response $response) use ($from, $to, $permanent) {
+            // Map URL variables
+            $urlVariables = VariableUrl::extractUrlVariables($request->getRequestUri(), $to);
+
+            if (!empty($urlVariables)) {
+                $to = VariableUrl::applyUrlVariables($to, $urlVariables);
+            }
+
+            // Perform redirect response
             $response->doRedirect($to, $permanent);
         });
         $this->register($route);

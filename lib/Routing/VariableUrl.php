@@ -54,7 +54,7 @@ class VariableUrl
         $regexPattern = '/^\\' . self::T_URL_VARIABLE . '.+/';
         $variableKeys = preg_grep($regexPattern, explode('/', $urlPattern));
 
-        $params = array();
+        $params = [];
 
         foreach ($variableKeys as $key => $value) {
             $params[substr($value, 1)] = $inputParts[$key];
