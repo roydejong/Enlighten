@@ -12,11 +12,6 @@ use Enlighten\Http\Response;
 class Route
 {
     /**
-     * The variable operator used for dependency injection.
-     */
-    const VARIABLE_SEP = '$';
-
-    /**
      * A subdirectory for this route, effectively a prefix for all patterns we match against.
      *
      * @var string
