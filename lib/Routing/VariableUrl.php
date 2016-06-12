@@ -79,6 +79,8 @@ class VariableUrl
      */
     public static function applyUrlVariables($urlPattern, array $variables)
     {
+        $regexPattern = '/([\\' . self::T_URL_VARIABLE . ']{1}[\\w]*)/';
+
         $inputParts = explode('/', $urlPattern);
         $resultUrl = '';
         $first = true;
@@ -90,18 +92,22 @@ class VariableUrl
                 $first = false;
             }
 
-            if (strpos($inputPart, self::T_URL_VARIABLE) === 0) {
-                // URL variable to be replaced
-                $variableName = substr($inputPart, 1);
-                
-                if (!isset($variables[$variableName])) {
-                    throw new \InvalidArgumentException('applyUrlVariables(): the given $variables set does not contain requested URL variable: ' . $inputPart);
+            if (preg_match_all($regexPattern, $inputPart, $variableMatches)) {
+                // Dynamic URL variable(s) pending replacement
+                $variableMatches = $variableMatches[0];
+
+                foreach ($variableMatches as $variableName) {
+                    $variableKey = substr($variableName, 1);
+
+                    if (!isset($variables[$variableKey])) {
+                        throw new \InvalidArgumentException('applyUrlVariables(): the given $variables set does not contain requested URL variable: ' . $variableName);
+                    }
+                    
+                    $inputPart = str_replace($variableName, $variables[$variableKey], $inputPart);
                 }
-                
-                $resultUrl .= $variables[$variableName];
-            } else {
-                $resultUrl .= $inputPart;
             }
+            
+            $resultUrl .= $inputPart;
         }
 
         return $resultUrl;

@@ -45,4 +45,26 @@ class VariableUrlTest extends PHPUnit_Framework_TestCase
 
         VariableUrl::applyUrlVariables($inputPattern, $inputSet);
     }
+
+    public function testComplexExternalUrlMapping()
+    {
+        $routePatten = '/test/local/$testvar/$why/$also';
+        $requestUri = '/test/local/bla/whynot/hi';
+        $targetUri = 'https://www.google.com/search?q=$testvar&why=$why&also=$also';
+
+        $route = new Route($routePatten, function () {
+            // ...
+        });
+
+        $request = new Request();
+        $request->setRequestUri($requestUri);
+
+        $this->assertTrue($route->matches($request));
+        
+        $variableSet = VariableUrl::extractUrlVariables($requestUri, $routePatten);
+        $this->assertEquals(['testvar' => 'bla', 'why' => 'whynot', 'also' => 'hi'], $variableSet);
+
+        $mappedOutput = VariableUrl::applyUrlVariables($targetUri, $variableSet);
+        $this->assertEquals('https://www.google.com/search?q=bla&why=whynot&also=hi', $mappedOutput);
+    }
 }
