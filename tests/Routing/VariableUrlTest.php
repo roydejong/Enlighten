@@ -23,4 +23,26 @@ class VariableUrlTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['id' => '5', 'action' => 'teststr_123.html'],
             VariableUrl::extractUrlVariables($requestUri, $routePatten));
     }
+
+    public function testApplyUrlVariables()
+    {
+        $inputPattern = '/example/$myVar/bla/$secondary';
+        $inputSet = ['myVar' => 'replaced', 'secondary' => 'anotherOne', 'extra' => 'butNotThis'];
+
+        $output = VariableUrl::applyUrlVariables($inputPattern, $inputSet);
+
+        $this->assertEquals('/example/replaced/bla/anotherOne', $output);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage does not contain requested URL variable: $missing
+     */
+    public function testApplyUrlVariablesThrowsExceptionForMissingVariables()
+    {
+        $inputPattern = '/example/$myVar/bla/$secondary/$missing';
+        $inputSet = ['myVar' => 'replaced', 'secondary' => 'anotherOne', 'extra' => 'butNotThis'];
+
+        VariableUrl::applyUrlVariables($inputPattern, $inputSet);
+    }
 }
