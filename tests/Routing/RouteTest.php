@@ -73,19 +73,6 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($route->isCallable(), 'String reference to class is not callable');
     }
 
-    public function testVariableMapping()
-    {
-        $route = new Route('/view/user/$id/do/$action', function () {
-            // ...
-        });
-
-        $request = new Request();
-        $request->setRequestUri('/view/user/5/do/teststr_123.html');
-
-        $this->assertTrue($route->matches($request));
-        $this->assertEquals(['id' => '5', 'action' => 'teststr_123.html'], $route->mapPathVariables($request));
-    }
-
     public function testConditionFailures()
     {
         $failureConstraint = function (Request $request) {

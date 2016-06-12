@@ -189,7 +189,7 @@ class Router
             if (!empty($request)) {
                 // If we have a request, map the path variables and pass them to the context as primitive types by name.
                 // This will allow us to inject info from a route e.g. "/view/$userId" to a $userId variable.
-                $pathVariables = $route->mapPathVariables($request);
+                $pathVariables = VariableUrl::extractUrlVariables($request->getRequestUri(), $route->getPattern());
 
                 foreach ($pathVariables as $name => $value) {
                     $context->registerVariable($name, $value);

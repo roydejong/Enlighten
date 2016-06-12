@@ -73,7 +73,7 @@ class Route
     public function __construct($pattern, $target)
     {
         $this->pattern = $pattern;
-        $this->regexPattern = $this->formatRegex($this->pattern);
+        $this->regexPattern = VariableUrl::createRegexMask($this->pattern);
         $this->target = $target;
         $this->constraints = [];
         $this->filters = new Filters();
@@ -98,7 +98,7 @@ class Route
     public function setSubdirectory($subdirectory)
     {
         $this->subdirectory = $subdirectory;
-        $this->regexPattern = $this->formatRegex($subdirectory . $this->pattern);
+        $this->regexPattern = VariableUrl::createRegexMask($subdirectory . $this->pattern);
         return $this;
     }
 
@@ -143,55 +143,6 @@ class Route
         $this->addConstraint(function (Request $request) use ($acceptableMethods) {
             return in_array($request->getMethod(), $acceptableMethods);
         });
-    }
-
-    /**
-     * Takes user pattern input and converts it to a properly formatted Regex pattern for matching against.
-     *
-     * @param string $pattern
-     * @return string
-     */
-    private function formatRegex($pattern)
-    {
-        $parts = explode('/', $pattern);
-        $formattedRegex = '';
-
-        for ($i = 0; $i < count($parts); $i++) {
-            if ($i > 0) {
-                $formattedRegex .= "\/";
-            }
-
-            $part = $parts[$i];
-
-            if (!empty($part) && $part[0] === self::VARIABLE_SEP) {
-                $formattedRegex .= "[^\/]{1,}";
-            } else {
-                $formattedRegex .= $part;
-            }
-        }
-
-        return '/^' . $formattedRegex . '$/';
-    }
-
-    /**
-     * Maps the dynamic path variables in the path mask to the user input provided by a http request.
-     * This function should only be launched if matches() returns true, otherwise results are unpredictable.
-     *
-     * @param Request $request
-     * @return array
-     */
-    public function mapPathVariables(Request $request)
-    {
-        $inputParts = explode('/', $request->getRequestUri());
-        $variableKeys = preg_grep('/^\$.+/', explode('/', $this->pattern));
-
-        $params = array();
-
-        foreach ($variableKeys as $key => $value) {
-            $params[substr($value, 1)] = $inputParts[$key];
-        }
-
-        return $params;
     }
 
     /**
