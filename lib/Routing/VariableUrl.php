@@ -41,11 +41,11 @@ class VariableUrl
     }
 
     /**
-     * Extracts variables from a $requestUri, based on 
+     * Extracts variables from a $requestUri, based on a variable URL pattern.
      *
      * @param string $requestUri
      * @param string $urlPattern
-     * @return array
+     * @return array A key-value array containing the extracted variables.
      */
     public static function extractUrlVariables($requestUri, $urlPattern)
     {
