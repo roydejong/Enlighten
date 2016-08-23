@@ -169,10 +169,20 @@ class Enlighten
                     }
 
                     $this->response = $returnValue;
-                    $this->context->registerInstance($this->response);
                 }
             } else {
-                $this->prepareNotFoundResponse();
+                $anyOptionsAvailable = $this->router->getOptions($this->request);
+
+                if (!$anyOptionsAvailable) {
+                    // No options at all for this route, this is a true 404
+                    $this->prepareNotFoundResponse();
+                } else if ($this->request->getMethod() == RequestMethod::OPTIONS) {
+                    // Options available, no custom OPTIONS handler, generate an OPTIONS ("Allow") response.
+                    $this->prepareOptionsResponse();
+                } else {
+                    // There are options, but no match, this is a 405
+                    $this->prepareNotAllowedResponse();
+                }
             }
 
             $this->filters->trigger(Filters::AFTER_ROUTE, $this->context);
@@ -183,6 +193,42 @@ class Enlighten
         }
 
         return $this->response;
+    }
+
+    /**
+     * Cleans the output buffer and builds a default HTTP 200 OK "Allow" response to an OPTIONS request.
+     */
+    private function prepareOptionsResponse()
+    {
+        ob_clean();
+
+        // Determine which options have been set up for this route based on the registered routes
+        $optionsForRoute = $this->router->getOptions($this->request);
+        $methodsAllowed = [RequestMethod::OPTIONS];
+
+        foreach ($optionsForRoute as $route) {
+            $acceptableMethods = $route->getAcceptableMethods();
+
+            if (empty($acceptableMethods)) {
+                // No constraints set for this particular route - effectively all normal methods are allowed
+                $methodsAllowed = array_merge_recursive($methodsAllowed, [RequestMethod::POST, RequestMethod::GET,
+                    RequestMethod::PUT, RequestMethod::DELETE, RequestMethod::HEAD]);
+            } else {
+                // Extend the set of acceptable methods with the ones set up for this route
+                $methodsAllowed = array_merge_recursive($methodsAllowed, $acceptableMethods);
+            }
+        }
+
+        array_unique($methodsAllowed);
+
+        $this->response = new Response();
+        $this->response->setResponseCode(ResponseCode::HTTP_OK);
+        $this->response->setHeader('Allow', implode(',', $methodsAllowed));
+        $this->response->setBody('');
+
+        $this->context->registerInstance($this->response);
+
+        $this->finalizeOutputBuffer();
     }
 
     /**
@@ -206,8 +252,7 @@ class Enlighten
 
         $this->filters->trigger(Filters::ON_EXCEPTION, $this->context);
 
-        if (!$this->filters->anyHandlersForEvent(Filters::ON_EXCEPTION))
-        {
+        if (!$this->filters->anyHandlersForEvent(Filters::ON_EXCEPTION)) {
             // If this exception was completely unhandled, rethrow it so it appears as any old php exception
             $rethrow = true;
         }
@@ -247,6 +292,27 @@ class Enlighten
             } else {
                 $this->serveStaticPage('not_found');
             }
+        }
+    }
+
+    /**
+     * Triggers any "not allowed" filters and prepares an appropriate 404 error response.
+     */
+    private function prepareNotAllowedResponse()
+    {
+        ob_clean();
+
+        $this->response = new Response();
+        $this->response->setResponseCode(ResponseCode::HTTP_METHOD_NOT_ALLOWED);
+
+        $this->context->registerInstance($this->response);
+
+        $this->filters->trigger(Filters::METHOD_NOT_ALLOWED, $this->context);
+
+        $this->finalizeOutputBuffer();
+
+        if (empty($this->response->getBody())) {
+            $this->serveStaticPage('method_not_allowed');
         }
     }
 
