@@ -173,6 +173,25 @@ class Router
     }
 
     /**
+     * Gets all routing options for a given request.
+     *
+     * @param Request $request
+     * @return Route[]
+     */
+    public function getOptions(Request $request)
+    {
+        $routes = [];
+
+        foreach ($this->routes as $route) {
+            if ($route->matchesPattern($request)) {
+                $routes[] = $route;
+            }
+        }
+
+        return $routes;
+    }
+
+    /**
      * Dispatches a Route, executing its action.
      *
      * @param Route $route The route to be executed.

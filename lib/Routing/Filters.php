@@ -25,10 +25,15 @@ class Filters
      */
     const ON_EXCEPTION = 'onException';
     /**
-     * Represents a filter that is triggered when routing fails (404 error).
+     * Represents a filter that is triggered when routing fails due to a completely non-existent route (404 error).
      * This filter only applies to application scope and not to route scope.
      */
     const NO_ROUTE_FOUND = 'noRouteFound';
+    /**
+     * Represents a filter that is triggered when routing fails due to a invalid request method (405 error).
+     * This filter only applies to application scope and not to route scope.
+     */
+    const METHOD_NOT_ALLOWED = 'methodNotAllowed';
 
     /**
      * A registry of event handlers.

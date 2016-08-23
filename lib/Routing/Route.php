@@ -60,6 +60,13 @@ class Route
     protected $filters;
 
     /**
+     * A list of acceptable request methods set via setAcceptableMethods().
+     *
+     * @var array
+     */
+    protected $acceptableMethods;
+
+    /**
      * Constructs a new Route configuration.
      *
      * @param string $pattern
@@ -72,6 +79,7 @@ class Route
         $this->target = $target;
         $this->constraints = [];
         $this->filters = new Filters();
+        $this->acceptableMethods = [];
     }
 
     /**
@@ -129,12 +137,24 @@ class Route
     }
 
     /**
+     * Gets a list of acceptable HTTP methods for this route to match.
+     *
+     * @return array
+     */
+    public function getAcceptableMethods()
+    {
+        return $this->acceptableMethods;
+    }
+
+    /**
      * Sets a list of acceptable HTTP method for this route to match.
      *
      * @param array $acceptableMethods
      */
     public function setAcceptableMethods(array $acceptableMethods)
     {
+        $this->acceptableMethods = $acceptableMethods;
+
         $this->addConstraint(function (Request $request) use ($acceptableMethods) {
             return in_array($request->getMethod(), $acceptableMethods);
         });
@@ -151,6 +171,38 @@ class Route
     }
 
     /**
+     * Matches a request against the pattern configured on this route.
+     *
+     * @param Request $request
+     * @return bool
+     */
+    public function matchesPattern(Request $request)
+    {
+        if (preg_match($this->regexPattern, $request->getRequestUri()) <= 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Matches a request against the constraints configured on this route.
+     *
+     * @param Request $request
+     * @return bool
+     */
+    public function meetsConstraints(Request $request)
+    {
+        foreach ($this->constraints as $constraint) {
+            if (!$constraint($request)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Matches a route against a request, and returns whether it is a good match or not.
      * This function result only implies a match and does not consider the importance / weight of a given route.
      *
@@ -159,17 +211,7 @@ class Route
      */
     public function matches(Request $request)
     {
-        if (preg_match($this->regexPattern, $request->getRequestUri()) <= 0) {
-            return false;
-        }
-
-        foreach ($this->constraints as $constraint) {
-            if (!$constraint($request)) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->matchesPattern($request) && $this->meetsConstraints($request);
     }
 
     /**
