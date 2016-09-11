@@ -218,16 +218,9 @@ class Enlighten
         $methodsAllowed = [RequestMethod::OPTIONS];
 
         foreach ($optionsForRoute as $route) {
+            // Extend the set of acceptable methods with the ones set up for this route
             $acceptableMethods = $route->getAcceptableMethods();
-
-            if (empty($acceptableMethods)) {
-                // No constraints set for this particular route - effectively all normal methods are allowed
-                $methodsAllowed = array_merge_recursive($methodsAllowed, [RequestMethod::POST, RequestMethod::GET,
-                    RequestMethod::PUT, RequestMethod::DELETE, RequestMethod::HEAD]);
-            } else {
-                // Extend the set of acceptable methods with the ones set up for this route
-                $methodsAllowed = array_merge_recursive($methodsAllowed, $acceptableMethods);
-            }
+            $methodsAllowed = array_merge_recursive($methodsAllowed, $acceptableMethods);
         }
 
         array_unique($methodsAllowed);
