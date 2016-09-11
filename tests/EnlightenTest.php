@@ -574,4 +574,76 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
 
         $this->expectOutputString('intercept!', 'Filter function should interrupt execution');
     }
+
+    /**
+     * @runInSeparateProcess 
+     */
+    public function testDefaultOptionsResponse()
+    {
+        $app = new Enlighten();
+
+        $app->get('/sample', function () {
+            echo 'hi!!!';
+        });
+
+        $optionsRequest = new Request();
+        $optionsRequest->setRequestUri('/sample');
+        $optionsRequest->setMethod(RequestMethod::OPTIONS);
+        
+        $app->setRequest($optionsRequest);
+        $response = $app->start();
+
+        $this->assertEmpty($response->getBody());
+        $this->assertEquals(ResponseCode::HTTP_OK, $response->getResponseCode());
+        $this->assertEquals('OPTIONS,GET,HEAD', $response->getHeader('Allow'));
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testCustomOptionsResponse()
+    {
+        $router = new Router();
+
+        $unrestrictedRoute = new Route('/sample', function (Request $request) {
+            echo 'hello ' . $request->getMethod() . '!';
+        });
+
+        $router->register($unrestrictedRoute);
+
+        $app = new Enlighten();
+        $app->setRouter($router);
+
+        $optionsRequest = new Request();
+        $optionsRequest->setRequestUri('/sample');
+        $optionsRequest->setMethod(RequestMethod::OPTIONS);
+
+        $app->setRequest($optionsRequest);
+        $response = $app->start();
+
+        $this->assertEquals('hello OPTIONS!', $response->getBody());
+        $this->assertEquals(ResponseCode::HTTP_OK, $response->getResponseCode());
+
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testNotAllowedResponse()
+    {
+        $app = new Enlighten();
+
+        $app->get('/sample', function () {
+            echo 'hi!!!';
+        });
+
+        $optionsRequest = new Request();
+        $optionsRequest->setRequestUri('/sample');
+        $optionsRequest->setMethod(RequestMethod::POST);
+
+        $app->setRequest($optionsRequest);
+        $response = $app->start();
+
+        $this->assertEquals(ResponseCode::HTTP_METHOD_NOT_ALLOWED, $response->getResponseCode());
+    }
 }
