@@ -96,6 +96,17 @@ class Enlighten
     }
 
     /**
+     * Sets a new HTTP response object on the application, clearing and overriding any previous response data.
+     *
+     * @param Response $response
+     */
+    public function setResponse(Response $response)
+    {
+        $this->response = $response;
+        $this->context->registerInstance($response);
+    }
+
+    /**
      * Sets the router that should be used to handle routing and request resolution duties.
      *
      * @param Router $router

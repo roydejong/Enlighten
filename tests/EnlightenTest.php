@@ -490,6 +490,29 @@ class EnlightenTest extends PHPUnit_Framework_TestCase
     /**
      * @runInSeparateProcess
      */
+    public function testSetOverrideResponse()
+    {
+        $request = new Request();
+        $request->setRequestUri('/bla');
+
+        $enlighten = new Enlighten();
+        $enlighten->setRequest($request);
+        $enlighten->notFound(function (Response $response) use ($enlighten) {
+            $responseOverride = new Response();
+            $responseOverride->setResponseCode(ResponseCode::HTTP_IM_A_TEAPOT);
+            $responseOverride->setBody('i am a teapot');
+
+            $enlighten->setResponse($responseOverride);
+        });
+        $response = $enlighten->start();
+
+        $this->assertEquals(ResponseCode::HTTP_IM_A_TEAPOT, $response->getResponseCode());
+        $this->expectOutputString('i am a teapot');
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
     public function testFirstRunPage()
     {
         $request = new Request();
