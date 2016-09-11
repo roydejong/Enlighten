@@ -133,6 +133,22 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($route->matches($request));
     }
 
+    /**
+     * @depends testRequireMethodCondition
+     */
+    public function testGetAcceptableMethods()
+    {
+        $route = new Route('/dir/sample.html', function () {
+            // ...
+        });
+        
+        $acceptableMethods = [RequestMethod::PATCH, RequestMethod::DELETE];
+        
+        $route->setAcceptableMethods($acceptableMethods);
+        
+        $this->assertEquals($acceptableMethods, $route->getAcceptableMethods());
+    }
+
     public function testRouteActionClosure()
     {
         $request = new Request();
